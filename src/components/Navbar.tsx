@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,8 +17,13 @@ const Navbar = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#home" className="flex items-center">
-            <img src={logo} alt="Data Delve - From Zero to Analyst" className="h-10 w-auto" />
+          <a href="#home" className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center">
+              <span className="font-display font-bold text-primary-foreground text-lg">D</span>
+            </div>
+            <span className="font-display font-bold text-xl text-foreground">
+              Data<span className="text-primary">Delve</span>
+            </span>
           </a>
 
           {/* Desktop Navigation */}
