@@ -1,10 +1,10 @@
-import { Database, LineChart, Brain, Code2, Target, Lightbulb } from "lucide-react";
+import { Database, LineChart, GitBranch, Code2, Target, Lightbulb } from "lucide-react";
 
 const services = [
   {
     icon: Database,
     title: "Data Fundamentals",
-    description: "Master the basics of data management, SQL, and database design with hands-on exercises.",
+    description: "Master the basics of data management, Excel, SQL, and database design with hands-on exercises.",
   },
   {
     icon: LineChart,
@@ -12,14 +12,14 @@ const services = [
     description: "Learn to create compelling visualizations using tools like Tableau, Power BI, and Python.",
   },
   {
-    icon: Brain,
-    title: "Machine Learning",
-    description: "Dive into ML algorithms, model building, and predictive analytics from scratch.",
-  },
-  {
     icon: Code2,
     title: "Python for Data",
     description: "Build powerful data pipelines and automate analysis with Python and pandas.",
+  },
+  {
+    icon: GitBranch,
+    title: "Git & GitHub for Data",
+    description: "Learn version control, collaboration workflows, and portfolio building for data professionals.",
   },
   {
     icon: Target,
