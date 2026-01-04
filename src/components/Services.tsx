@@ -29,7 +29,7 @@ const services = [
   {
     icon: Lightbulb,
     title: "Career Coaching",
-    description: "Get guidance on building your data career, portfolio reviews, and interview prep.",
+    description: "Build a capstone project, create your data portfolio, and get career guidance with interview prep.",
   },
 ];
 
