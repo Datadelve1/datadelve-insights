@@ -10,7 +10,7 @@ const WebinarRegistration = () => {
   const [isConfigured, setIsConfigured] = useState(false);
 
   // Replace this with your actual external form URL
-  const EXTERNAL_FORM_URL = "https://forms.google.com/your-form-id"; // TODO: Replace with actual form URL
+  const EXTERNAL_FORM_URL = "https://forms.gle/rtGLzwfspG849Y4H6";
 
   const handleRegisterClick = () => {
     window.open(EXTERNAL_FORM_URL, "_blank", "noopener,noreferrer");
