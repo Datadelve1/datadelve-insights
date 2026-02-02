@@ -5,7 +5,7 @@ const services = [
   {
     icon: Users,
     title: "Data Analytics One-on-One Training",
-    description: "Get personalised, one-on-one data analytics training designed around your learning pace and goals. Our sessions are hands-on and interactive, giving you the space to ask questions, practise in real time, and truly understand how data analytics works in real-world scenarios — not just theory.",
+    description: "Get personalised, one-on-one data analytics training designed around your learning pace and goals. Our sessions are hands-on and interactive, giving you the space to ask questions, practise in real time, and truly understand how data analytics works in real-world scenarios, not just theory.",
   },
   {
     icon: Wrench,
