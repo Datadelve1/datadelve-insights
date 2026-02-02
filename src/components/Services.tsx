@@ -41,13 +41,13 @@ const Services = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-primary font-medium mb-4 block">Our Services</span>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Personalized Training <span className="gradient-text">Programs</span>
+            Learn the Skills That Make You a <span className="gradient-text">Data Analyst</span> — Practically
           </h2>
           <p className="text-muted-foreground text-lg">
-            Every session is tailored to your goals, experience level, and learning style.
+            At DataDelve, we focus on practical data skills that matter. You'll master the foundational tools — Excel for analysis, SQL for querying, Python for automation, and Power BI for reporting — through guided exercises and meaningful projects that build a polished analytics portfolio.
           </p>
         </div>
 
