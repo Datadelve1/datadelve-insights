@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, BarChart2, Database, FolderKanban, Shield, Code, Briefcase } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const courses = [
   {
@@ -35,6 +36,15 @@ const courses = [
 ];
 
 const DelveSchool = () => {
+  const { toast } = useToast();
+
+  const handleExploreCourses = () => {
+    toast({
+      title: "Coming Soon! 🚀",
+      description: "Delve School courses are launching soon. Stay tuned!",
+    });
+  };
+
   return (
     <section id="delve-school" className="py-24 relative overflow-hidden">
       {/* Background Effects */}
@@ -55,7 +65,7 @@ const DelveSchool = () => {
             Learn at your own pace with our comprehensive self-paced courses. 
             From data analysis to software engineering, build the skills you need for your tech career.
           </p>
-          <Button variant="hero" size="lg" className="group">
+          <Button variant="hero" size="lg" className="group" onClick={handleExploreCourses}>
             Explore Courses
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
