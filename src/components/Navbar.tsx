@@ -7,6 +7,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "#home" },
+    { name: "Delve School", href: "#delve-school" },
     { name: "Services", href: "#services" },
     { name: "Free Training", href: "#webinar" },
     { name: "About", href: "#about" },
