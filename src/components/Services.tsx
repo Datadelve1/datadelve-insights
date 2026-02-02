@@ -1,35 +1,25 @@
-import { Database, LineChart, GitBranch, Code2, Target, Lightbulb } from "lucide-react";
+import { Users, Wrench, FolderOpen, HeartHandshake } from "lucide-react";
 
 const services = [
   {
-    icon: Database,
-    title: "Data Fundamentals",
-    description: "Master the basics of data management, Excel, SQL, and database design with hands-on exercises.",
+    icon: Users,
+    title: "Data Analytics One-on-One Training",
+    description: "Get personalised, one-on-one data analytics training designed around your learning pace and goals. Our sessions are hands-on and interactive, giving you the space to ask questions, practise in real time, and truly understand how data analytics works in real-world scenarios — not just theory.",
   },
   {
-    icon: LineChart,
-    title: "Data Visualization",
-    description: "Learn to create compelling visualizations using tools like Tableau, Power BI, and Python.",
+    icon: Wrench,
+    title: "Technical Skills",
+    description: "Build strong foundations in the core tools every data analyst needs. You'll learn Excel, SQL, Power BI, and Python basics, while also understanding how these tools work together in real analytics workflows. Each concept is taught practically, with guided exercises you can apply immediately.",
   },
   {
-    icon: Code2,
-    title: "Python for Data",
-    description: "Build powerful data pipelines and automate analysis with Python and pandas.",
+    icon: FolderOpen,
+    title: "Portfolio Building",
+    description: "Work on real-life data projects that mirror actual workplace tasks. You'll analyse datasets, create dashboards, and present insights you can confidently showcase as work experience. By the end, you'll have projects ready to add to your CV, GitHub, and portfolio.",
   },
   {
-    icon: GitBranch,
-    title: "Git & GitHub for Data",
-    description: "Learn version control, collaboration workflows, and portfolio building for data professionals.",
-  },
-  {
-    icon: Target,
-    title: "Business Intelligence",
-    description: "Transform raw data into actionable insights that drive business decisions.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Career Coaching",
-    description: "Build a capstone project, create your data portfolio, and get career guidance with interview prep.",
+    icon: HeartHandshake,
+    title: "Flexible Learning & Support",
+    description: "Learn at a pace that works for you. With personalised guidance and ongoing support, you're never left stuck or confused. We focus on building confidence, clarity, and practical problem-solving skills you can carry into interviews and real roles.",
   },
 ];
 
@@ -52,7 +42,7 @@ const Services = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {services.map((service, index) => (
             <div
               key={service.title}
