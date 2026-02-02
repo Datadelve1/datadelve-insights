@@ -14,8 +14,18 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Delve School Banner */}
+          <a 
+            href="#delve-school"
+            className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 mb-6 opacity-0 animate-fade-in hover:from-primary/30 hover:to-accent/30 transition-all duration-300 group cursor-pointer"
+          >
+            <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">NEW</span>
+            <span className="text-sm text-foreground">Introducing Delve School — Self-paced tech courses</span>
+            <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+          </a>
+
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 opacity-0 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 opacity-0 animate-fade-in animation-delay-100">
             <Zap className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">Transform Your Data Skills</span>
           </div>
