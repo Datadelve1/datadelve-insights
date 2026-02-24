@@ -1,1 +1,4 @@
 project_id = "cszwkukwkcrecirbvvee"
+
+[functions.send-webinar-confirmation]
+verify_jwt = false

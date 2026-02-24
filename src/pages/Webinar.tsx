@@ -35,7 +35,11 @@ const Webinar = () => {
           throw error;
         }
       } else {
-        toast({ title: "You're in! 🎉", description: "Check your email for details." });
+        // Send confirmation email
+        supabase.functions.invoke("send-webinar-confirmation", {
+          body: { email: email.trim() },
+        });
+        toast({ title: "You're in! 🎉", description: "Check your email for a confirmation." });
       }
       setEmail("");
     } catch {
