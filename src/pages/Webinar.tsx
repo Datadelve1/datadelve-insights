@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Clock, MapPin, Users, ArrowRight, Sparkles } from "lucide-react";
+import { Calendar, Clock, MapPin, ArrowRight, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import webinarFlyerMain from "@/assets/webinar-flyer-main.jpg";
+import webinarFlyerSpeaker from "@/assets/webinar-flyer-speaker.jpg";
 
 const Webinar = () => {
   const { toast } = useToast();
@@ -45,71 +45,106 @@ const Webinar = () => {
     }
   };
 
+  // Light theme colors inspired by the flyer
+  const theme = {
+    bg: "#FAF8F5",
+    bgAlt: "#F2EDE6",
+    text: "#1A1A1A",
+    textMuted: "#5A5A5A",
+    gold: "#D4A017",
+    goldLight: "#F5E6B8",
+    goldDark: "#B8860B",
+    border: "#E8E0D4",
+    card: "#FFFFFF",
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen font-body" style={{ background: theme.bg, color: theme.text }}>
       {/* Hero */}
-      <section className="relative py-20 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_hsl(187_85%_53%_/_0.08)_0%,_transparent_60%)]" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <section className="relative py-16 md:py-28 overflow-hidden">
+        <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(ellipse at top right, ${theme.goldLight}, transparent 60%)` }} />
 
         <div className="container mx-auto px-6 relative z-10">
           {/* Live badge */}
           <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-medium text-muted-foreground">Live Webinar</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border" style={{ borderColor: theme.border, background: theme.card }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: theme.gold }} />
+              <span className="text-sm font-medium" style={{ color: theme.textMuted }}>Live Webinar</span>
             </div>
           </div>
 
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] mb-4">
+            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] mb-4" style={{ color: theme.text }}>
               Stop Learning Tech
             </h1>
-            <div className="inline-block px-5 py-2 rounded-md bg-primary/15 border border-primary/30 mb-8">
-              <p className="font-display text-lg md:text-2xl text-primary font-semibold">
+            <div className="inline-block px-6 py-2.5 rounded-md mb-8" style={{ background: theme.gold }}>
+              <p className="font-display text-lg md:text-2xl font-semibold" style={{ color: "#FFFFFF" }}>
                 Unless You Want To Stay Relevant
               </p>
             </div>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: theme.textMuted }}>
               Join us for an eye-opening conversation about why continuous learning isn't optional in tech — and how to do it right.
             </p>
 
             {/* Event details pills */}
             <div className="flex flex-wrap justify-center gap-4 mb-12">
-              <div className="flex items-center gap-2 px-5 py-3 rounded-xl glass">
-                <Calendar className="w-5 h-5 text-primary" />
-                <span className="font-medium">27th March, 2026</span>
-              </div>
-              <div className="flex items-center gap-2 px-5 py-3 rounded-xl glass">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="font-medium">8:00 PM (GMT+1)</span>
-              </div>
-              <div className="flex items-center gap-2 px-5 py-3 rounded-xl glass">
-                <MapPin className="w-5 h-5 text-primary" />
-                <span className="font-medium">Online — Free</span>
-              </div>
+              {[
+                { icon: Calendar, label: "27th March, 2026" },
+                { icon: Clock, label: "8:00 PM (GMT+1)" },
+                { icon: MapPin, label: "Online — Free" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2 px-5 py-3 rounded-xl border" style={{ borderColor: theme.border, background: theme.card }}>
+                  <item.icon className="w-5 h-5" style={{ color: theme.gold }} />
+                  <span className="font-medium" style={{ color: theme.text }}>{item.label}</span>
+                </div>
+              ))}
             </div>
 
             {/* Email CTA */}
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <Input
+              <input
                 type="email"
                 placeholder="Enter your email to register"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-secondary/50 border-border/50 focus:border-primary h-12 text-base"
                 maxLength={255}
+                className="flex-1 h-12 px-4 rounded-lg text-base border outline-none transition-colors"
+                style={{
+                  background: theme.card,
+                  borderColor: theme.border,
+                  color: theme.text,
+                }}
+                onFocus={(e) => (e.target.style.borderColor = theme.gold)}
+                onBlur={(e) => (e.target.style.borderColor = theme.border)}
               />
-              <Button type="submit" variant="hero" size="lg" disabled={isLoading} className="shrink-0">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="h-12 px-8 rounded-lg font-display font-semibold text-base flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:scale-105 shrink-0 disabled:opacity-50"
+                style={{ background: theme.gold, color: "#FFFFFF" }}
+              >
                 {isLoading ? "Registering..." : (
                   <>
                     Reserve My Spot
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
-              </Button>
+              </button>
             </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Flyer Graphics */}
+      <section className="py-16 relative" style={{ background: theme.bgAlt }}>
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="rounded-3xl overflow-hidden shadow-xl border" style={{ borderColor: theme.border }}>
+              <img src={webinarFlyerMain} alt="Stop Learning Tech webinar flyer featuring host and guest speaker" className="w-full h-auto" />
+            </div>
+            <div className="rounded-3xl overflow-hidden shadow-xl border" style={{ borderColor: theme.border }}>
+              <img src={webinarFlyerSpeaker} alt="Meet our speaker Tobi Anifowose - Senior Software Engineer" className="w-full h-auto" />
+            </div>
           </div>
         </div>
       </section>
@@ -118,35 +153,35 @@ const Webinar = () => {
       <section className="py-20 relative">
         <div className="container mx-auto px-6">
           <div className="text-center mb-14">
-            <span className="text-primary font-medium mb-3 block text-sm uppercase tracking-wider">Meet The Speakers</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold">
-              Learn From The <span className="gradient-text">Best</span>
+            <span className="font-medium mb-3 block text-sm uppercase tracking-wider" style={{ color: theme.gold }}>Meet The Speakers</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold" style={{ color: theme.text }}>
+              Learn From The Best
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Host */}
-            <div className="glass rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-5 uppercase tracking-wider">
+            <div className="rounded-3xl p-8 border transition-all duration-300 hover:shadow-lg" style={{ background: theme.card, borderColor: theme.border }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5 uppercase tracking-wider" style={{ background: theme.goldLight, color: theme.goldDark }}>
                 <Users className="w-3 h-3" />
                 Host
               </div>
-              <h3 className="font-display text-2xl font-bold mb-1">Pipeloluwa Opeyemi</h3>
-              <p className="text-primary font-medium text-sm mb-4">Data Analytics Expert</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <h3 className="font-display text-2xl font-bold mb-1" style={{ color: theme.text }}>Pipeloluwa Opeyemi</h3>
+              <p className="font-medium text-sm mb-4" style={{ color: theme.gold }}>Data Analytics Expert</p>
+              <p className="text-sm leading-relaxed" style={{ color: theme.textMuted }}>
                 Passionate about making tech accessible to everyone. Pipeloluwa brings clarity and energy to every session, guiding learners through their tech journey with practical insights.
               </p>
             </div>
 
             {/* Guest Speaker */}
-            <div className="glass rounded-3xl p-8 border border-border/50 hover:border-primary/30 transition-all duration-300">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-semibold mb-5 uppercase tracking-wider">
+            <div className="rounded-3xl p-8 border transition-all duration-300 hover:shadow-lg" style={{ background: theme.card, borderColor: theme.border }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5 uppercase tracking-wider" style={{ background: theme.goldLight, color: theme.goldDark }}>
                 <Sparkles className="w-3 h-3" />
                 Guest Speaker
               </div>
-              <h3 className="font-display text-2xl font-bold mb-1">Tobi Anifowose</h3>
-              <p className="text-primary font-medium text-sm mb-4">Senior Software Engineer</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <h3 className="font-display text-2xl font-bold mb-1" style={{ color: theme.text }}>Tobi Anifowose</h3>
+              <p className="font-medium text-sm mb-4" style={{ color: theme.gold }}>Senior Software Engineer</p>
+              <p className="text-sm leading-relaxed" style={{ color: theme.textMuted }}>
                 With over eight years of experience building scalable software across healthcare, finance, and legal industries. A First Class graduate in Electrical & Electronics Engineering, Tobi combines analytical thinking with a passion for clean architecture and high-performance systems. He's also the founder of Booklynk.co.
               </p>
             </div>
@@ -155,12 +190,11 @@ const Webinar = () => {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-20 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(270_60%_60%_/_0.05)_0%,_transparent_60%)]" />
+      <section className="py-20 relative" style={{ background: theme.bgAlt }}>
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-14">
-            <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-              What You'll <span className="gradient-text">Walk Away With</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold mb-4" style={{ color: theme.text }}>
+              What You'll Walk Away With
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -172,9 +206,9 @@ const Webinar = () => {
               { title: "Career Growth Mindset", desc: "Developing the mindset that drives sustainable career growth in a fast-changing industry." },
               { title: "Live Q&A Session", desc: "Get your burning questions answered by industry veterans in an interactive session." },
             ].map((item, i) => (
-              <div key={i} className="p-6 rounded-2xl glass border border-border/50 hover:border-primary/20 transition-all">
-                <h3 className="font-display font-semibold text-lg mb-2 text-foreground">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+              <div key={i} className="p-6 rounded-2xl border transition-all hover:shadow-md" style={{ background: theme.card, borderColor: theme.border }}>
+                <h3 className="font-display font-semibold text-lg mb-2" style={{ color: theme.text }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: theme.textMuted }}>{item.desc}</p>
               </div>
             ))}
           </div>
@@ -183,28 +217,36 @@ const Webinar = () => {
 
       {/* Final CTA */}
       <section className="py-24 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_hsl(187_85%_53%_/_0.1)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 opacity-20" style={{ background: `radial-gradient(ellipse at bottom, ${theme.goldLight}, transparent 60%)` }} />
         <div className="container mx-auto px-6 relative z-10 text-center">
-          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4" style={{ color: theme.text }}>
             Don't Miss Out
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
+          <p className="text-lg max-w-xl mx-auto mb-8" style={{ color: theme.textMuted }}>
             Spots are limited. Register now and take the first step towards staying relevant in tech.
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <Input
+            <input
               type="email"
               placeholder="Your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-secondary/50 border-border/50 focus:border-primary h-12 text-base"
               maxLength={255}
+              className="flex-1 h-12 px-4 rounded-lg text-base border outline-none transition-colors"
+              style={{ background: theme.card, borderColor: theme.border, color: theme.text }}
+              onFocus={(e) => (e.target.style.borderColor = theme.gold)}
+              onBlur={(e) => (e.target.style.borderColor = theme.border)}
             />
-            <Button type="submit" variant="hero" size="lg" disabled={isLoading} className="shrink-0">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="h-12 px-8 rounded-lg font-display font-semibold text-base transition-all duration-300 hover:shadow-lg hover:scale-105 shrink-0 disabled:opacity-50"
+              style={{ background: theme.gold, color: "#FFFFFF" }}
+            >
               {isLoading ? "Registering..." : "Register Free"}
-            </Button>
+            </button>
           </form>
-          <p className="text-xs text-muted-foreground mt-4">Free · Online · 27th March 2026 · 8PM GMT+1</p>
+          <p className="text-xs mt-4" style={{ color: theme.textMuted }}>Free · Online · 27th March 2026 · 8PM GMT+1</p>
         </div>
       </section>
     </div>
