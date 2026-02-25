@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Delve <onboarding@resend.dev>",
+        from: "Delve <info@datadelve.io>",
         to: [email],
         subject: "You're Registered! 🎉 Stop Learning Tech Webinar",
         html: `
@@ -74,6 +74,29 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Send notification to admin
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "Delve <info@datadelve.io>",
+        to: ["info@datadelve.io"],
+        subject: `🔔 New Webinar Registration: ${email}`,
+        html: `
+          <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px;">
+            <h2 style="color: #1A1A1A;">New Webinar Registration</h2>
+            <p style="color: #5A5A5A; font-size: 16px;"><strong>Email:</strong> ${email}</p>
+            <p style="color: #5A5A5A; font-size: 14px;"><strong>Registered at:</strong> ${new Date().toLocaleString()}</p>
+            <hr style="border: 1px solid #E8E0D4; margin: 20px 0;" />
+            <p style="color: #999; font-size: 12px;">Stop Learning Tech Webinar — 27th March, 2026</p>
+          </div>
+        `,
+      }),
+    });
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
