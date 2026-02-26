@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
         html: `
           <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <img src="https://delve-insight-connect.lovable.app/favicon.ico" alt="DelveSchool" style="width: 48px; height: 48px; margin-bottom: 12px;" />
+              <img src="https://delve-insight-connect.lovable.app/delveschool-logo.png" alt="DelveSchool" style="width: 48px; height: 48px; margin-bottom: 12px;" />
               <h1 style="font-size: 28px; color: #1A1A1A; margin: 0 0 8px;">You're In! 🎉</h1>
               <p style="color: #5A5A5A; font-size: 16px; margin: 0;">Your spot has been reserved</p>
             </div>

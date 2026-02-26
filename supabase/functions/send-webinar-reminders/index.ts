@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     const emailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <img src="https://delve-insight-connect.lovable.app/favicon.ico" alt="DelveSchool" style="width: 48px; height: 48px; margin-bottom: 12px;" />
+          <img src="https://delve-insight-connect.lovable.app/delveschool-logo.png" alt="DelveSchool" style="width: 48px; height: 48px; margin-bottom: 12px;" />
           <h1 style="font-size: 28px; color: #1A1A1A; margin: 0 0 8px;">${heading}</h1>
         </div>
         
