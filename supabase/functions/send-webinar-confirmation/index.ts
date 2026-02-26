@@ -53,8 +53,8 @@ Deno.serve(async (req) => {
             </div>
 
             <div style="text-align: center; padding: 20px 0;">
-              <p style="color: #5A5A5A; font-size: 14px; margin: 0 0 12px;">Join the webinar here:</p>
-              <a href="https://www.datadelve.io/webinar" style="display: inline-block; background: #D4A017; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Join Webinar</a>
+              <p style="color: #5A5A5A; font-size: 14px; margin: 0 0 12px;">Join the webinar via Google Meet:</p>
+              <a href="PASTE_YOUR_GOOGLE_MEET_LINK_HERE" style="display: inline-block; background: #D4A017; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Join Webinar</a>
               <p style="color: #5A5A5A; font-size: 14px; margin: 12px 0 0;">We'll send you a reminder before the event.</p>
               <p style="color: #5A5A5A; font-size: 14px; margin: 8px 0 0;">See you there! 👋</p>
             </div>
