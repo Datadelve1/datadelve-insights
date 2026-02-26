@@ -179,7 +179,7 @@ const Webinar = () => {
               <h3 className="font-display text-2xl font-bold mb-1" style={{ color: theme.text }}>Pipeloluwa Oshinubi</h3>
               <p className="font-medium text-sm mb-4" style={{ color: theme.gold }}>Data Analyst & Co-Founder, DelveSchool</p>
               <p className="text-sm leading-relaxed" style={{ color: theme.textMuted }}>
-                A data analyst with over 5 years of experience turning raw data into actionable insights. Pipeloluwa is the co-founder of DelveSchool, passionate about making tech education accessible to everyone. He brings clarity and energy to every session, guiding learners through their tech journey with practical, real-world insights.
+                A data analyst with over five years of experience helping businesses make smarter decisions through data. Pipeloluwa is the co-founder of DelveSchool, passionate about making tech education accessible to everyone. He brings clarity and energy to every session, guiding learners through their tech journey with practical, real-world insights.
               </p>
             </div>
 
