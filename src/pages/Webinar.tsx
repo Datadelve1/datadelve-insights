@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, MapPin, ArrowRight, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import WebinarCountdown from "@/components/WebinarCountdown";
 import webinarFlyerMain from "@/assets/webinar-flyer-main.jpg";
 import webinarFlyerSpeaker from "@/assets/webinar-flyer-speaker.jpg";
 
@@ -102,6 +103,11 @@ const Webinar = () => {
                   <span className="font-medium" style={{ color: theme.text }}>{item.label}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Countdown */}
+            <div className="mb-12">
+              <WebinarCountdown />
             </div>
 
             {/* Email CTA */}
