@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   try {
     const { reminder_type } = await req.json();
 
-    if (!["3_days", "30_mins"].includes(reminder_type)) {
+    if (!["3_days", "1_day", "30_mins"].includes(reminder_type)) {
       return new Response(JSON.stringify({ error: "Invalid reminder_type" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -37,20 +37,27 @@ Deno.serve(async (req) => {
     }
 
     const is3Days = reminder_type === "3_days";
+    const is1Day = reminder_type === "1_day";
 
     const subject = is3Days
       ? "⏰ 3 Days To Go! Stop Learning Tech Webinar"
+      : is1Day
+      ? "⏰ Tomorrow! Stop Learning Tech Webinar"
       : "🔴 Starting in 30 Minutes! Stop Learning Tech Webinar";
 
     const heading = is3Days
       ? "3 Days To Go! ⏰"
+      : is1Day
+      ? "It's Tomorrow! ⏰"
       : "We're Live in 30 Minutes! 🔴";
 
     const bodyText = is3Days
       ? "Just a friendly reminder — the <strong>Stop Learning Tech</strong> webinar is happening in 3 days. Make sure you've blocked out time in your calendar!"
+      : is1Day
+      ? "The <strong>Stop Learning Tech</strong> webinar is happening <strong>tomorrow</strong>! Make sure you're ready to join us at 8:00 PM (GMT+1)."
       : "The wait is almost over! The <strong>Stop Learning Tech</strong> webinar starts in just 30 minutes. Get ready to join us!";
 
-    const ctaText = is3Days ? "Add to Calendar" : "Join Now";
+    const ctaText = is3Days ? "Add to Calendar" : is1Day ? "Set a Reminder" : "Join Now";
 
     const emailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
