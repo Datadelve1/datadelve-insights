@@ -1,7 +1,7 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const GOOGLE_MEET_LINK = "PASTE_YOUR_GOOGLE_MEET_LINK_HERE";
+const GOOGLE_MEET_LINK = "https://meet.google.com/imz-pqyp-kib";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
