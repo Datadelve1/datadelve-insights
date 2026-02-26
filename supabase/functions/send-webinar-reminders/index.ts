@@ -57,7 +57,11 @@ Deno.serve(async (req) => {
       ? "The <strong>Stop Learning Tech</strong> webinar is happening <strong>tomorrow</strong>! Make sure you're ready to join us at 8:00 PM (GMT+1)."
       : "The wait is almost over! The <strong>Stop Learning Tech</strong> webinar starts in just 30 minutes. Get ready to join us!";
 
-    const ctaText = is3Days ? "Add to Calendar" : is1Day ? "Set a Reminder" : "Join Now";
+    const ctaText = is3Days ? "Add to Calendar" : is1Day ? "Save the Link" : "Join Now";
+
+    const GOOGLE_CALENDAR_LINK = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Stop+Learning+Tech+Webinar&dates=20260328T190000Z/20260328T200000Z&details=Join+via+Google+Meet:+${encodeURIComponent(GOOGLE_MEET_LINK)}&location=Online+(Google+Meet)";
+
+    const ctaLink = is3Days ? GOOGLE_CALENDAR_LINK : GOOGLE_MEET_LINK;
 
     const emailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
@@ -76,7 +80,7 @@ Deno.serve(async (req) => {
         </div>
 
         <div style="text-align: center; margin-bottom: 24px;">
-          <a href="${GOOGLE_MEET_LINK}" style="display: inline-block; background: #D4A017; color: #FFFFFF; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">${ctaText}</a>
+          <a href="${ctaLink}" style="display: inline-block; background: #D4A017; color: #FFFFFF; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">${ctaText}</a>
         </div>
 
         <div style="background: #FFFFFF; border-radius: 12px; padding: 24px; border: 1px solid #E8E0D4; margin-bottom: 24px;">
