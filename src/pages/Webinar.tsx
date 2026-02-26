@@ -93,7 +93,7 @@ const Webinar = () => {
             {/* Event details pills */}
             <div className="flex flex-wrap justify-center gap-4 mb-12">
               {[
-                { icon: Calendar, label: "27th March, 2026" },
+                { icon: Calendar, label: "28th March, 2026" },
                 { icon: Clock, label: "8:00 PM (GMT+1)" },
                 { icon: MapPin, label: "Online — Free" },
               ].map((item, i) => (
@@ -170,10 +170,10 @@ const Webinar = () => {
                 <Users className="w-3 h-3" />
                 Host
               </div>
-              <h3 className="font-display text-2xl font-bold mb-1" style={{ color: theme.text }}>Pipeloluwa Opeyemi</h3>
-              <p className="font-medium text-sm mb-4" style={{ color: theme.gold }}>Data Analytics Expert</p>
+              <h3 className="font-display text-2xl font-bold mb-1" style={{ color: theme.text }}>Pipeloluwa Oshinubi</h3>
+              <p className="font-medium text-sm mb-4" style={{ color: theme.gold }}>Data Analyst & Co-Founder, DelveSchool</p>
               <p className="text-sm leading-relaxed" style={{ color: theme.textMuted }}>
-                Passionate about making tech accessible to everyone. Pipeloluwa brings clarity and energy to every session, guiding learners through their tech journey with practical insights.
+                A data analyst with over 5 years of experience turning raw data into actionable insights. Pipeloluwa is the co-founder of DelveSchool, passionate about making tech education accessible to everyone. He brings clarity and energy to every session, guiding learners through their tech journey with practical, real-world insights.
               </p>
             </div>
 
@@ -250,7 +250,7 @@ const Webinar = () => {
               {isLoading ? "Registering..." : "Register Free"}
             </button>
           </form>
-          <p className="text-xs mt-4" style={{ color: theme.textMuted }}>Free · Online · 27th March 2026 · 8PM GMT+1</p>
+          <p className="text-xs mt-4" style={{ color: theme.textMuted }}>Free · Online · 28th March 2026 · 8PM GMT+1</p>
         </div>
       </section>
     </div>
