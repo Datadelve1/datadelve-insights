@@ -14,6 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      ambassador_applications: {
+        Row: {
+          attended_sessions: boolean
+          commitment_agreed: boolean
+          completed_assignments: boolean
+          created_at: string
+          cv_url: string
+          email: string
+          full_name: string
+          id: string
+          linkedin_url: string
+          phone: string
+          skills_strengths: string
+          submitted_reflections: boolean
+          video_url: string
+          whatsapp_engagement: string
+          why_ambassador: string
+          willing_20hrs: boolean
+        }
+        Insert: {
+          attended_sessions?: boolean
+          commitment_agreed?: boolean
+          completed_assignments?: boolean
+          created_at?: string
+          cv_url: string
+          email: string
+          full_name: string
+          id?: string
+          linkedin_url: string
+          phone: string
+          skills_strengths: string
+          submitted_reflections?: boolean
+          video_url: string
+          whatsapp_engagement: string
+          why_ambassador: string
+          willing_20hrs?: boolean
+        }
+        Update: {
+          attended_sessions?: boolean
+          commitment_agreed?: boolean
+          completed_assignments?: boolean
+          created_at?: string
+          cv_url?: string
+          email?: string
+          full_name?: string
+          id?: string
+          linkedin_url?: string
+          phone?: string
+          skills_strengths?: string
+          submitted_reflections?: boolean
+          video_url?: string
+          whatsapp_engagement?: string
+          why_ambassador?: string
+          willing_20hrs?: boolean
+        }
+        Relationships: []
+      }
+      training_commitments: {
+        Row: {
+          agree_weekly_assignments: boolean
+          ambassador_interest: string
+          available_fridays: boolean
+          commitment_agreed: boolean
+          country: string
+          created_at: string
+          current_status: string
+          email: string
+          engage_posts: boolean
+          full_name: string
+          id: string
+          submit_reflections: boolean
+        }
+        Insert: {
+          agree_weekly_assignments?: boolean
+          ambassador_interest: string
+          available_fridays?: boolean
+          commitment_agreed?: boolean
+          country: string
+          created_at?: string
+          current_status: string
+          email: string
+          engage_posts?: boolean
+          full_name: string
+          id?: string
+          submit_reflections?: boolean
+        }
+        Update: {
+          agree_weekly_assignments?: boolean
+          ambassador_interest?: string
+          available_fridays?: boolean
+          commitment_agreed?: boolean
+          country?: string
+          created_at?: string
+          current_status?: string
+          email?: string
+          engage_posts?: boolean
+          full_name?: string
+          id?: string
+          submit_reflections?: boolean
+        }
+        Relationships: []
+      }
       webinar_registrations: {
         Row: {
           created_at: string
@@ -29,6 +131,39 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+        }
+        Relationships: []
+      }
+      weekly_reviews: {
+        Row: {
+          comments: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          video_url: string | null
+          week_number: number
+          written_reflection: string | null
+        }
+        Insert: {
+          comments?: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          video_url?: string | null
+          week_number: number
+          written_reflection?: string | null
+        }
+        Update: {
+          comments?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          video_url?: string | null
+          week_number?: number
+          written_reflection?: string | null
         }
         Relationships: []
       }
