@@ -41,12 +41,10 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
-            <Button 
-              variant="hero" 
-              size="default"
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Get Started
+            <Button variant="hero" size="default" asChild>
+              <Link to="/auth">
+                <GraduationCap className="w-4 h-4" /> Student Portal
+              </Link>
             </Button>
           </div>
 
