@@ -71,6 +71,71 @@ export type Database = {
         }
         Relationships: []
       }
+      assignment_submissions: {
+        Row: {
+          answers: Json
+          assignment_id: string
+          created_at: string
+          id: string
+          score: number
+          total: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          assignment_id: string
+          created_at?: string
+          id?: string
+          score?: number
+          total?: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          assignment_id?: string
+          created_at?: string
+          id?: string
+          score?: number
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assignments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          questions: Json
+          title: string
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          questions?: Json
+          title: string
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          questions?: Json
+          title?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
       class_recordings: {
         Row: {
           created_at: string
