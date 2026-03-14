@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, CheckCircle2, Loader2, Video, PenLine } from "lucide-react";
+import { FileText, CheckCircle2, Loader2, Video, PenLine, Upload } from "lucide-react";
 
 interface WeeklyReview {
   id: string;
@@ -33,7 +33,7 @@ const WeeklyReviews = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [reflectionType, setReflectionType] = useState<"video" | "written">("written");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [writtenReflection, setWrittenReflection] = useState("");
   const [comments, setComments] = useState("");
 
@@ -65,8 +65,8 @@ const WeeklyReviews = () => {
       toast({ title: "You already submitted a review for this week", variant: "destructive" });
       return;
     }
-    if (reflectionType === "video" && !videoUrl.trim()) {
-      toast({ title: "Please enter a video URL", variant: "destructive" });
+    if (reflectionType === "video" && !videoFile) {
+      toast({ title: "Please select a video file", variant: "destructive" });
       return;
     }
     if (reflectionType === "written" && !writtenReflection.trim()) {
@@ -76,12 +76,22 @@ const WeeklyReviews = () => {
 
     setIsSubmitting(true);
     try {
+      let uploadedVideoUrl: string | null = null;
+      if (reflectionType === "video" && videoFile) {
+        const ext = videoFile.name.split(".").pop();
+        const path = `weekly-videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("form-uploads").upload(path, videoFile);
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        const { data: urlData } = supabase.storage.from("form-uploads").getPublicUrl(path);
+        uploadedVideoUrl = urlData.publicUrl;
+      }
+
       const { error } = await supabase.from("weekly_reviews").insert({
         user_id: user!.id,
         full_name: profile?.full_name ?? "",
         email: profile?.email ?? user!.email ?? "",
         week_number: weekNum,
-        video_url: reflectionType === "video" ? videoUrl.trim() : null,
+        video_url: uploadedVideoUrl,
         written_reflection: reflectionType === "written" ? writtenReflection.trim() : null,
         comments: comments.trim(),
       });
@@ -98,7 +108,7 @@ const WeeklyReviews = () => {
 
       toast({ title: "Review submitted! 🎉", description: `Week ${weekNum} review recorded.` });
       setSelectedWeek("");
-      setVideoUrl("");
+      setVideoFile(null);
       setWrittenReflection("");
       setComments("");
       fetchReviews();
@@ -205,14 +215,21 @@ const WeeklyReviews = () => {
 
             {reflectionType === "video" ? (
               <div className="space-y-2">
-                <Label>Video URL *</Label>
-                <Input
-                  type="url"
-                  placeholder="Paste your video link (YouTube, Loom, etc.)"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  className="bg-card border-border"
-                />
+                <Label>Upload Video *</Label>
+                <label
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-card"
+                >
+                  <Upload className="w-5 h-5 text-primary" />
+                  <span className="text-sm text-muted-foreground">
+                    {videoFile ? videoFile.name : "Click to select a video file"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    className="hidden"
+                    onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                  />
+                </label>
               </div>
             ) : (
               <div className="space-y-2">
