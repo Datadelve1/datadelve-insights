@@ -20,6 +20,7 @@ import ProjectManagement from "./pages/courses/ProjectManagement";
 import BusinessAnalysis from "./pages/courses/BusinessAnalysis";
 import Cybersecurity from "./pages/courses/Cybersecurity";
 import SoftwareEngineering from "./pages/courses/SoftwareEngineering";
+import DataEngineering from "./pages/courses/DataEngineering";
 
 const queryClient = new QueryClient();
 
