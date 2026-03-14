@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      class_recordings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          video_url: string
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          video_url: string
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          video_url?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
