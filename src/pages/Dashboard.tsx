@@ -138,24 +138,32 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
               {Array.from({ length: 8 }, (_, i) => {
                 const week = i + 1;
-                const completed = submittedWeeks.has(week);
+                const reviewDone = submittedWeeks.has(week);
+                const score = assignmentScores[week];
                 return (
                   <div
                     key={i}
-                    className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
-                      completed
+                    className={`flex flex-col gap-1 rounded-lg p-3 text-sm ${
+                      reviewDone
                         ? "bg-primary/10 border border-primary/20"
                         : "bg-secondary"
                     }`}
                   >
-                    {completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Lock className="w-4 h-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2">
+                      {reviewDone ? (
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                      ) : (
+                        <Lock className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      <span className={reviewDone ? "text-foreground font-medium" : "text-muted-foreground"}>
+                        Week {week} {week >= 7 ? "(Project)" : ""}
+                      </span>
+                    </div>
+                    {score && (
+                      <span className="text-xs text-primary font-medium pl-6">
+                        Score: {score.score}/{score.total}
+                      </span>
                     )}
-                    <span className={completed ? "text-foreground font-medium" : "text-muted-foreground"}>
-                      Week {week} {week >= 7 ? "(Project)" : ""}
-                    </span>
                   </div>
                 );
               })}
