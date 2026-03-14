@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, CheckCircle2, Loader2, Video, PenLine } from "lucide-react";
+import { FileText, CheckCircle2, Loader2, Video, PenLine, Upload } from "lucide-react";
 
 interface WeeklyReview {
   id: string;
@@ -33,7 +33,7 @@ const WeeklyReviews = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState("");
   const [reflectionType, setReflectionType] = useState<"video" | "written">("written");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [writtenReflection, setWrittenReflection] = useState("");
   const [comments, setComments] = useState("");
 
