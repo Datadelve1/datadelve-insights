@@ -15,10 +15,12 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
+import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
+
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
@@ -67,9 +69,7 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center">
-              <span className="font-display font-bold text-primary-foreground text-lg">D</span>
-            </div>
+            <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
             <span className="font-display font-bold text-xl text-foreground">
               Student Dashboard
             </span>
@@ -96,27 +96,25 @@ const Dashboard = () => {
             weekly tasks, and unlock your full potential.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 rounded-xl bg-secondary p-4">
-              <CalendarDays className="w-5 h-5 text-primary shrink-0" />
+            <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
+              <CalendarDays className="w-5 h-5 shrink-0" />
               <div>
-                <p className="text-xs text-muted-foreground">Class Day</p>
-                <p className="font-display font-semibold text-foreground">Every Friday</p>
+                <p className="text-xs opacity-80">Class Day</p>
+                <p className="font-display font-semibold">Every Friday</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-secondary p-4">
-              <Clock className="w-5 h-5 text-primary shrink-0" />
+            <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
+              <Clock className="w-5 h-5 shrink-0" />
               <div>
-                <p className="text-xs text-muted-foreground">Time</p>
-                <p className="font-display font-semibold text-foreground">6 PM – 9 PM</p>
+                <p className="text-xs opacity-80">Time</p>
+                <p className="font-display font-semibold">6 PM – 9 PM</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-secondary p-4">
-              <BookOpen className="w-5 h-5 text-primary shrink-0" />
+            <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
+              <BookOpen className="w-5 h-5 shrink-0" />
               <div>
-                <p className="text-xs text-muted-foreground">Duration</p>
-                <p className="font-display font-semibold text-foreground">
-                  8 Weeks (6 + 2 Project)
-                </p>
+                <p className="text-xs opacity-80">Duration</p>
+                <p className="font-display font-semibold">8 Weeks (6 + 2 Project)</p>
               </div>
             </div>
           </div>
@@ -145,7 +143,7 @@ const Dashboard = () => {
                     key={i}
                     className={`flex flex-col gap-1 rounded-lg p-3 text-sm ${
                       reviewDone
-                        ? "bg-primary/10 border border-primary/20"
+                        ? "bg-primary/20 border border-primary/30"
                         : "bg-secondary"
                     }`}
                   >

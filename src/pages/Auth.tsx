@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -71,9 +72,7 @@ const Auth = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center">
-              <span className="font-display font-bold text-primary-foreground text-xl">D</span>
-            </div>
+            <img src={delvetekLogo} alt="Delvetek" className="h-14 w-auto rounded-xl" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
             {isLogin ? "Welcome Back" : "Join Delvetek"}
