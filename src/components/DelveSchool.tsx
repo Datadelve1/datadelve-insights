@@ -69,10 +69,11 @@ const DelveSchool = () => {
 
         {/* Course Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => (
-            <div
+          {courses.map((course) => (
+            <Link
               key={course.title}
-              className="group p-6 rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
+              to={course.href}
+              className="group p-6 rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 block"
             >
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <course.icon className="w-6 h-6 text-primary" />
@@ -80,10 +81,13 @@ const DelveSchool = () => {
               <h3 className="font-display text-lg font-semibold mb-2 text-foreground group-hover:text-primary transition-colors">
                 {course.title}
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-3">
                 {course.description}
               </p>
-            </div>
+              <span className="text-primary text-sm font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                View Details <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
           ))}
         </div>
 
