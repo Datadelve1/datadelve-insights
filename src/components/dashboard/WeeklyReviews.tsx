@@ -76,12 +76,22 @@ const WeeklyReviews = () => {
 
     setIsSubmitting(true);
     try {
+      let uploadedVideoUrl: string | null = null;
+      if (reflectionType === "video" && videoFile) {
+        const ext = videoFile.name.split(".").pop();
+        const path = `weekly-videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("form-uploads").upload(path, videoFile);
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        const { data: urlData } = supabase.storage.from("form-uploads").getPublicUrl(path);
+        uploadedVideoUrl = urlData.publicUrl;
+      }
+
       const { error } = await supabase.from("weekly_reviews").insert({
         user_id: user!.id,
         full_name: profile?.full_name ?? "",
         email: profile?.email ?? user!.email ?? "",
         week_number: weekNum,
-        video_url: reflectionType === "video" ? videoUrl.trim() : null,
+        video_url: uploadedVideoUrl,
         written_reflection: reflectionType === "written" ? writtenReflection.trim() : null,
         comments: comments.trim(),
       });
@@ -98,7 +108,7 @@ const WeeklyReviews = () => {
 
       toast({ title: "Review submitted! 🎉", description: `Week ${weekNum} review recorded.` });
       setSelectedWeek("");
-      setVideoUrl("");
+      setVideoFile(null);
       setWrittenReflection("");
       setComments("");
       fetchReviews();
