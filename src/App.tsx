@@ -15,6 +15,11 @@ import DashboardCommitment from "./pages/DashboardCommitment";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import DataAnalysis from "./pages/courses/DataAnalysis";
+import ProjectManagement from "./pages/courses/ProjectManagement";
+import BusinessAnalysis from "./pages/courses/BusinessAnalysis";
+import Cybersecurity from "./pages/courses/Cybersecurity";
+import SoftwareEngineering from "./pages/courses/SoftwareEngineering";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +32,11 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/courses/data-analysis" element={<DataAnalysis />} />
+            <Route path="/courses/project-management" element={<ProjectManagement />} />
+            <Route path="/courses/business-analysis" element={<BusinessAnalysis />} />
+            <Route path="/courses/cybersecurity" element={<Cybersecurity />} />
+            <Route path="/courses/software-engineering" element={<SoftwareEngineering />} />
             <Route path="/webinar" element={<Webinar />} />
             <Route path="/ambassador" element={<AmbassadorForm />} />
             <Route path="/commitment" element={<CommitmentForm />} />
