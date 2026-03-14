@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, BarChart2, FolderKanban, Shield, Code, Briefcase } from "lucide-react";
+import { ArrowRight, BookOpen, BarChart2, FolderKanban, Shield, Code, Briefcase, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const courses = [
