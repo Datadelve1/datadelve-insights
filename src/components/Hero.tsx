@@ -20,7 +20,7 @@ const Hero = () => {
             className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 mb-6 opacity-0 animate-fade-in hover:from-primary/30 hover:to-accent/30 transition-all duration-300 group cursor-pointer"
           >
             <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">NEW</span>
-            <span className="text-sm text-foreground">Introducing Delve School — Self-paced tech courses</span>
+            <span className="text-sm text-foreground">Introducing Delvetek — Multi-track tech training</span>
             <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
           </a>
 
