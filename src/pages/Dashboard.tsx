@@ -22,6 +22,7 @@ import Assignments from "@/components/dashboard/Assignments";
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
+  const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   useEffect(() => {
