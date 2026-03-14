@@ -61,14 +61,10 @@ const DelveSchool = () => {
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
             Introducing <span className="gradient-text">Delve School</span>
           </h2>
-          <p className="text-muted-foreground text-lg mb-8">
-            Learn at your own pace with our comprehensive self-paced courses. 
+          <p className="text-muted-foreground text-lg">
+            6 weeks of live training plus a 2-week hands-on project. 
             From data analysis to software engineering, build the skills you need for your tech career.
           </p>
-          <Button variant="hero" size="lg" className="group" onClick={handleExploreCourses}>
-            Explore Courses
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
         </div>
 
         {/* Course Grid */}
