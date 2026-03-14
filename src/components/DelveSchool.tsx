@@ -28,6 +28,12 @@ const courses = [
     href: "/courses/cybersecurity",
   },
   {
+    icon: Database,
+    title: "Data Engineering",
+    description: "Build robust data pipelines and scalable data infrastructure.",
+    href: "/courses/data-engineering",
+  },
+  {
     icon: Code,
     title: "Software Engineering",
     description: "Build scalable applications with modern development practices.",

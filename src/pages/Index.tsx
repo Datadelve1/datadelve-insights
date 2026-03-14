@@ -4,6 +4,7 @@ import DelveSchool from "@/components/DelveSchool";
 import Services from "@/components/Services";
 import WebinarRegistration from "@/components/WebinarRegistration";
 import Testimonials from "@/components/Testimonials";
+import MeetTheTeam from "@/components/MeetTheTeam";
 import About from "@/components/About";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
@@ -19,6 +20,7 @@ const Index = () => {
         <Services />
         <WebinarRegistration />
         <Testimonials />
+        <MeetTheTeam />
         <About />
         <FAQ />
         <Contact />
