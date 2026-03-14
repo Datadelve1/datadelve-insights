@@ -36,15 +36,6 @@ const courses = [
 ];
 
 const DelveSchool = () => {
-  const { toast } = useToast();
-
-  const handleExploreCourses = () => {
-    toast({
-      title: "Coming Soon! 🚀",
-      description: "Delve School courses are launching soon. Stay tuned!",
-    });
-  };
-
   return (
     <section id="delve-school" className="py-24 relative overflow-hidden">
       {/* Background Effects */}
