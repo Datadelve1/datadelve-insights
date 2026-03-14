@@ -40,7 +40,7 @@ const Dashboard = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center">
               <span className="font-display font-bold text-primary-foreground text-lg">D</span>
             </div>
             <span className="font-display font-bold text-xl text-foreground">
@@ -172,7 +172,7 @@ const CommitmentGate = ({
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-lg text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center mx-auto">
           <Lock className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
