@@ -32,13 +32,13 @@ const Hero = () => {
 
           {/* Heading */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 opacity-0 animate-fade-in animation-delay-200">
-            Master Data Analytics with{" "}
-            <span className="gradient-text">1:1 Expert Training</span>
+            Master In-Demand Tech Skills with{" "}
+            <span className="gradient-text">Structured Training</span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in animation-delay-400 text-balance">
-            Unlock the power of data with personalized training sessions. From fundamentals to advanced analytics, we guide you every step of the way.
+            Learn essential tech skills from fundamentals to advanced levels. We guide you every step of the way.
           </p>
 
           {/* CTA Buttons */}
