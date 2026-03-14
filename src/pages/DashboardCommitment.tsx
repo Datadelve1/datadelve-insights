@@ -12,7 +12,7 @@ import { ArrowLeft, Loader2, Lock } from "lucide-react";
 import { Navigate, Link } from "react-router-dom";
 
 const DashboardCommitment = () => {
-  const { user, profile, isLoading, hasCommitted } = useAuth();
+  const { user, profile, isLoading, hasCommitted, refreshCommitment } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
