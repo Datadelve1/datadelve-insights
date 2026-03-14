@@ -215,14 +215,21 @@ const WeeklyReviews = () => {
 
             {reflectionType === "video" ? (
               <div className="space-y-2">
-                <Label>Video URL *</Label>
-                <Input
-                  type="url"
-                  placeholder="Paste your video link (YouTube, Loom, etc.)"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  className="bg-card border-border"
-                />
+                <Label>Upload Video *</Label>
+                <label
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-card"
+                >
+                  <Upload className="w-5 h-5 text-primary" />
+                  <span className="text-sm text-muted-foreground">
+                    {videoFile ? videoFile.name : "Click to select a video file"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    className="hidden"
+                    onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                  />
+                </label>
               </div>
             ) : (
               <div className="space-y-2">
