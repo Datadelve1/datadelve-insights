@@ -20,25 +20,25 @@ const Hero = () => {
             className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 mb-6 opacity-0 animate-fade-in hover:from-primary/30 hover:to-accent/30 transition-all duration-300 group cursor-pointer"
           >
             <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">NEW</span>
-            <span className="text-sm text-foreground">Introducing Delve School — Self-paced tech courses</span>
+            <span className="text-sm text-foreground">Introducing Delvetek — Multi-track tech training</span>
             <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
           </a>
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 opacity-0 animate-fade-in animation-delay-100">
             <Zap className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Transform Your Data Skills</span>
+            <span className="text-sm text-muted-foreground">Transform Your Tech Career</span>
           </div>
 
           {/* Heading */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold mb-6 opacity-0 animate-fade-in animation-delay-200">
-            Master Data Analytics with{" "}
-            <span className="gradient-text">1:1 Expert Training</span>
+            Master In-Demand Tech Skills with{" "}
+            <span className="gradient-text">Structured Training</span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in animation-delay-400 text-balance">
-            Unlock the power of data with personalized training sessions. From fundamentals to advanced analytics, we guide you every step of the way.
+            Learn essential tech skills from fundamentals to advanced levels. We guide you every step of the way.
           </p>
 
           {/* CTA Buttons */}
@@ -49,7 +49,7 @@ const Hero = () => {
               className="group"
               onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Book Your Session
+              Book a Clarity Session
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 

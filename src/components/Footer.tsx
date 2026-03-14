@@ -41,7 +41,7 @@ const Footer = () => {
               </span>
             </a>
             <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed">
-              Empowering individuals to master data analytics through personalized 1:1 training sessions. 
+              Empowering individuals to master in-demand tech skills through structured, multi-track training programs. 
               Transform your career with expert guidance.
             </p>
             <div className="flex gap-4">

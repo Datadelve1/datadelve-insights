@@ -20,14 +20,14 @@ const About = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div>
-            <span className="text-primary font-medium mb-4 block">Why Choose DataDelve</span>
+            <span className="text-primary font-medium mb-4 block">Why Choose Delvetek</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-              Your Journey to Data Mastery <span className="gradient-text">Starts Here</span>
+              Your Journey to Tech Mastery <span className="gradient-text">Starts Here</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              At DataDelve, we believe everyone can become a data expert with the right guidance. 
-              Our 1:1 training approach ensures you get personalized attention, practical experience, 
-              and the confidence to tackle real-world data challenges.
+              At Delvetek, we believe everyone can become a tech professional with the right guidance. 
+              Our structured training approach ensures you get personalised attention, practical experience, 
+              and the confidence to tackle real-world challenges across multiple tech fields.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-10">

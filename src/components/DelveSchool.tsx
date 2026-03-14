@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, BarChart2, FolderKanban, Shield, Code, Briefcase } from "lucide-react";
+import { ArrowRight, BookOpen, BarChart2, FolderKanban, Shield, Code, Briefcase, Database } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const courses = [
@@ -28,6 +28,12 @@ const courses = [
     href: "/courses/cybersecurity",
   },
   {
+    icon: Database,
+    title: "Data Engineering",
+    description: "Build robust data pipelines and scalable data infrastructure.",
+    href: "/courses/data-engineering",
+  },
+  {
     icon: Code,
     title: "Software Engineering",
     description: "Build scalable applications with modern development practices.",
@@ -47,10 +53,10 @@ const DelveSchool = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <BookOpen className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">New Product</span>
+            <span className="text-sm text-muted-foreground">Our Courses</span>
           </div>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Introducing <span className="gradient-text">Delve School</span>
+            <span className="gradient-text">Delvetek</span> Training Programs
           </h2>
           <p className="text-muted-foreground text-lg">
             6 weeks of live training plus a 2-week hands-on project. 

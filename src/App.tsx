@@ -20,6 +20,7 @@ import ProjectManagement from "./pages/courses/ProjectManagement";
 import BusinessAnalysis from "./pages/courses/BusinessAnalysis";
 import Cybersecurity from "./pages/courses/Cybersecurity";
 import SoftwareEngineering from "./pages/courses/SoftwareEngineering";
+import DataEngineering from "./pages/courses/DataEngineering";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/courses/business-analysis" element={<BusinessAnalysis />} />
             <Route path="/courses/cybersecurity" element={<Cybersecurity />} />
             <Route path="/courses/software-engineering" element={<SoftwareEngineering />} />
+            <Route path="/courses/data-engineering" element={<DataEngineering />} />
             <Route path="/webinar" element={<Webinar />} />
             <Route path="/ambassador" element={<AmbassadorForm />} />
             <Route path="/commitment" element={<CommitmentForm />} />
