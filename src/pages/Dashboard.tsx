@@ -177,44 +177,27 @@ const Dashboard = () => {
         {/* Class Recordings */}
         <ClassRecordings submittedWeeks={submittedWeeks} />
 
-        {/* Locked Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-border bg-card relative overflow-hidden">
-            <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
-                <p className="text-xs text-muted-foreground font-medium">Coming in Phase 3</p>
-              </div>
-            </div>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="text-primary"><BookOpen className="w-6 h-6" /></div>
-                <CardTitle className="font-display text-lg text-foreground">Assignments</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Complete weekly assignments and track scores</p>
-            </CardContent>
-          </Card>
+        {/* Assignments */}
+        <Assignments submittedWeeks={submittedWeeks} onScoreUpdate={fetchDashboardData} />
 
-          <Card className="border-border bg-card relative overflow-hidden">
-            <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
-                <p className="text-xs text-muted-foreground font-medium">Complete all weeks to unlock</p>
-              </div>
+        {/* Locked Features */}
+        <Card className="border-border bg-card relative overflow-hidden">
+          <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+            <div className="text-center space-y-2">
+              <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
+              <p className="text-xs text-muted-foreground font-medium">Complete all weeks to unlock</p>
             </div>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="text-primary"><Award className="w-6 h-6" /></div>
-                <CardTitle className="font-display text-lg text-foreground">Ambassador Program</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Unlock after completing the full 8-week program</p>
-            </CardContent>
-          </Card>
-        </div>
+          </div>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="text-primary"><Award className="w-6 h-6" /></div>
+              <CardTitle className="font-display text-lg text-foreground">Ambassador Program</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Unlock after completing the full 8-week program</p>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
