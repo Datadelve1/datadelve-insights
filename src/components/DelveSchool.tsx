@@ -1,37 +1,37 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BookOpen, BarChart2, Database, FolderKanban, Shield, Code, Briefcase } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { ArrowRight, BookOpen, BarChart2, FolderKanban, Shield, Code, Briefcase } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const courses = [
   {
     icon: BarChart2,
     title: "Data Analysis",
-    description: "Master data analysis with Excel, SQL, and visualization tools.",
-  },
-  {
-    icon: Database,
-    title: "Data Engineering",
-    description: "Build data pipelines, ETL processes, and data warehouses.",
+    description: "Master data analysis with SQL, Excel, Power BI, and visualization tools.",
+    href: "/courses/data-analysis",
   },
   {
     icon: FolderKanban,
     title: "Project Management",
-    description: "Learn Agile, Scrum, and modern project management frameworks.",
+    description: "Learn PRINCE2, Agile, Scrum, and modern project management frameworks.",
+    href: "/courses/project-management",
   },
   {
     icon: Briefcase,
     title: "Business Analysis",
     description: "Bridge business needs with technical solutions effectively.",
+    href: "/courses/business-analysis",
   },
   {
     icon: Shield,
     title: "Cybersecurity",
     description: "Protect systems and data with security best practices.",
+    href: "/courses/cybersecurity",
   },
   {
     icon: Code,
     title: "Software Engineering",
     description: "Build scalable applications with modern development practices.",
+    href: "/courses/software-engineering",
   },
 ];
 
