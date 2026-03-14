@@ -49,7 +49,7 @@ const Hero = () => {
               className="group"
               onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Book Your Session
+              Book a Clarity Session
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
