@@ -1,4 +1,5 @@
 import { Linkedin, Twitter, Github, Mail } from "lucide-react";
+import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -33,12 +34,10 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <a href="#home" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center">
-                <span className="font-display font-bold text-primary-foreground text-lg">D</span>
-              </div>
+            <a href="#home" className="flex items-center gap-3 mb-6">
+              <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
               <span className="font-display font-bold text-xl text-foreground">
-                Data<span className="text-primary">Delve</span>
+                Delve<span className="text-primary">Tek</span>
               </span>
             </a>
             <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed">
@@ -65,12 +64,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors duration-300"
-                  >
-                    {link.name}
-                  </a>
+                  <a href={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
                 </li>
               ))}
             </ul>
@@ -81,12 +75,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors duration-300"
-                  >
-                    {link.name}
-                  </a>
+                  <a href={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
                 </li>
               ))}
             </ul>
@@ -97,26 +86,16 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors duration-300"
-                  >
-                    {link.name}
-                  </a>
+                  <a href={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {currentYear} DataDelve. All rights reserved.
-          </p>
-          <p className="text-muted-foreground text-sm">
-            Crafted with passion for data education
-          </p>
+          <p className="text-muted-foreground text-sm">© {currentYear} DelveTek. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">Your Path to Global Tech Mastery</p>
         </div>
       </div>
     </footer>

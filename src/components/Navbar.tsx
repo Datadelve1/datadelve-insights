@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
+import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
 
   const navLinks = [
     { name: "Home", href: "#home" },
@@ -16,17 +18,26 @@ const Navbar = () => {
     { name: "Contact", href: "#contact" },
   ];
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+    if (newCount >= 5) {
+      setLogoClickCount(0);
+      window.location.href = "/admin";
+    }
+    // Reset after 3 seconds
+    setTimeout(() => setLogoClickCount(0), 3000);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-amber-600 flex items-center justify-center">
-              <span className="font-display font-bold text-primary-foreground text-lg">D</span>
-            </div>
+          <a href="#home" className="flex items-center gap-3" onClick={handleLogoClick}>
+            <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
             <span className="font-display font-bold text-xl text-foreground">
-              Data<span className="text-primary">Delve</span>
+              Delve<span className="text-primary">Tek</span>
             </span>
           </a>
 
@@ -36,7 +47,7 @@ const Navbar = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+                className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
               >
                 {link.name}
               </a>
@@ -65,7 +76,7 @@ const Navbar = () => {
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors duration-300 font-medium"
+                  className="text-muted-foreground hover:text-primary transition-colors duration-300 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
