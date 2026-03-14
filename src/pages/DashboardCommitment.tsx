@@ -90,8 +90,8 @@ const DashboardCommitment = () => {
       });
 
       toast({ title: "Commitment confirmed! 🎉", description: "Your dashboard is now unlocked." });
-      // Force page reload to refresh auth context
-      window.location.href = "/dashboard";
+      await refreshCommitment();
+      navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
     } finally {
