@@ -18,7 +18,7 @@ import {
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
-
+import Assignments from "@/components/dashboard/Assignments";
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
