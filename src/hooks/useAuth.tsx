@@ -1,0 +1,140 @@
+import { useState, useEffect, createContext, useContext } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { User, Session } from "@supabase/supabase-js";
+
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  profile: { full_name: string; email: string } | null;
+  isAdmin: boolean;
+  isLoading: boolean;
+  hasCommitted: boolean;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  session: null,
+  profile: null,
+  isAdmin: false,
+  isLoading: true,
+  hasCommitted: false,
+  signOut: async () => {},
+});
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string; email: string } | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCommitted, setHasCommitted] = useState(false);
+
+  const fetchUserData = async (userId: string, email: string) => {
+    // Fetch profile
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("full_name, email")
+      .eq("id", userId)
+      .single();
+
+    if (profileData) setProfile(profileData);
+
+    // Check admin role
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    setIsAdmin(roles?.some((r: any) => r.role === "admin") ?? false);
+
+    // Check commitment
+    const { data: commitments } = await supabase
+      .from("training_commitments")
+      .select("id")
+      .eq("user_id", userId)
+      .limit(1);
+
+    // Also check by email if no user_id match (legacy submissions)
+    if (!commitments?.length) {
+      const { data: legacyCommitments } = await supabase
+        .from("training_commitments")
+        .select("id")
+        .eq("email", email)
+        .limit(1);
+      setHasCommitted(!!legacyCommitments?.length);
+    } else {
+      setHasCommitted(true);
+    }
+  };
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          // Use setTimeout to avoid Supabase auth deadlock
+          setTimeout(() => {
+            fetchUserData(session.user.id, session.user.email ?? "");
+            setIsLoading(false);
+          }, 0);
+        } else {
+          setProfile(null);
+          setIsAdmin(false);
+          setHasCommitted(false);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserData(session.user.id, session.user.email ?? "").then(() =>
+          setIsLoading(false)
+        );
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const refreshCommitment = async () => {
+    if (user) {
+      const { data } = await supabase
+        .from("training_commitments")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+      if (!data?.length && user.email) {
+        const { data: legacy } = await supabase
+          .from("training_commitments")
+          .select("id")
+          .eq("email", user.email)
+          .limit(1);
+        setHasCommitted(!!legacy?.length);
+      } else {
+        setHasCommitted(!!data?.length);
+      }
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ user, session, profile, isAdmin, isLoading, hasCommitted, signOut }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
