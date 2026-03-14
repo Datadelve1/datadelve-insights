@@ -18,23 +18,34 @@ import {
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
-
+import Assignments from "@/components/dashboard/Assignments";
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
+  const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    const [{ data: reviewData }, { data: subData }] = await Promise.all([
+      supabase.from("weekly_reviews").select("week_number").eq("user_id", user.id),
+      supabase
+        .from("assignment_submissions")
+        .select("assignment_id, score, total, assignments!inner(week_number)")
+        .eq("user_id", user.id),
+    ]);
+    setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
+    const scores: Record<number, { score: number; total: number }> = {};
+    (subData || []).forEach((s: any) => {
+      const wn = s.assignments?.week_number;
+      if (wn) scores[wn] = { score: s.score, total: s.total };
+    });
+    setAssignmentScores(scores);
+    setReviewsLoaded(true);
+  };
+
   useEffect(() => {
-    const fetchSubmittedWeeks = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("weekly_reviews")
-        .select("week_number")
-        .eq("user_id", user.id);
-      setSubmittedWeeks(new Set((data || []).map((r) => r.week_number)));
-      setReviewsLoaded(true);
-    };
-    if (user && hasCommitted) fetchSubmittedWeeks();
+    if (user && hasCommitted) fetchDashboardData();
   }, [user, hasCommitted]);
 
   if (isLoading) {
@@ -127,24 +138,32 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
               {Array.from({ length: 8 }, (_, i) => {
                 const week = i + 1;
-                const completed = submittedWeeks.has(week);
+                const reviewDone = submittedWeeks.has(week);
+                const score = assignmentScores[week];
                 return (
                   <div
                     key={i}
-                    className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
-                      completed
+                    className={`flex flex-col gap-1 rounded-lg p-3 text-sm ${
+                      reviewDone
                         ? "bg-primary/10 border border-primary/20"
                         : "bg-secondary"
                     }`}
                   >
-                    {completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Lock className="w-4 h-4 text-muted-foreground" />
+                    <div className="flex items-center gap-2">
+                      {reviewDone ? (
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                      ) : (
+                        <Lock className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      <span className={reviewDone ? "text-foreground font-medium" : "text-muted-foreground"}>
+                        Week {week} {week >= 7 ? "(Project)" : ""}
+                      </span>
+                    </div>
+                    {score && (
+                      <span className="text-xs text-primary font-medium pl-6">
+                        Score: {score.score}/{score.total}
+                      </span>
                     )}
-                    <span className={completed ? "text-foreground font-medium" : "text-muted-foreground"}>
-                      Week {week} {week >= 7 ? "(Project)" : ""}
-                    </span>
                   </div>
                 );
               })}
@@ -158,44 +177,27 @@ const Dashboard = () => {
         {/* Class Recordings */}
         <ClassRecordings submittedWeeks={submittedWeeks} />
 
-        {/* Locked Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-border bg-card relative overflow-hidden">
-            <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
-                <p className="text-xs text-muted-foreground font-medium">Coming in Phase 3</p>
-              </div>
-            </div>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="text-primary"><BookOpen className="w-6 h-6" /></div>
-                <CardTitle className="font-display text-lg text-foreground">Assignments</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Complete weekly assignments and track scores</p>
-            </CardContent>
-          </Card>
+        {/* Assignments */}
+        <Assignments submittedWeeks={submittedWeeks} onScoreUpdate={fetchDashboardData} />
 
-          <Card className="border-border bg-card relative overflow-hidden">
-            <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
-                <p className="text-xs text-muted-foreground font-medium">Complete all weeks to unlock</p>
-              </div>
+        {/* Locked Features */}
+        <Card className="border-border bg-card relative overflow-hidden">
+          <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
+            <div className="text-center space-y-2">
+              <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
+              <p className="text-xs text-muted-foreground font-medium">Complete all weeks to unlock</p>
             </div>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className="text-primary"><Award className="w-6 h-6" /></div>
-                <CardTitle className="font-display text-lg text-foreground">Ambassador Program</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Unlock after completing the full 8-week program</p>
-            </CardContent>
-          </Card>
-        </div>
+          </div>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="text-primary"><Award className="w-6 h-6" /></div>
+              <CardTitle className="font-display text-lg text-foreground">Ambassador Program</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Unlock after completing the full 8-week program</p>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
