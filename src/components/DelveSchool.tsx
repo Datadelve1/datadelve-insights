@@ -47,10 +47,10 @@ const DelveSchool = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <BookOpen className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">New Product</span>
+            <span className="text-sm text-muted-foreground">Our Courses</span>
           </div>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Introducing <span className="gradient-text">Delve School</span>
+            <span className="gradient-text">Delvetek</span> Training Programs
           </h2>
           <p className="text-muted-foreground text-lg">
             6 weeks of live training plus a 2-week hands-on project. 

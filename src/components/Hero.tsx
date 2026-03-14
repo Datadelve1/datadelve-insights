@@ -27,7 +27,7 @@ const Hero = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 opacity-0 animate-fade-in animation-delay-100">
             <Zap className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Transform Your Data Skills</span>
+            <span className="text-sm text-muted-foreground">Transform Your Tech Career</span>
           </div>
 
           {/* Heading */}

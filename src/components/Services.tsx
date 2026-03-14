@@ -35,10 +35,10 @@ const Services = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-primary font-medium mb-4 block">Our Services</span>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Learn the Skills That Make You a <span className="gradient-text">Practical Data Analyst</span>
+            Learn the Skills That Make You a <span className="gradient-text">Job-Ready Tech Professional</span>
           </h2>
           <p className="text-muted-foreground text-lg">
-            At DataDelve, we focus on practical data skills that matter. You'll master the foundational tools — Excel for analysis, SQL for querying, Python for automation, and Power BI for reporting — through guided exercises and meaningful projects that build a polished analytics portfolio.
+            At Delvetek, we focus on practical tech skills that matter. From data analysis and project management to cybersecurity and software engineering — master in-demand skills through guided exercises and meaningful projects.
           </p>
         </div>
 
