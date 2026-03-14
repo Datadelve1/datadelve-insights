@@ -10,6 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   hasCommitted: boolean;
   signOut: () => Promise<void>;
+  refreshCommitment: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
