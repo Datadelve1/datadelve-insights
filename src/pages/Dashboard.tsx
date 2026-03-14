@@ -25,17 +25,27 @@ const Dashboard = () => {
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    const [{ data: reviewData }, { data: subData }] = await Promise.all([
+      supabase.from("weekly_reviews").select("week_number").eq("user_id", user.id),
+      supabase
+        .from("assignment_submissions")
+        .select("assignment_id, score, total, assignments!inner(week_number)")
+        .eq("user_id", user.id),
+    ]);
+    setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
+    const scores: Record<number, { score: number; total: number }> = {};
+    (subData || []).forEach((s: any) => {
+      const wn = s.assignments?.week_number;
+      if (wn) scores[wn] = { score: s.score, total: s.total };
+    });
+    setAssignmentScores(scores);
+    setReviewsLoaded(true);
+  };
+
   useEffect(() => {
-    const fetchSubmittedWeeks = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("weekly_reviews")
-        .select("week_number")
-        .eq("user_id", user.id);
-      setSubmittedWeeks(new Set((data || []).map((r) => r.week_number)));
-      setReviewsLoaded(true);
-    };
-    if (user && hasCommitted) fetchSubmittedWeeks();
+    if (user && hasCommitted) fetchDashboardData();
   }, [user, hasCommitted]);
 
   if (isLoading) {
