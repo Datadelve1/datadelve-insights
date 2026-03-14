@@ -12,7 +12,7 @@ import { ArrowLeft, Loader2, Lock } from "lucide-react";
 import { Navigate, Link } from "react-router-dom";
 
 const DashboardCommitment = () => {
-  const { user, profile, isLoading, hasCommitted } = useAuth();
+  const { user, profile, isLoading, hasCommitted, refreshCommitment } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,8 +90,8 @@ const DashboardCommitment = () => {
       });
 
       toast({ title: "Commitment confirmed! 🎉", description: "Your dashboard is now unlocked." });
-      // Force page reload to refresh auth context
-      window.location.href = "/dashboard";
+      await refreshCommitment();
+      navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
     } finally {

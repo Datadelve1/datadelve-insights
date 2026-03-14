@@ -10,6 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   hasCommitted: boolean;
   signOut: () => Promise<void>;
+  refreshCommitment: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   hasCommitted: false,
   signOut: async () => {},
+  refreshCommitment: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -130,7 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, profile, isAdmin, isLoading, hasCommitted, signOut }}
+      value={{ user, session, profile, isAdmin, isLoading, hasCommitted, signOut, refreshCommitment }}
     >
       {children}
     </AuthContext.Provider>
