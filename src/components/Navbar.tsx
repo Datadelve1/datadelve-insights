@@ -71,16 +71,10 @@ const Navbar = () => {
                   {link.name}
                 </a>
               ))}
-              <Button 
-                variant="hero" 
-                size="default" 
-                className="w-full mt-2"
-                onClick={() => {
-                  setIsOpen(false);
-                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                Get Started
+              <Button variant="hero" size="default" className="w-full mt-2" asChild>
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <GraduationCap className="w-4 h-4" /> Student Portal
+                </Link>
               </Button>
             </div>
           </div>
