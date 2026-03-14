@@ -94,7 +94,7 @@ const DelveSchool = () => {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            Self-paced learning with lifetime access • Start anytime
+            Live online sessions • 3 hours, Friday & Saturday • Certificate upon completion
           </p>
         </div>
       </div>

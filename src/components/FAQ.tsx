@@ -7,36 +7,40 @@ import {
 
 const faqs = [
   {
-    question: "Who is DataDelve training for?",
-    answer: "Our training is designed for anyone looking to build or advance their data skills—whether you're a complete beginner, a professional transitioning into data, or someone looking to level up specific skills like Python or SQL.",
+    question: "Who is Delvetek training for?",
+    answer: "Students, undergraduates, graduates, NYSC members, career switchers, and working professionals looking to build or advance their tech skills.",
   },
   {
-    question: "Do I need any prior experience?",
-    answer: "Not at all! We tailor each session to your current skill level. Whether you've never touched a spreadsheet or you're already working with data daily, we'll meet you where you are.",
+    question: "Do I need prior experience?",
+    answer: "No, all our programs cover fundamentals to advanced levels. We meet you where you are, regardless of your current skill level.",
   },
   {
     question: "How are the sessions delivered?",
-    answer: "All sessions are conducted one-on-one via video call. This allows for personalized attention, real-time feedback, and the flexibility to focus on what matters most to you.",
+    answer: "All sessions are delivered live online via the student dashboard. You get real-time interaction with instructors and fellow students.",
   },
   {
     question: "How long is each session?",
-    answer: "Standard sessions are 60 minutes, but we also offer 90-minute deep-dive sessions for more complex topics or hands-on project work.",
+    answer: "Each session is 3 hours, held on Fridays and Saturdays.",
   },
   {
-    question: "What tools and software will I learn?",
-    answer: "Depending on your goals, you may work with Excel, SQL, Python (pandas, matplotlib), Tableau, Power BI, Git/GitHub, and more. We focus on industry-standard tools that employers value.",
+    question: "What happens if I miss a session?",
+    answer: "You can access the recorded class video through your dashboard after submitting your weekly review for that week.",
   },
   {
-    question: "Do you offer package deals or discounts?",
-    answer: "Yes! We offer discounted packages for booking multiple sessions upfront. Contact us to learn about current offers and find the right package for your learning journey.",
+    question: "How are assignments submitted and tracked?",
+    answer: "Assignments are submitted through the student dashboard. They feature automated grading with additional admin review for detailed feedback.",
   },
   {
-    question: "What is the capstone project?",
-    answer: "The capstone is a real-world data project you'll complete with guidance. It becomes a portfolio piece you can showcase to employers, demonstrating your practical skills.",
+    question: "Do I get a certificate?",
+    answer: "Yes, certificates are issued upon completion of the full program and meeting all participation requirements including weekly reviews and assignments.",
   },
   {
-    question: "How do I get started?",
-    answer: "Simply fill out the contact form or book a free consultation call. We'll discuss your goals, assess your current level, and create a personalized learning plan.",
+    question: "What is the Optional Advanced Package?",
+    answer: "It includes CV optimization, LinkedIn profile setup, and personalized guidance for applying to jobs. Contact us for more details.",
+  },
+  {
+    question: "What are the hands-on projects?",
+    answer: "A 2-week project at the end of the 6-week training where you work on real-world scenario simulations relevant to your course track.",
   },
 ];
 
