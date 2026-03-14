@@ -65,8 +65,8 @@ const WeeklyReviews = () => {
       toast({ title: "You already submitted a review for this week", variant: "destructive" });
       return;
     }
-    if (reflectionType === "video" && !videoUrl.trim()) {
-      toast({ title: "Please enter a video URL", variant: "destructive" });
+    if (reflectionType === "video" && !videoFile) {
+      toast({ title: "Please select a video file", variant: "destructive" });
       return;
     }
     if (reflectionType === "written" && !writtenReflection.trim()) {
