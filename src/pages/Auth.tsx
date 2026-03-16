@@ -46,6 +46,20 @@ const Auth = () => {
           password: form.password,
         });
         if (error) throw error;
+
+        // Check if user is admin and redirect accordingly
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data: roles } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", authUser.id);
+          const hasAdmin = roles?.some((r: any) => r.role === "admin");
+          if (hasAdmin) {
+            navigate("/admin/dashboard");
+            return;
+          }
+        }
         navigate("/dashboard");
       } else {
         if (!form.full_name.trim()) {
