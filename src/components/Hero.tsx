@@ -47,10 +47,12 @@ const Hero = () => {
               variant="hero" 
               size="xl" 
               className="group"
-              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              asChild
             >
-              Book a Clarity Session
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20book%20a%20clarity%20session" target="_blank" rel="noopener noreferrer">
+                Book a Clarity Session
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </Button>
             <Button 
               variant="hero-outline" 

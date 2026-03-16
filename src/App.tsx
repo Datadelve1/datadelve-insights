@@ -27,6 +27,11 @@ import BusinessAnalysis from "./pages/courses/BusinessAnalysis";
 import Cybersecurity from "./pages/courses/Cybersecurity";
 import SoftwareEngineering from "./pages/courses/SoftwareEngineering";
 import DataEngineering from "./pages/courses/DataEngineering";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Blog from "./pages/Blog";
+import CaseStudies from "./pages/CaseStudies";
+import ComingSoonPage from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +57,11 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/commitment" element={<DashboardCommitment />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/case-studies" element={<CaseStudies />} />
+            <Route path="/coming-soon" element={<ComingSoonPage />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminOverview />} />

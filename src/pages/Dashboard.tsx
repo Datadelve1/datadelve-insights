@@ -14,6 +14,7 @@ import {
   Lock,
   CheckCircle2,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
