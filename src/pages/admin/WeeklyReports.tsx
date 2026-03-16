@@ -33,7 +33,7 @@ const WeeklyReports = () => {
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("student_attendance").select("id", { count: "exact", head: true }).eq("week_number", week).eq("status", "present"),
       supabase.from("weekly_reviews").select("id", { count: "exact", head: true }).eq("week_number", week),
-      supabase.from("assignment_submissions").select("id, assignments!inner(week_number)").eq("assignments.week_number" as any, week),
+      supabase.from("assignment_submissions").select("id, assignment_id"),
     ]);
 
     setTotalStudents(profilesRes.count ?? 0);

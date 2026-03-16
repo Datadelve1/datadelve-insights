@@ -13,7 +13,11 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import DashboardCommitment from "./pages/DashboardCommitment";
 import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminOverview from "./pages/admin/AdminOverview";
+import StudentTracking from "./pages/admin/StudentTracking";
+import WeeklyReports from "./pages/admin/WeeklyReports";
+import ComingSoon from "./pages/admin/ComingSoon";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DataAnalysis from "./pages/courses/DataAnalysis";
@@ -48,7 +52,16 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/commitment" element={<DashboardCommitment />} />
             <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminOverview />} />
+              <Route path="students" element={<StudentTracking />} />
+              <Route path="reports" element={<WeeklyReports />} />
+              <Route path="videos" element={<ComingSoon />} />
+              <Route path="assignments" element={<ComingSoon />} />
+              <Route path="certificates" element={<ComingSoon />} />
+              <Route path="ambassadors" element={<ComingSoon />} />
+              <Route path="notifications" element={<ComingSoon />} />
+            </Route>
             <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
