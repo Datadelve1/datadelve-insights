@@ -16,6 +16,7 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { isAdmin, user } = useAuth();
 
+  const [isForgot, setIsForgot] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
   // If already logged in as admin, redirect
