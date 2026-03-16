@@ -17,6 +17,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import StudentTracking from "./pages/admin/StudentTracking";
 import WeeklyReports from "./pages/admin/WeeklyReports";
+import VideoManagement from "./pages/admin/VideoManagement";
 import ComingSoon from "./pages/admin/ComingSoon";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
