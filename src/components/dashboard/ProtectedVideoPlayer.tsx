@@ -91,8 +91,9 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
     const video = videoRef.current;
     if (video) {
       video.disablePictureInPicture = true;
-      video.controlsList?.add("nodownload");
-      video.controlsList?.add("noplaybackrate");
+      // controlsList is not in TS types but works in browsers
+      (video as any).controlsList?.add("nodownload");
+      (video as any).controlsList?.add("noplaybackrate");
     }
   }, []);
 
