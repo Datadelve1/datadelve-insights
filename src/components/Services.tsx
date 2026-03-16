@@ -82,7 +82,7 @@ const Services = () => {
                 asChild
               >
                 <a 
-                  href="https://www.youtube.com/@datadelveio" 
+                  href="http://www.youtube.com/@Delvetek" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2"

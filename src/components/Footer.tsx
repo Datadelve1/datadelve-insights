@@ -1,4 +1,5 @@
-import { Linkedin, Twitter, Github, Mail } from "lucide-react";
+import { Linkedin, Mail, Facebook, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Footer = () => {
@@ -11,21 +12,21 @@ const Footer = () => {
       { name: "Contact", href: "#contact" },
     ],
     resources: [
-      { name: "Blog", href: "#" },
-      { name: "Case Studies", href: "#" },
-      { name: "Free Resources", href: "#" },
+      { name: "Blog", href: "/blog" },
+      { name: "Case Studies", href: "/case-studies" },
+      { name: "Free Resources", href: "https://www.youtube.com/@Delvetek", external: true },
     ],
     legal: [
-      { name: "Privacy Policy", href: "#" },
-      { name: "Terms of Service", href: "#" },
+      { name: "Privacy Policy", href: "/privacy-policy" },
+      { name: "Terms of Service", href: "/terms-of-service" },
     ],
   };
 
   const socialLinks = [
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Github, href: "#", label: "GitHub" },
-    { icon: Mail, href: "#contact", label: "Email" },
+    { icon: Linkedin, href: "https://www.linkedin.com/company/datadelve.com/", label: "LinkedIn" },
+    { icon: Facebook, href: "https://www.facebook.com/share/15hQHcG1G9L/?mibextid=wwXIfr", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/delvetek_?igsh=MXB2Y2Myd2pibzc3Yg%3D%3D&utm_source=qr", label: "Instagram" },
+    { icon: Mail, href: "mailto:datadelve1@gmail.com", label: "Email" },
   ];
 
   return (
@@ -49,6 +50,8 @@ const Footer = () => {
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-secondary transition-colors duration-300"
                 >
@@ -75,7 +78,11 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
+                  {link.external ? (
+                    <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
+                  ) : (
+                    <Link to={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -86,7 +93,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</a>
+                  <Link to={link.href} className="text-muted-foreground hover:text-foreground transition-colors duration-300">{link.name}</Link>
                 </li>
               ))}
             </ul>

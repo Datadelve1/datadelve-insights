@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, MapPin, Clock, Send } from "lucide-react";
+import { Mail, MapPin, Clock, Send, MessageCircle, Phone } from "lucide-react";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -22,33 +22,26 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-      toast({
-        title: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      toast({
-        title: "Please enter a valid email address",
-        variant: "destructive",
-      });
+      toast({ title: "Please enter a valid email address", variant: "destructive" });
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Open mailto with the form data
+    const mailtoLink = `mailto:datadelve1@gmail.com?subject=${encodeURIComponent(formData.subject || "Contact from Website")}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+    window.open(mailtoLink);
 
     toast({
-      title: "Message sent successfully!",
-      description: "We'll get back to you within 24 hours.",
+      title: "Opening your email client...",
+      description: "Your message is ready to send to datadelve1@gmail.com",
     });
 
     setFormData({ name: "", email: "", subject: "", message: "" });
@@ -59,12 +52,14 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      value: "hello@datadelve.com",
+      value: "datadelve1@gmail.com",
+      href: "mailto:datadelve1@gmail.com",
     },
     {
-      icon: MapPin,
-      title: "Location",
-      value: "Remote & Worldwide",
+      icon: MessageCircle,
+      title: "WhatsApp",
+      value: "+234 803 814 9647",
+      href: "https://wa.me/2348038149647?text=Hello%20I%20want%20to%20chat",
     },
     {
       icon: Clock,
@@ -104,20 +99,37 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">{info.title}</p>
-                  <p className="font-display font-semibold text-foreground">{info.value}</p>
+                  {info.href ? (
+                    <a href={info.href} target={info.href.startsWith("https") ? "_blank" : undefined} rel="noopener noreferrer" className="font-display font-semibold text-foreground hover:text-primary transition-colors">
+                      {info.value}
+                    </a>
+                  ) : (
+                    <p className="font-display font-semibold text-foreground">{info.value}</p>
+                  )}
                 </div>
               </div>
             ))}
 
-            {/* Additional Info Card */}
+            {/* Clarity Session Card */}
             <div className="p-6 rounded-2xl gradient-border bg-card/50">
               <h3 className="font-display font-semibold text-lg mb-3 text-foreground">
-                Book a Free Consultation
+                Book a Free Clarity Session
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Not sure where to start? Book a free 15-minute call to discuss your goals 
-                and get a customized learning roadmap.
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                Not sure where to start? Reach out via WhatsApp or email for a personalized consultation.
               </p>
+              <div className="flex gap-3">
+                <Button variant="hero" size="sm" asChild>
+                  <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20book%20a%20clarity%20session" target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </a>
+                </Button>
+                <Button variant="hero-outline" size="sm" asChild>
+                  <a href="mailto:datadelve1@gmail.com?subject=Clarity%20Session%20Booking">
+                    <Mail className="w-4 h-4" /> Email
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -126,78 +138,24 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="p-8 rounded-3xl glass space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Your Name *
-                  </label>
-                  <Input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="John Doe"
-                    className="bg-secondary/50 border-border/50 focus:border-primary"
-                    maxLength={100}
-                  />
+                  <label className="block text-sm font-medium text-foreground mb-2">Your Name *</label>
+                  <Input name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className="bg-secondary/50 border-border/50 focus:border-primary" maxLength={100} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Email Address *
-                  </label>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="john@example.com"
-                    className="bg-secondary/50 border-border/50 focus:border-primary"
-                    maxLength={255}
-                  />
+                  <label className="block text-sm font-medium text-foreground mb-2">Email Address *</label>
+                  <Input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" className="bg-secondary/50 border-border/50 focus:border-primary" maxLength={255} />
                 </div>
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Subject
-                </label>
-                <Input
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="What would you like to learn?"
-                  className="bg-secondary/50 border-border/50 focus:border-primary"
-                  maxLength={200}
-                />
+                <label className="block text-sm font-medium text-foreground mb-2">Subject</label>
+                <Input name="subject" value={formData.subject} onChange={handleChange} placeholder="What would you like to learn?" className="bg-secondary/50 border-border/50 focus:border-primary" maxLength={200} />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Message *
-                </label>
-                <Textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Tell us about your goals and experience level..."
-                  rows={5}
-                  className="bg-secondary/50 border-border/50 focus:border-primary resize-none"
-                  maxLength={1000}
-                />
+                <label className="block text-sm font-medium text-foreground mb-2">Message *</label>
+                <Textarea name="message" value={formData.message} onChange={handleChange} placeholder="Tell us about your goals and experience level..." rows={5} className="bg-secondary/50 border-border/50 focus:border-primary resize-none" maxLength={1000} />
               </div>
-
-              <Button
-                type="submit"
-                variant="hero"
-                size="lg"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  "Sending..."
-                ) : (
-                  <>
-                    Send Message
-                    <Send className="w-4 h-4" />
-                  </>
-                )}
+              <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
+                {isLoading ? "Sending..." : (<>Send Message <Send className="w-4 h-4" /></>)}
               </Button>
             </form>
           </div>
