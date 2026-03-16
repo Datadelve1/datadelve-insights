@@ -78,6 +78,11 @@ const Dashboard = () => {
             <span className="text-sm text-muted-foreground hidden sm:block">
               {profile?.full_name || user.email}
             </span>
+            <Button variant="ghost" size="sm" asChild>
+              <a href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" /> Home
+              </a>
+            </Button>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>
