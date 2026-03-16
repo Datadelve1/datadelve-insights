@@ -11,7 +11,7 @@ const ProjectManagement = () => (
       { question: "Who is this course for?", answer: "Students, NYSC members, career switchers, and working professionals looking to break into or advance in project management." },
       { question: "Do I need prior project experience?", answer: "No, this course is beginner-friendly and covers fundamentals through advanced techniques." },
       { question: "What tools will I use?", answer: "MS Project, Jira, and Trello for hands-on project planning and tracking." },
-      { question: "Will I earn any certifications or badges?", answer: "Yes, you receive a certificate of completion including PRINCE2 and Agile badges." },
+      { question: "Will I earn any certifications or badges?", answer: "Yes, you receive a certificate of completion including PRINCE2 and Agile badges. Please note that certificates are paid and not included in free/standard access." },
     ]}
   />
 );

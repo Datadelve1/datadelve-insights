@@ -12,7 +12,7 @@ const DataEngineering = () => (
       { question: "What tools will I use?", answer: "You will work with SQL, Python, Apache Spark, Airflow, and cloud platforms like AWS, Azure, or GCP." },
       { question: "What's included in the hands-on project?", answer: "You'll build a complete data pipeline from ingestion to transformation and loading, simulating real job scenarios." },
       { question: "Is cloud access provided?", answer: "Yes, instructions and access details for cloud platforms are provided via the student dashboard." },
-      { question: "Is a certificate provided?", answer: "Yes, you receive a certificate of completion after finishing the 8-week program and meeting all requirements." },
+      { question: "Is a certificate provided?", answer: "Yes, you receive a certificate of completion after finishing the 8-week program and meeting all requirements. Please note that certificates are paid and not included in free/standard access." },
     ]}
   />
 );
