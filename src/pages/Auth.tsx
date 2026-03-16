@@ -10,6 +10,7 @@ import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgot, setIsForgot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
@@ -26,6 +27,19 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      if (isForgot) {
+        const { error } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast({
+          title: "Reset link sent! 📧",
+          description: "Check your email for the password reset link.",
+        });
+        setIsForgot(false);
+        setIsLoading(false);
+        return;
+      }
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email: form.email.trim(),
@@ -75,10 +89,12 @@ const Auth = () => {
             <img src={delvetekLogo} alt="Delvetek" className="h-14 w-auto rounded-xl" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isLogin ? "Welcome Back" : "Join Delvetek"}
+            {isForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join Delvetek"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin
+            {isForgot
+              ? "Enter your email to receive a reset link"
+              : isLogin
               ? "Sign in to access your student dashboard"
               : "Create your account to start learning"}
           </p>
@@ -87,7 +103,7 @@ const Auth = () => {
         {/* Form */}
         <div className="rounded-2xl border border-border bg-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
+            {!isLogin && !isForgot && (
               <div className="space-y-2">
                 <Label className="text-foreground">Full Name</Label>
                 <Input
@@ -113,26 +129,28 @@ const Auth = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-foreground">Password</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                  className="bg-secondary border-border pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+            {!isForgot && (
+              <div className="space-y-2">
+                <Label className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    required
+                    className="bg-secondary border-border pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
@@ -142,6 +160,8 @@ const Auth = () => {
             >
               {isLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</>
+              ) : isForgot ? (
+                "Send Reset Link"
               ) : isLogin ? (
                 "Sign In"
               ) : (
@@ -150,15 +170,31 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
+            {isLogin && !isForgot && (
+              <button
+                onClick={() => setIsForgot(true)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
+              >
+                Forgot your password?
+              </button>
+            )}
             <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
+              onClick={() => { setIsLogin(!isLogin); setIsForgot(false); }}
+              className="text-sm text-primary hover:underline block mx-auto"
             >
-              {isLogin
+              {isLogin || isForgot
                 ? "Don't have an account? Sign up"
                 : "Already have an account? Sign in"}
             </button>
+            {isForgot && (
+              <button
+                onClick={() => setIsForgot(false)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
+              >
+                Back to Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>

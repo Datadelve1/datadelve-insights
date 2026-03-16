@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardCommitment from "./pages/DashboardCommitment";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DataAnalysis from "./pages/courses/DataAnalysis";
 import ProjectManagement from "./pages/courses/ProjectManagement";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/dashboard/commitment" element={<DashboardCommitment />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
