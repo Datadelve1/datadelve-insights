@@ -78,9 +78,13 @@ const AdminLogin = () => {
           </div>
           <div className="flex items-center justify-center gap-2 mb-2">
             <Shield className="w-5 h-5 text-primary" />
-            <h1 className="font-display text-2xl font-bold text-foreground">Admin Portal</h1>
+            <h1 className="font-display text-2xl font-bold text-foreground">
+              {isForgot ? "Reset Password" : "Admin Portal"}
+            </h1>
           </div>
-          <p className="text-muted-foreground text-sm">Authorized personnel only</p>
+          <p className="text-muted-foreground text-sm">
+            {isForgot ? "Enter your admin email to receive a reset link" : "Authorized personnel only"}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-8">
