@@ -18,6 +18,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import StudentTracking from "./pages/admin/StudentTracking";
 import WeeklyReports from "./pages/admin/WeeklyReports";
 import VideoManagement from "./pages/admin/VideoManagement";
+import StudentVideos from "./pages/admin/StudentVideos";
 import ComingSoon from "./pages/admin/ComingSoon";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="students" element={<StudentTracking />} />
               <Route path="reports" element={<WeeklyReports />} />
               <Route path="videos" element={<VideoManagement />} />
+              <Route path="student-videos" element={<StudentVideos />} />
               <Route path="assignments" element={<ComingSoon />} />
               <Route path="certificates" element={<ComingSoon />} />
               <Route path="ambassadors" element={<ComingSoon />} />

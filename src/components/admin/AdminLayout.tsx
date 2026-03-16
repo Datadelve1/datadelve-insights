@@ -29,11 +29,14 @@ import {
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
+import { FileVideo } from "lucide-react";
+
 const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Student Tracking", url: "/admin/students", icon: Users },
   { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Video Management", url: "/admin/videos", icon: Video },
+  { title: "Student Videos", url: "/admin/student-videos", icon: FileVideo },
   { title: "Assignments", url: "/admin/assignments", icon: FileText },
   { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
   { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
