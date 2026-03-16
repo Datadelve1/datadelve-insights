@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notes: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          note: string
+          user_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          note?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ambassador_applications: {
         Row: {
           attended_sessions: boolean
@@ -181,6 +205,36 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+        }
+        Relationships: []
+      }
+      student_attendance: {
+        Row: {
+          created_at: string
+          id: string
+          marked_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          week_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          marked_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          week_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          marked_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          week_number?: number
         }
         Relationships: []
       }
