@@ -89,10 +89,12 @@ const Auth = () => {
             <img src={delvetekLogo} alt="Delvetek" className="h-14 w-auto rounded-xl" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isLogin ? "Welcome Back" : "Join Delvetek"}
+            {isForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join Delvetek"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            {isLogin
+            {isForgot
+              ? "Enter your email to receive a reset link"
+              : isLogin
               ? "Sign in to access your student dashboard"
               : "Create your account to start learning"}
           </p>
