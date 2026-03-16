@@ -29,17 +29,26 @@ const WeeklyReports = () => {
 
   const fetchReport = async (week: number) => {
     setLoading(true);
+    // Get assignments for this week first
+    const { data: weekAssignments } = await supabase
+      .from("assignments")
+      .select("id")
+      .eq("week_number", week);
+    const assignmentIds = (weekAssignments ?? []).map((a: any) => a.id);
+
     const [profilesRes, attendanceRes, reviewsRes, submissionsRes] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("student_attendance").select("id", { count: "exact", head: true }).eq("week_number", week).eq("status", "present"),
       supabase.from("weekly_reviews").select("id", { count: "exact", head: true }).eq("week_number", week),
-      supabase.from("assignment_submissions").select("id, assignment_id"),
+      assignmentIds.length > 0
+        ? supabase.from("assignment_submissions").select("id", { count: "exact", head: true }).in("assignment_id", assignmentIds)
+        : Promise.resolve({ count: 0 }),
     ]);
 
     setTotalStudents(profilesRes.count ?? 0);
     setReport({
       attended: attendanceRes.count ?? 0,
-      assignmentsSubmitted: submissionsRes.data?.length ?? 0,
+      assignmentsSubmitted: submissionsRes.count ?? 0,
       reflectionsSubmitted: reviewsRes.count ?? 0,
     });
     setLoading(false);
