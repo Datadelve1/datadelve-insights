@@ -142,6 +142,8 @@ const Auth = () => {
             >
               {isLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</>
+              ) : isForgot ? (
+                "Send Reset Link"
               ) : isLogin ? (
                 "Sign In"
               ) : (
@@ -150,15 +152,31 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
+            {isLogin && !isForgot && (
+              <button
+                onClick={() => setIsForgot(true)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
+              >
+                Forgot your password?
+              </button>
+            )}
             <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-primary hover:underline"
+              onClick={() => { setIsLogin(!isLogin); setIsForgot(false); }}
+              className="text-sm text-primary hover:underline block mx-auto"
             >
-              {isLogin
+              {isLogin || isForgot
                 ? "Don't have an account? Sign up"
                 : "Already have an account? Sign in"}
             </button>
+            {isForgot && (
+              <button
+                onClick={() => setIsForgot(false)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
+              >
+                Back to Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>
