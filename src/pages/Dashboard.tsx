@@ -21,6 +21,7 @@ import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
+import StudentVideoUpload from "@/components/dashboard/StudentVideoUpload";
 
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
