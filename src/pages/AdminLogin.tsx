@@ -101,26 +101,28 @@ const AdminLogin = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-foreground">Password</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                  className="bg-secondary border-border pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+            {!isForgot && (
+              <div className="space-y-2">
+                <Label className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    required
+                    className="bg-secondary border-border pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
@@ -129,12 +131,33 @@ const AdminLogin = () => {
               className="w-full h-12 text-base"
             >
               {isLoading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {isForgot ? "Sending..." : "Verifying..."}</>
+              ) : isForgot ? (
+                "Send Reset Link"
               ) : (
                 "Sign In as Admin"
               )}
             </Button>
           </form>
+
+          <div className="mt-6 text-center space-y-2">
+            {!isForgot && (
+              <button
+                onClick={() => setIsForgot(true)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
+              >
+                Forgot your password?
+              </button>
+            )}
+            {isForgot && (
+              <button
+                onClick={() => setIsForgot(false)}
+                className="text-sm text-primary hover:underline block mx-auto"
+              >
+                Back to Sign In
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
