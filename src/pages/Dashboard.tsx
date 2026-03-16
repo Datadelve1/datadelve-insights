@@ -185,6 +185,9 @@ const Dashboard = () => {
         {/* Assignments */}
         <Assignments submittedWeeks={submittedWeeks} onScoreUpdate={fetchDashboardData} />
 
+        {/* Student Video Upload */}
+        <StudentVideoUpload />
+
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">
           <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
