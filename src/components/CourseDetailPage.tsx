@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowLeft, Clock, CalendarDays, Monitor, Award, BookOpen, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowLeft, Clock, CalendarDays, Monitor, Award, BookOpen, CheckCircle2, Sparkles, MessageCircle, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -26,6 +26,16 @@ interface CourseDetailProps {
 }
 
 const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDetailProps) => {
+  // Add certificate FAQ if not already present
+  const allFaqs = [...faqs];
+  const hasCertFaq = faqs.some(f => f.question.toLowerCase().includes("certificate"));
+  if (!hasCertFaq) {
+    allFaqs.push({
+      question: "Do I get a certificate?",
+      answer: "Yes, certificates are issued upon completion of the full program and meeting all participation requirements. Please note that certificates are paid and not included in free/standard access.",
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -53,7 +63,7 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDe
               { icon: Clock, label: "Duration", value: "6 weeks + 2 week project" },
               { icon: CalendarDays, label: "Sessions", value: "3 hrs, Fri & Sat" },
               { icon: Monitor, label: "Mode", value: "Live online via dashboard" },
-              { icon: Award, label: "Certificate", value: "Yes, upon completion" },
+              { icon: Award, label: "Certificate", value: "Yes (paid)" },
             ].map((item) => (
               <Card key={item.label} className="border-primary/20 bg-primary/5">
                 <CardContent className="p-5 flex flex-col items-center text-center gap-2">
@@ -109,12 +119,21 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDe
                 <h3 className="font-display text-xl font-bold mb-3 text-foreground">
                   Optional Advanced Package
                 </h3>
-                <p className="text-muted-foreground mb-4 max-w-lg mx-auto">
+                <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
                   Take your career to the next level with CV optimization, LinkedIn profile setup, and personalized job application guidance.
                 </p>
-                <Button variant="hero" asChild>
-                  <a href="/#contact">Contact Us for Details</a>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="hero" asChild>
+                    <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20enquire%20about%20the%20Advanced%20Package" target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="w-4 h-4" /> WhatsApp Us
+                    </a>
+                  </Button>
+                  <Button variant="hero-outline" asChild>
+                    <a href="mailto:datadelve1@gmail.com?subject=Advanced%20Package%20Enquiry">
+                      <Mail className="w-4 h-4" /> Email Us
+                    </a>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -125,7 +144,7 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDe
               Frequently Asked Questions
             </h2>
             <Accordion type="single" collapsible className="space-y-4">
-              {faqs.map((faq, index) => (
+              {allFaqs.map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index}`} className="glass rounded-xl px-6 border-none">
                   <AccordionTrigger className="text-left font-display font-semibold hover:text-primary transition-colors py-6">
                     {faq.question}

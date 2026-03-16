@@ -91,7 +91,7 @@ const DelveSchool = () => {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            Live online sessions • 3 hours, Friday & Saturday • Certificate upon completion
+            Live online sessions • 3 hours, Friday & Saturday • Certificate upon completion (paid)
           </p>
         </div>
       </div>

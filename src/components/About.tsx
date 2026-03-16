@@ -39,7 +39,11 @@ const About = () => {
               ))}
             </div>
 
-            <Button variant="hero" size="lg">
+            <Button 
+              variant="hero" 
+              size="lg"
+              onClick={() => document.getElementById('webinar')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Start Your Journey
             </Button>
           </div>
@@ -47,29 +51,22 @@ const About = () => {
           {/* Right - Visual Element */}
           <div className="relative">
             <div className="aspect-square rounded-3xl glass p-8 relative overflow-hidden">
-              {/* Gradient Orb */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-primary/30 to-accent/30 rounded-full blur-3xl" />
-              
-              {/* Content Cards */}
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="gradient-border rounded-2xl p-6 bg-card/80 backdrop-blur-sm">
                   <div className="text-5xl font-display font-bold gradient-text mb-2">10+</div>
                   <p className="text-muted-foreground">Years of Industry Experience</p>
                 </div>
-                
                 <div className="gradient-border rounded-2xl p-6 bg-card/80 backdrop-blur-sm self-end max-w-[80%]">
                   <div className="text-5xl font-display font-bold gradient-text mb-2">24/7</div>
                   <p className="text-muted-foreground">Support & Resources Access</p>
                 </div>
-                
                 <div className="gradient-border rounded-2xl p-6 bg-card/80 backdrop-blur-sm max-w-[70%]">
                   <div className="text-5xl font-display font-bold gradient-text mb-2">100%</div>
                   <p className="text-muted-foreground">Personalized Experience</p>
                 </div>
               </div>
             </div>
-
-            {/* Floating Badge */}
             <div className="absolute -bottom-6 -left-6 glass rounded-2xl p-4 animate-float">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">

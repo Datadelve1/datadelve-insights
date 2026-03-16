@@ -1,15 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Users, Clock, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const WebinarRegistration = () => {
-  const [formUrl, setFormUrl] = useState("");
-  const [isConfigured, setIsConfigured] = useState(false);
-
-  // Replace this with your actual external form URL
   const EXTERNAL_FORM_URL = "https://forms.gle/rtGLzwfspG849Y4H6";
 
   const handleRegisterClick = () => {
@@ -19,24 +12,27 @@ const WebinarRegistration = () => {
   const upcomingTrainings = [
     {
       title: "Data Analytics Fundamentals",
-      date: "February 15, 2026",
-      time: "2:00 PM EST",
-      spots: 25,
+      date: "March 27th, 2026",
+      time: "6:00 PM (GMT+1)",
+      spots: "25 slots available – Closing soon",
       description: "Learn the basics of data analytics, including Excel, SQL fundamentals, and data visualization principles.",
+      registerAction: handleRegisterClick,
     },
     {
-      title: "Advanced Power BI Masterclass",
-      date: "February 22, 2026",
-      time: "10:00 AM EST",
-      spots: 15,
-      description: "Deep dive into Power BI with DAX formulas, custom visuals, and enterprise dashboards.",
+      title: "Project Management",
+      date: "Coming Soon",
+      time: "TBA",
+      spots: "Limited spots",
+      description: "Learn PRINCE2, Agile, and Scrum frameworks to manage projects confidently in any industry.",
+      comingSoon: true,
     },
     {
-      title: "Python for Data Science",
-      date: "March 1, 2026",
-      time: "11:00 AM EST",
-      spots: 20,
-      description: "Introduction to Python programming with pandas, numpy, and matplotlib for data analysis.",
+      title: "Business Analysis",
+      date: "Coming Soon",
+      time: "TBA",
+      spots: "Limited spots",
+      description: "Bridge business needs with technical solutions through requirements gathering and process mapping.",
+      comingSoon: true,
     },
   ];
 
@@ -87,18 +83,26 @@ const WebinarRegistration = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Users className="w-4 h-4 text-primary" />
-                  <span>{training.spots} spots available</span>
+                  <span>{training.spots}</span>
                 </div>
               </div>
 
-              <Button 
-                variant="hero-outline" 
-                className="w-full group/btn"
-                onClick={handleRegisterClick}
-              >
-                Register Now
-                <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-              </Button>
+              {training.comingSoon ? (
+                <Button variant="hero-outline" className="w-full" asChild>
+                  <Link to="/coming-soon">
+                    Coming Soon
+                  </Link>
+                </Button>
+              ) : (
+                <Button 
+                  variant="hero-outline" 
+                  className="w-full group/btn"
+                  onClick={training.registerAction}
+                >
+                  Register Now
+                  <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                </Button>
+              )}
             </div>
           ))}
         </div>

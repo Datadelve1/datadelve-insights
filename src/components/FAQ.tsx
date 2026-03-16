@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     question: "Do I get a certificate?",
-    answer: "Yes, certificates are issued upon completion of the full program and meeting all participation requirements including weekly reviews and assignments.",
+    answer: "Yes, certificates are issued upon completion of the full program and meeting all participation requirements including weekly reviews and assignments. Please note that certificates are paid and not included in free/standard access.",
   },
   {
     question: "What is the Optional Advanced Package?",
