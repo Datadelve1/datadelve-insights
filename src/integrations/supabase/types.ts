@@ -238,6 +238,48 @@ export type Database = {
         }
         Relationships: []
       }
+      student_video_submissions: {
+        Row: {
+          consent_given: boolean
+          created_at: string
+          description: string | null
+          id: string
+          session_date: string
+          storage_path: string
+          student_name: string
+          title: string | null
+          user_id: string
+          video_url: string
+          week_number: number
+        }
+        Insert: {
+          consent_given?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          session_date: string
+          storage_path: string
+          student_name: string
+          title?: string | null
+          user_id: string
+          video_url: string
+          week_number: number
+        }
+        Update: {
+          consent_given?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          session_date?: string
+          storage_path?: string
+          student_name?: string
+          title?: string | null
+          user_id?: string
+          video_url?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
       training_commitments: {
         Row: {
           agree_weekly_assignments: boolean
@@ -303,6 +345,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_access_logs: {
+        Row: {
+          accessed_by: string
+          action_type: string
+          created_at: string
+          id: string
+          video_id: string
+        }
+        Insert: {
+          accessed_by: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          video_id: string
+        }
+        Update: {
+          accessed_by?: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_access_logs_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "student_video_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webinar_registrations: {
         Row: {
