@@ -186,9 +186,6 @@ const Dashboard = () => {
         {/* Assignments */}
         <Assignments submittedWeeks={submittedWeeks} onScoreUpdate={fetchDashboardData} />
 
-        {/* SQL Playground */}
-        <SQLPlayground />
-
         {/* Student Video Upload */}
         <StudentVideoUpload />
 
