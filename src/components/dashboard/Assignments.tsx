@@ -245,7 +245,7 @@ const Assignments = ({
     }
   };
 
-  if (isLoading) {
+  if (isLoading || datasetsLoading) {
     return (
       <Card className="border-border bg-card">
         <CardContent className="flex items-center justify-center py-12">
