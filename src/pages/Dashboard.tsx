@@ -22,7 +22,7 @@ import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 import StudentVideoUpload from "@/components/dashboard/StudentVideoUpload";
-import SQLPlayground from "@/components/dashboard/SQLPlayground";
+
 
 const Dashboard = () => {
   const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
