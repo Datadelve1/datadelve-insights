@@ -118,7 +118,7 @@ const AssignmentManagement = () => {
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { question: "", dataset: "employees", expected_query: "" }]);
+    setQuestions([...questions, { question: "", dataset: "", expected_query: "" }]);
   };
 
   const removeQuestion = (idx: number) => {
