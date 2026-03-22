@@ -112,7 +112,7 @@ const AssignmentManagement = () => {
     setQuestions(
       a.questions.length > 0
         ? a.questions
-        : [{ question: "", dataset: "employees", expected_query: "" }]
+        : [{ question: "", dataset: "", expected_query: "" }]
     );
     setDialogOpen(true);
   };
