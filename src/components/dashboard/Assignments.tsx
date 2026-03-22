@@ -80,6 +80,7 @@ const Assignments = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const windowInfo = useSubmissionWindow();
+  const { datasets, loading: datasetsLoading } = useDatasets();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
   const [isLoading, setIsLoading] = useState(true);
