@@ -19,6 +19,7 @@ import {
   Table2,
 } from "lucide-react";
 import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
+import { useDatasets, type SqlDatasetRow } from "@/hooks/useDatasets";
 import type initSqlJs from "sql.js";
 
 type SqlJsStatic = Awaited<ReturnType<typeof initSqlJs>>;
@@ -52,38 +53,6 @@ interface QueryResult {
   values: (string | number | null | Uint8Array)[][];
 }
 
-// ── Dataset definitions (same as SQLPlayground) ──
-const DATASETS: Record<string, { schema: string; seedData: string }> = {
-  employees: {
-    schema: `
-CREATE TABLE departments (dept_id INTEGER PRIMARY KEY, dept_name TEXT NOT NULL, location TEXT);
-CREATE TABLE employees (emp_id INTEGER PRIMARY KEY, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT, hire_date TEXT, salary REAL, dept_id INTEGER, FOREIGN KEY (dept_id) REFERENCES departments(dept_id));`,
-    seedData: `
-INSERT INTO departments VALUES (1,'Engineering','Lagos');INSERT INTO departments VALUES (2,'Marketing','London');INSERT INTO departments VALUES (3,'Sales','Abuja');INSERT INTO departments VALUES (4,'HR','Lagos');INSERT INTO departments VALUES (5,'Finance','London');
-INSERT INTO employees VALUES (1,'Adaeze','Okafor','adaeze@company.com','2023-01-15',85000,1);INSERT INTO employees VALUES (2,'Chidi','Nwosu','chidi@company.com','2022-06-01',72000,2);INSERT INTO employees VALUES (3,'Fatima','Bello','fatima@company.com','2023-03-20',95000,1);INSERT INTO employees VALUES (4,'Emeka','Eze','emeka@company.com','2021-11-10',68000,3);INSERT INTO employees VALUES (5,'Ngozi','Adeyemi','ngozi@company.com','2024-01-05',55000,4);INSERT INTO employees VALUES (6,'Tunde','Bakare','tunde@company.com','2022-08-15',91000,1);INSERT INTO employees VALUES (7,'Amara','Igwe','amara@company.com','2023-07-22',78000,5);INSERT INTO employees VALUES (8,'Yusuf','Mohammed','yusuf@company.com','2021-04-30',62000,3);INSERT INTO employees VALUES (9,'Blessing','Obi','blessing@company.com','2024-02-14',70000,2);INSERT INTO employees VALUES (10,'Kunle','Ajayi','kunle@company.com','2022-12-01',88000,1);INSERT INTO employees VALUES (11,'Chioma','Uche','chioma@company.com','2023-09-10',65000,5);INSERT INTO employees VALUES (12,'Ibrahim','Sani','ibrahim@company.com','2021-07-19',73000,3);`,
-  },
-  sales: {
-    schema: `
-CREATE TABLE products (product_id INTEGER PRIMARY KEY, product_name TEXT NOT NULL, category TEXT, price REAL, stock INTEGER);
-CREATE TABLE customers (customer_id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT, city TEXT, country TEXT);
-CREATE TABLE orders (order_id INTEGER PRIMARY KEY, customer_id INTEGER, product_id INTEGER, quantity INTEGER, order_date TEXT, FOREIGN KEY (customer_id) REFERENCES customers(customer_id), FOREIGN KEY (product_id) REFERENCES products(product_id));`,
-    seedData: `
-INSERT INTO products VALUES (1,'Laptop','Electronics',1200.00,50);INSERT INTO products VALUES (2,'Headphones','Electronics',89.99,200);INSERT INTO products VALUES (3,'Desk Chair','Furniture',350.00,75);INSERT INTO products VALUES (4,'Notebook','Stationery',12.50,500);INSERT INTO products VALUES (5,'Monitor','Electronics',450.00,30);INSERT INTO products VALUES (6,'Keyboard','Electronics',65.00,150);INSERT INTO products VALUES (7,'Standing Desk','Furniture',800.00,20);INSERT INTO products VALUES (8,'Pen Set','Stationery',25.00,300);
-INSERT INTO customers VALUES (1,'Adeola Johnson','adeola@email.com','Lagos','Nigeria');INSERT INTO customers VALUES (2,'James Smith','james@email.com','London','UK');INSERT INTO customers VALUES (3,'Aisha Bello','aisha@email.com','Abuja','Nigeria');INSERT INTO customers VALUES (4,'Sarah Williams','sarah@email.com','New York','USA');INSERT INTO customers VALUES (5,'Olumide Adebayo','olumide@email.com','Ibadan','Nigeria');
-INSERT INTO orders VALUES (1,1,1,1,'2025-01-10');INSERT INTO orders VALUES (2,1,2,2,'2025-01-10');INSERT INTO orders VALUES (3,2,3,1,'2025-01-15');INSERT INTO orders VALUES (4,3,4,10,'2025-01-20');INSERT INTO orders VALUES (5,4,5,2,'2025-02-01');INSERT INTO orders VALUES (6,5,1,1,'2025-02-05');INSERT INTO orders VALUES (7,2,6,3,'2025-02-10');INSERT INTO orders VALUES (8,3,7,1,'2025-02-14');INSERT INTO orders VALUES (9,1,8,5,'2025-02-20');INSERT INTO orders VALUES (10,4,2,1,'2025-03-01');INSERT INTO orders VALUES (11,5,3,2,'2025-03-05');INSERT INTO orders VALUES (12,1,6,1,'2025-03-10');`,
-  },
-  students: {
-    schema: `
-CREATE TABLE courses (course_id INTEGER PRIMARY KEY, course_name TEXT NOT NULL, credits INTEGER, instructor TEXT);
-CREATE TABLE students (student_id INTEGER PRIMARY KEY, full_name TEXT NOT NULL, enrollment_date TEXT, major TEXT);
-CREATE TABLE grades (id INTEGER PRIMARY KEY, student_id INTEGER, course_id INTEGER, grade TEXT, score REAL, semester TEXT, FOREIGN KEY (student_id) REFERENCES students(student_id), FOREIGN KEY (course_id) REFERENCES courses(course_id));`,
-    seedData: `
-INSERT INTO courses VALUES (1,'Intro to SQL',3,'Dr. Nneka');INSERT INTO courses VALUES (2,'Data Visualization',3,'Prof. Balogun');INSERT INTO courses VALUES (3,'Statistics 101',4,'Dr. Okonkwo');INSERT INTO courses VALUES (4,'Python Programming',3,'Prof. Adamu');INSERT INTO courses VALUES (5,'Business Analytics',3,'Dr. Eze');
-INSERT INTO students VALUES (1,'Tobi Adekunle','2024-09-01','Data Science');INSERT INTO students VALUES (2,'Grace Okafor','2024-09-01','Computer Science');INSERT INTO students VALUES (3,'Musa Abdullahi','2024-09-01','Business');INSERT INTO students VALUES (4,'Folake Adeyemo','2024-09-01','Data Science');INSERT INTO students VALUES (5,'David Eze','2025-01-15','Statistics');INSERT INTO students VALUES (6,'Halima Yusuf','2025-01-15','Data Science');
-INSERT INTO grades VALUES (1,1,1,'A',92,'2024-Fall');INSERT INTO grades VALUES (2,1,3,'B+',87,'2024-Fall');INSERT INTO grades VALUES (3,2,1,'A-',90,'2024-Fall');INSERT INTO grades VALUES (4,2,4,'A',95,'2024-Fall');INSERT INTO grades VALUES (5,3,5,'B',83,'2024-Fall');INSERT INTO grades VALUES (6,3,2,'B+',88,'2024-Fall');INSERT INTO grades VALUES (7,4,1,'A',94,'2024-Fall');INSERT INTO grades VALUES (8,4,3,'A-',91,'2024-Fall');INSERT INTO grades VALUES (9,5,1,'B',82,'2025-Spring');INSERT INTO grades VALUES (10,5,2,'A-',89,'2025-Spring');INSERT INTO grades VALUES (11,6,1,'A+',98,'2025-Spring');INSERT INTO grades VALUES (12,6,4,'A',93,'2025-Spring');`,
-  },
-};
-
 // Compare two result sets (order-insensitive)
 function resultsMatch(a: QueryResult | null, b: QueryResult | null): boolean {
   if (!a || !b) return false;
@@ -111,6 +80,7 @@ const Assignments = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const windowInfo = useSubmissionWindow();
+  const { datasets, loading: datasetsLoading } = useDatasets();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -176,13 +146,13 @@ const Assignments = ({
   const runQueryOnDataset = useCallback(
     (datasetId: string, queryStr: string): { result: QueryResult | null; error: string | null } => {
       if (!sqlJs) return { result: null, error: "SQL engine not ready" };
-      const ds = DATASETS[datasetId];
+      const ds = datasets.find((d) => d.id === datasetId);
       if (!ds) return { result: null, error: "Unknown dataset" };
       let db: SqlJsDatabase | null = null;
       try {
         db = new sqlJs.Database();
-        db.run(ds.schema);
-        db.run(ds.seedData);
+        db.run(ds.schema_sql);
+        db.run(ds.seed_sql);
         const res = db.exec(queryStr);
         if (res.length > 0) {
           return { result: { columns: res[0].columns, values: res[0].values }, error: null };
@@ -194,7 +164,7 @@ const Assignments = ({
         db?.close();
       }
     },
-    [sqlJs]
+    [sqlJs, datasets]
   );
 
   const handleRunQuestion = (assignmentQuestions: SqlQuestion[], qIdx: number) => {
@@ -275,7 +245,7 @@ const Assignments = ({
     }
   };
 
-  if (isLoading) {
+  if (isLoading || datasetsLoading) {
     return (
       <Card className="border-border bg-card">
         <CardContent className="flex items-center justify-center py-12">
@@ -391,12 +361,8 @@ const Assignments = ({
                       {sqlReady &&
                         assignment.questions.map((q, qi) => {
                           const qs = questionStates[qi] || { query: "", result: null, error: null, correct: null, running: false };
-                          const dsLabel =
-                            q.dataset === "employees"
-                              ? "Employees & Departments"
-                              : q.dataset === "sales"
-                              ? "Sales & Products"
-                              : "School & Grades";
+                          const dsObj = datasets.find((d) => d.id === q.dataset);
+                          const dsLabel = dsObj?.name || q.dataset;
 
                           return (
                             <div key={qi} className="space-y-3 rounded-lg border border-border p-4">
@@ -544,7 +510,7 @@ const Assignments = ({
                             {qi + 1}. {q.question}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Dataset: {q.dataset === "employees" ? "Employees & Departments" : q.dataset === "sales" ? "Sales & Products" : "School & Grades"}
+                            Dataset: {datasets.find((d) => d.id === q.dataset)?.name || q.dataset}
                           </p>
                         </div>
                       ))}

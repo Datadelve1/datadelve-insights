@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useDatasets } from "@/hooks/useDatasets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,14 +58,9 @@ interface Assignment {
   created_at: string;
 }
 
-const DATASET_OPTIONS = [
-  { id: "employees", label: "Employees & Departments" },
-  { id: "sales", label: "Sales & Products" },
-  { id: "students", label: "School & Grades" },
-];
-
 const AssignmentManagement = () => {
   const { toast } = useToast();
+  const { datasets: datasetOptions, loading: datasetsLoading } = useDatasets();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -77,7 +73,7 @@ const AssignmentManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<SqlQuestion[]>([
-    { question: "", dataset: "employees", expected_query: "" },
+    { question: "", dataset: "", expected_query: "" },
   ]);
 
   useEffect(() => {
@@ -104,7 +100,7 @@ const AssignmentManagement = () => {
     setWeekNumber(1);
     setTitle("");
     setDescription("");
-    setQuestions([{ question: "", dataset: "employees", expected_query: "" }]);
+    setQuestions([{ question: "", dataset: "", expected_query: "" }]);
     setEditingId(null);
   };
 
@@ -116,13 +112,13 @@ const AssignmentManagement = () => {
     setQuestions(
       a.questions.length > 0
         ? a.questions
-        : [{ question: "", dataset: "employees", expected_query: "" }]
+        : [{ question: "", dataset: "", expected_query: "" }]
     );
     setDialogOpen(true);
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { question: "", dataset: "employees", expected_query: "" }]);
+    setQuestions([...questions, { question: "", dataset: "", expected_query: "" }]);
   };
 
   const removeQuestion = (idx: number) => {
@@ -303,13 +299,13 @@ const AssignmentManagement = () => {
                             onValueChange={(v) => updateQuestion(idx, "dataset", v)}
                           >
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select a dataset" />
                             </SelectTrigger>
                             <SelectContent>
-                              {DATASET_OPTIONS.map((ds) => (
+                              {datasetOptions.map((ds) => (
                                 <SelectItem key={ds.id} value={ds.id}>
                                   <span className="flex items-center gap-2">
-                                    <Database className="w-3 h-3" /> {ds.label}
+                                    <Database className="w-3 h-3" /> {ds.name}
                                   </span>
                                 </SelectItem>
                               ))}
@@ -439,7 +435,7 @@ const AssignmentManagement = () => {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Dataset:{" "}
-                          {DATASET_OPTIONS.find((d) => d.id === q.dataset)?.label || q.dataset}
+                          {datasetOptions.find((d) => d.id === q.dataset)?.name || q.dataset}
                         </p>
                         <pre className="text-xs font-mono bg-secondary p-3 rounded border border-border text-foreground overflow-x-auto">
                           {q.expected_query}

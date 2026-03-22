@@ -21,6 +21,7 @@ import VideoManagement from "./pages/admin/VideoManagement";
 import StudentVideos from "./pages/admin/StudentVideos";
 import ComingSoon from "./pages/admin/ComingSoon";
 import AssignmentManagement from "./pages/admin/AssignmentManagement";
+import DatasetManagement from "./pages/admin/DatasetManagement";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DataAnalysis from "./pages/courses/DataAnalysis";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="videos" element={<VideoManagement />} />
               <Route path="student-videos" element={<StudentVideos />} />
               <Route path="assignments" element={<AssignmentManagement />} />
+              <Route path="datasets" element={<DatasetManagement />} />
               <Route path="certificates" element={<ComingSoon />} />
               <Route path="ambassadors" element={<ComingSoon />} />
               <Route path="notifications" element={<ComingSoon />} />
