@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText, CheckCircle2, Loader2, Video, PenLine, Upload } from "lucide-react";
+import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
 interface WeeklyReview {
   id: string;
