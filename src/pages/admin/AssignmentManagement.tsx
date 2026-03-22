@@ -58,14 +58,9 @@ interface Assignment {
   created_at: string;
 }
 
-const DATASET_OPTIONS = [
-  { id: "employees", label: "Employees & Departments" },
-  { id: "sales", label: "Sales & Products" },
-  { id: "students", label: "School & Grades" },
-];
-
 const AssignmentManagement = () => {
   const { toast } = useToast();
+  const { datasets: datasetOptions, loading: datasetsLoading } = useDatasets();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
