@@ -56,6 +56,7 @@ const Assignments = ({
   const [activeAssignment, setActiveAssignment] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPlayground, setShowPlayground] = useState(false);
 
   useEffect(() => {
     fetchData();
