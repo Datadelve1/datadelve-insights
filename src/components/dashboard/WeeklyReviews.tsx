@@ -28,6 +28,7 @@ interface WeeklyReview {
 
 const WeeklyReviews = () => {
   const { user, profile } = useAuth();
+  const windowInfo = useSubmissionWindow();
   const { toast } = useToast();
   const [reviews, setReviews] = useState<WeeklyReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
