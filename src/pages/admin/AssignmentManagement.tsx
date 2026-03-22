@@ -100,7 +100,7 @@ const AssignmentManagement = () => {
     setWeekNumber(1);
     setTitle("");
     setDescription("");
-    setQuestions([{ question: "", dataset: "employees", expected_query: "" }]);
+    setQuestions([{ question: "", dataset: "", expected_query: "" }]);
     setEditingId(null);
   };
 
