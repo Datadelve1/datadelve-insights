@@ -19,7 +19,7 @@ import {
 import { Upload, FileVideo, Loader2, CheckCircle2, Video } from "lucide-react";
 import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
-const WEEK_1_START = new Date("2025-03-27");
+const WEEK_1_START = new Date("2026-03-27");
 
 function getWeekNumber(sessionDate: Date): number {
   const diffMs = sessionDate.getTime() - WEEK_1_START.getTime();
