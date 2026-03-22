@@ -20,6 +20,7 @@ import WeeklyReports from "./pages/admin/WeeklyReports";
 import VideoManagement from "./pages/admin/VideoManagement";
 import StudentVideos from "./pages/admin/StudentVideos";
 import ComingSoon from "./pages/admin/ComingSoon";
+import AssignmentManagement from "./pages/admin/AssignmentManagement";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DataAnalysis from "./pages/courses/DataAnalysis";
