@@ -26,10 +26,10 @@ import {
   GraduationCap,
   Loader2,
   LayoutDashboard,
+  Database,
+  FileVideo,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
-
-import { FileVideo } from "lucide-react";
 
 const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
