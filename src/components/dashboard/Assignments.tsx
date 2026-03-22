@@ -361,12 +361,8 @@ const Assignments = ({
                       {sqlReady &&
                         assignment.questions.map((q, qi) => {
                           const qs = questionStates[qi] || { query: "", result: null, error: null, correct: null, running: false };
-                          const dsLabel =
-                            q.dataset === "employees"
-                              ? "Employees & Departments"
-                              : q.dataset === "sales"
-                              ? "Sales & Products"
-                              : "School & Grades";
+                          const dsObj = datasets.find((d) => d.id === q.dataset);
+                          const dsLabel = dsObj?.name || q.dataset;
 
                           return (
                             <div key={qi} className="space-y-3 rounded-lg border border-border p-4">
