@@ -51,6 +51,7 @@ const Assignments = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const windowInfo = useSubmissionWindow();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, Submission>>({});
   const [isLoading, setIsLoading] = useState(true);
