@@ -510,7 +510,7 @@ const Assignments = ({
                             {qi + 1}. {q.question}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Dataset: {q.dataset === "employees" ? "Employees & Departments" : q.dataset === "sales" ? "Sales & Products" : "School & Grades"}
+                            Dataset: {datasets.find((d) => d.id === q.dataset)?.name || q.dataset}
                           </p>
                         </div>
                       ))}
