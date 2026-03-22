@@ -435,7 +435,7 @@ const AssignmentManagement = () => {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Dataset:{" "}
-                          {DATASET_OPTIONS.find((d) => d.id === q.dataset)?.label || q.dataset}
+                          {datasetOptions.find((d) => d.id === q.dataset)?.name || q.dataset}
                         </p>
                         <pre className="text-xs font-mono bg-secondary p-3 rounded border border-border text-foreground overflow-x-auto">
                           {q.expected_query}
