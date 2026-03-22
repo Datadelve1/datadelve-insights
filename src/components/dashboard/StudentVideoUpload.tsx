@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload, FileVideo, Loader2, CheckCircle2, Video } from "lucide-react";
+import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
 const WEEK_1_START = new Date("2025-03-27");
 
