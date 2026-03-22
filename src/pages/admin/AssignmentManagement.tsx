@@ -73,7 +73,7 @@ const AssignmentManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<SqlQuestion[]>([
-    { question: "", dataset: "employees", expected_query: "" },
+    { question: "", dataset: "", expected_query: "" },
   ]);
 
   useEffect(() => {
