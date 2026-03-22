@@ -208,6 +208,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sql_datasets: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          sample_queries: Json
+          schema_sql: string
+          seed_sql: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          sample_queries?: Json
+          schema_sql: string
+          seed_sql: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          sample_queries?: Json
+          schema_sql?: string
+          seed_sql?: string
+        }
+        Relationships: []
+      }
       student_attendance: {
         Row: {
           created_at: string
