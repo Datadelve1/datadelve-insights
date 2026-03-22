@@ -152,11 +152,30 @@ const Assignments = ({
   return (
     <Card className="border-border bg-card">
       <CardHeader>
-        <CardTitle className="font-display flex items-center gap-2 text-foreground">
-          <BookOpen className="w-5 h-5 text-primary" /> Weekly Assignments
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-display flex items-center gap-2 text-foreground">
+            <BookOpen className="w-5 h-5 text-primary" /> Weekly Assignments
+          </CardTitle>
+          <Button
+            variant={showPlayground ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowPlayground(!showPlayground)}
+            className="gap-2"
+          >
+            <Database className="w-4 h-4" />
+            SQL Playground
+            {showPlayground ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
+        {/* SQL Playground (collapsible) */}
+        {showPlayground && (
+          <div className="mb-6">
+            <SQLPlayground />
+          </div>
+        )}
+
         {assignments.length === 0 ? (
           <div className="text-center py-8">
             <BookOpen className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
