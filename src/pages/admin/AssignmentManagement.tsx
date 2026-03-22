@@ -299,13 +299,13 @@ const AssignmentManagement = () => {
                             onValueChange={(v) => updateQuestion(idx, "dataset", v)}
                           >
                             <SelectTrigger>
-                              <SelectValue />
+                              <SelectValue placeholder="Select a dataset" />
                             </SelectTrigger>
                             <SelectContent>
-                              {DATASET_OPTIONS.map((ds) => (
+                              {datasetOptions.map((ds) => (
                                 <SelectItem key={ds.id} value={ds.id}>
                                   <span className="flex items-center gap-2">
-                                    <Database className="w-3 h-3" /> {ds.label}
+                                    <Database className="w-3 h-3" /> {ds.name}
                                   </span>
                                 </SelectItem>
                               ))}
