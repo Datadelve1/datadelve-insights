@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText, CheckCircle2, Loader2, Video, PenLine, Upload } from "lucide-react";
+import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
 interface WeeklyReview {
   id: string;
@@ -27,6 +28,7 @@ interface WeeklyReview {
 
 const WeeklyReviews = () => {
   const { user, profile } = useAuth();
+  const windowInfo = useSubmissionWindow();
   const { toast } = useToast();
   const [reviews, setReviews] = useState<WeeklyReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,101 +168,105 @@ const WeeklyReviews = () => {
 
         {/* Submit new review form */}
         {submittedWeeks.size < 8 && (
-          <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-secondary/50 p-6">
-            <h3 className="font-display font-semibold text-foreground">Submit a Review</h3>
+          <SubmissionWindowBanner>
+            <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-secondary/50 p-6">
+              <h3 className="font-display font-semibold text-foreground">Submit a Review</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Select Week *</Label>
-                <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                  <SelectTrigger className="bg-card border-border">
-                    <SelectValue placeholder="Choose week..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 8 }, (_, i) => i + 1)
-                      .filter((w) => !submittedWeeks.has(w))
-                      .map((w) => (
-                        <SelectItem key={w} value={String(w)}>
-                          Week {w} {w >= 7 ? "(Project)" : ""}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Select Week *</Label>
+                  <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                    <SelectTrigger className="bg-card border-border">
+                      <SelectValue placeholder="Choose week..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {windowInfo.currentWeek && !submittedWeeks.has(windowInfo.currentWeek) ? (
+                        <SelectItem value={String(windowInfo.currentWeek)}>
+                          Week {windowInfo.currentWeek} {windowInfo.currentWeek >= 7 ? "(Project)" : ""}
                         </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                      ) : (
+                        <SelectItem value="none" disabled>
+                          No weeks available for submission
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label>Reflection Type *</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={reflectionType === "written" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setReflectionType("written")}
-                    className="flex-1"
-                  >
-                    <PenLine className="w-4 h-4 mr-1" /> Written
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={reflectionType === "video" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setReflectionType("video")}
-                    className="flex-1"
-                  >
-                    <Video className="w-4 h-4 mr-1" /> Video
-                  </Button>
+                <div className="space-y-2">
+                  <Label>Reflection Type *</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={reflectionType === "written" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setReflectionType("written")}
+                      className="flex-1"
+                    >
+                      <PenLine className="w-4 h-4 mr-1" /> Written
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={reflectionType === "video" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setReflectionType("video")}
+                      className="flex-1"
+                    >
+                      <Video className="w-4 h-4 mr-1" /> Video
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {reflectionType === "video" ? (
-              <div className="space-y-2">
-                <Label>Upload Video *</Label>
-                <label
-                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-card"
-                >
-                  <Upload className="w-5 h-5 text-primary" />
-                  <span className="text-sm text-muted-foreground">
-                    {videoFile ? videoFile.name : "Click to select a video file"}
-                  </span>
-                  <input
-                    type="file"
-                    accept="video/mp4,video/quicktime,video/webm"
-                    className="hidden"
-                    onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+              {reflectionType === "video" ? (
+                <div className="space-y-2">
+                  <Label>Upload Video *</Label>
+                  <label
+                    className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-card"
+                  >
+                    <Upload className="w-5 h-5 text-primary" />
+                    <span className="text-sm text-muted-foreground">
+                      {videoFile ? videoFile.name : "Click to select a video file"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="video/mp4,video/quicktime,video/webm"
+                      className="hidden"
+                      onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Written Reflection *</Label>
+                  <Textarea
+                    placeholder="What did you learn this week? What stood out?"
+                    value={writtenReflection}
+                    onChange={(e) => setWrittenReflection(e.target.value)}
+                    className="bg-card border-border min-h-[120px]"
                   />
-                </label>
-              </div>
-            ) : (
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label>Written Reflection *</Label>
+                <Label>Additional Comments (optional)</Label>
                 <Textarea
-                  placeholder="What did you learn this week? What stood out?"
-                  value={writtenReflection}
-                  onChange={(e) => setWrittenReflection(e.target.value)}
-                  className="bg-card border-border min-h-[120px]"
+                  placeholder="Any questions, feedback, or notes..."
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                  className="bg-card border-border"
                 />
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label>Additional Comments (optional)</Label>
-              <Textarea
-                placeholder="Any questions, feedback, or notes..."
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-                className="bg-card border-border"
-              />
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} variant="hero" className="w-full h-11">
-              {isSubmitting ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
-              ) : (
-                "Submit Review"
-              )}
-            </Button>
-          </form>
+              <Button type="submit" disabled={isSubmitting} variant="hero" className="w-full h-11">
+                {isSubmitting ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                ) : (
+                  "Submit Review"
+                )}
+              </Button>
+            </form>
+          </SubmissionWindowBanner>
         )}
 
         {submittedWeeks.size === 8 && (

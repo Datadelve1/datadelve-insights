@@ -17,8 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload, FileVideo, Loader2, CheckCircle2, Video } from "lucide-react";
+import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
-const WEEK_1_START = new Date("2025-03-27");
+const WEEK_1_START = new Date("2026-03-27");
 
 function getWeekNumber(sessionDate: Date): number {
   const diffMs = sessionDate.getTime() - WEEK_1_START.getTime();
@@ -65,6 +66,7 @@ interface Submission {
 
 const StudentVideoUpload = () => {
   const { user, profile } = useAuth();
+  const windowInfo = useSubmissionWindow();
   const { toast } = useToast();
   const [sessionDate, setSessionDate] = useState("");
   const [title, setTitle] = useState("");
@@ -169,109 +171,111 @@ const StudentVideoUpload = () => {
           Upload a video after each session (Friday/Saturday). Videos are securely stored and only accessible by authorized reviewers.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Session Date *</Label>
-              <Select value={sessionDate} onValueChange={setSessionDate}>
-                <SelectTrigger className="bg-secondary border-border">
-                  <SelectValue placeholder="Select session" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sessionDates.length === 0 ? (
-                    <SelectItem value="none" disabled>No sessions available yet</SelectItem>
-                  ) : (
-                    sessionDates.map((d) => (
-                      <SelectItem key={d.value} value={d.value}>
-                        {d.label}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+        <SubmissionWindowBanner>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Session Date *</Label>
+                <Select value={sessionDate} onValueChange={setSessionDate}>
+                  <SelectTrigger className="bg-secondary border-border">
+                    <SelectValue placeholder="Select session" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sessionDates.length === 0 ? (
+                      <SelectItem value="none" disabled>No sessions available yet</SelectItem>
+                    ) : (
+                      sessionDates.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>
+                          {d.label}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Title (optional)</Label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. My Week 1 Reflection"
+                  className="bg-secondary border-border"
+                />
+              </div>
             </div>
+
             <div className="space-y-2">
-              <Label>Title (optional)</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. My Week 1 Reflection"
+              <Label>Description (optional)</Label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Brief description of your video..."
                 className="bg-secondary border-border"
+                rows={2}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label>Description (optional)</Label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of your video..."
-              className="bg-secondary border-border"
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Video File *</Label>
-            <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-secondary">
-              <FileVideo className="w-5 h-5 text-primary shrink-0" />
-              <span className="text-sm text-muted-foreground truncate">
-                {videoFile ? videoFile.name : "Click to select a video file (MP4, WebM, MOV — max 500MB)"}
-              </span>
-              <input
-                type="file"
-                accept="video/mp4,video/webm,video/quicktime"
-                className="hidden"
-                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-              />
-            </label>
-            {videoFile && (
-              <p className="text-xs text-muted-foreground">
-                Size: {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
-              </p>
-            )}
-          </div>
-
-          {/* Consent checkbox */}
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-secondary border border-border">
-            <Checkbox
-              id="consent"
-              checked={consent}
-              onCheckedChange={(checked) => setConsent(!!checked)}
-              className="mt-0.5"
-            />
-            <label htmlFor="consent" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
-              I consent to DelveTek using my submitted video/testimonial for training proof and promotional purposes, 
-              in accordance with data protection policies. I understand this video will only be accessible by authorized 
-              administrators and reviewers.
-            </label>
-          </div>
-
-          {uploadProgress > 0 && uploadProgress < 100 && (
-            <div className="space-y-1">
-              <Progress value={uploadProgress} className="h-2" />
-              <p className="text-xs text-muted-foreground">Uploading video...</p>
+            <div className="space-y-2">
+              <Label>Video File *</Label>
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-secondary">
+                <FileVideo className="w-5 h-5 text-primary shrink-0" />
+                <span className="text-sm text-muted-foreground truncate">
+                  {videoFile ? videoFile.name : "Click to select a video file (MP4, WebM, MOV — max 500MB)"}
+                </span>
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  className="hidden"
+                  onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                />
+              </label>
+              {videoFile && (
+                <p className="text-xs text-muted-foreground">
+                  Size: {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
+                </p>
+              )}
             </div>
-          )}
 
-          <Button
-            type="submit"
-            disabled={submitting || !consent || !videoFile || !sessionDate}
-            className="w-full h-11"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                {uploadProgress > 0 ? "Uploading..." : "Submitting..."}
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" /> Submit Video
-              </>
+            {/* Consent checkbox */}
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-secondary border border-border">
+              <Checkbox
+                id="consent"
+                checked={consent}
+                onCheckedChange={(checked) => setConsent(!!checked)}
+                className="mt-0.5"
+              />
+              <label htmlFor="consent" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
+                I consent to DelveTek using my submitted video/testimonial for training proof and promotional purposes, 
+                in accordance with data protection policies. I understand this video will only be accessible by authorized 
+                administrators and reviewers.
+              </label>
+            </div>
+
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="space-y-1">
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-xs text-muted-foreground">Uploading video...</p>
+              </div>
             )}
-          </Button>
-        </form>
+
+            <Button
+              type="submit"
+              disabled={submitting || !consent || !videoFile || !sessionDate}
+              className="w-full h-11"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  {uploadProgress > 0 ? "Uploading..." : "Submitting..."}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" /> Submit Video
+                </>
+              )}
+            </Button>
+          </form>
+        </SubmissionWindowBanner>
 
         {/* Previous submissions */}
         {loaded && submissions.length > 0 && (
