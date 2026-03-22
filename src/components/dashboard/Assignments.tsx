@@ -14,7 +14,9 @@ import {
   Trophy,
   ChevronDown,
   ChevronUp,
+  Database,
 } from "lucide-react";
+import SQLPlayground from "./SQLPlayground";
 
 interface Question {
   question: string;
