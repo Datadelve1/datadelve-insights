@@ -17,6 +17,7 @@ import {
   Database,
 } from "lucide-react";
 import SQLPlayground from "./SQLPlayground";
+import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 
 interface Question {
   question: string;
