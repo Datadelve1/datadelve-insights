@@ -192,6 +192,8 @@ const Assignments = ({
               const submission = submissions[assignment.id];
               const reviewSubmitted = submittedWeeks.has(assignment.week_number);
               const isActive = activeAssignment === assignment.id;
+              const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
+              const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
@@ -200,12 +202,16 @@ const Assignments = ({
                     className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
                       submission
                         ? "bg-primary/5"
-                        : reviewSubmitted
+                        : reviewSubmitted && canSubmit
                         ? "bg-card hover:bg-secondary/50"
                         : "bg-secondary/50"
                     }`}
                     onClick={() => {
-                      if (submission || !reviewSubmitted) return;
+                      if (submission) {
+                        setActiveAssignment(isActive ? null : assignment.id);
+                        return;
+                      }
+                      if (!reviewSubmitted || !canSubmit) return;
                       setActiveAssignment(isActive ? null : assignment.id);
                       setAnswers({});
                     }}
@@ -215,14 +221,14 @@ const Assignments = ({
                         className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           submission
                             ? "bg-primary/20 text-primary"
-                            : reviewSubmitted
+                            : reviewSubmitted && canSubmit
                             ? "bg-secondary text-foreground"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {submission ? (
                           <Trophy className="w-5 h-5" />
-                        ) : reviewSubmitted ? (
+                        ) : reviewSubmitted && canSubmit ? (
                           <BookOpen className="w-5 h-5" />
                         ) : (
                           <Lock className="w-5 h-5" />
@@ -247,6 +253,10 @@ const Assignments = ({
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
                           Submit Week {assignment.week_number} review first
                         </span>
+                      ) : windowClosed ? (
+                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
+                          Submission window closed
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">
                           {isActive ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -256,7 +266,7 @@ const Assignments = ({
                   </div>
 
                   {/* Assignment questions (expanded) */}
-                  {isActive && !submission && reviewSubmitted && (
+                  {isActive && !submission && reviewSubmitted && canSubmit && (
                     <div className="p-6 border-t border-border space-y-6 bg-card">
                       {assignment.questions.map((q, qi) => (
                         <div key={qi} className="space-y-3">
@@ -349,6 +359,13 @@ const Assignments = ({
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Submission window status for assignments */}
+        {assignments.length > 0 && !windowInfo.isOpen && (
+          <div className="mt-4">
+            <SubmissionWindowBanner><span /></SubmissionWindowBanner>
           </div>
         )}
       </CardContent>
