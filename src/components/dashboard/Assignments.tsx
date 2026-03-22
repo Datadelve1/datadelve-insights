@@ -146,13 +146,13 @@ const Assignments = ({
   const runQueryOnDataset = useCallback(
     (datasetId: string, queryStr: string): { result: QueryResult | null; error: string | null } => {
       if (!sqlJs) return { result: null, error: "SQL engine not ready" };
-      const ds = DATASETS[datasetId];
+      const ds = datasets.find((d) => d.id === datasetId);
       if (!ds) return { result: null, error: "Unknown dataset" };
       let db: SqlJsDatabase | null = null;
       try {
         db = new sqlJs.Database();
-        db.run(ds.schema);
-        db.run(ds.seedData);
+        db.run(ds.schema_sql);
+        db.run(ds.seed_sql);
         const res = db.exec(queryStr);
         if (res.length > 0) {
           return { result: { columns: res[0].columns, values: res[0].values }, error: null };
@@ -164,7 +164,7 @@ const Assignments = ({
         db?.close();
       }
     },
-    [sqlJs]
+    [sqlJs, datasets]
   );
 
   const handleRunQuestion = (assignmentQuestions: SqlQuestion[], qIdx: number) => {
