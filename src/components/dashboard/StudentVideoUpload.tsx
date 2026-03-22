@@ -66,6 +66,7 @@ interface Submission {
 
 const StudentVideoUpload = () => {
   const { user, profile } = useAuth();
+  const windowInfo = useSubmissionWindow();
   const { toast } = useToast();
   const [sessionDate, setSessionDate] = useState("");
   const [title, setTitle] = useState("");
