@@ -26,9 +26,16 @@ interface WeeklyReview {
   created_at: string;
 }
 
+const UNRESTRICTED_EMAILS = [
+  "edwardolamide925@gmail.com",
+  "koredesax1@gmail.com",
+  "oloyedeopeyemi253@gmail.com",
+];
+
 const WeeklyReviews = () => {
   const { user, profile } = useAuth();
   const windowInfo = useSubmissionWindow();
+  const isUnrestricted = UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
   const [reviews, setReviews] = useState<WeeklyReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -167,8 +174,32 @@ const WeeklyReviews = () => {
         </div>
 
         {/* Submit new review form */}
-        {submittedWeeks.size < 8 && (
-          <SubmissionWindowBanner>
+        {submittedWeeks.size < 8 && (() => {
+          const weekSelector = isUnrestricted ? (
+            <SelectContent>
+              {Array.from({ length: 8 }, (_, i) => i + 1)
+                .filter((w) => !submittedWeeks.has(w))
+                .map((w) => (
+                  <SelectItem key={w} value={String(w)}>
+                    Week {w} {w >= 7 ? "(Project)" : ""}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          ) : (
+            <SelectContent>
+              {windowInfo.currentWeek && !submittedWeeks.has(windowInfo.currentWeek) ? (
+                <SelectItem value={String(windowInfo.currentWeek)}>
+                  Week {windowInfo.currentWeek} {windowInfo.currentWeek >= 7 ? "(Project)" : ""}
+                </SelectItem>
+              ) : (
+                <SelectItem value="none" disabled>
+                  No weeks available for submission
+                </SelectItem>
+              )}
+            </SelectContent>
+          );
+
+          const reviewForm = (
             <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-secondary/50 p-6">
               <h3 className="font-display font-semibold text-foreground">Submit a Review</h3>
 
@@ -179,17 +210,7 @@ const WeeklyReviews = () => {
                     <SelectTrigger className="bg-card border-border">
                       <SelectValue placeholder="Choose week..." />
                     </SelectTrigger>
-                    <SelectContent>
-                      {windowInfo.currentWeek && !submittedWeeks.has(windowInfo.currentWeek) ? (
-                        <SelectItem value={String(windowInfo.currentWeek)}>
-                          Week {windowInfo.currentWeek} {windowInfo.currentWeek >= 7 ? "(Project)" : ""}
-                        </SelectItem>
-                      ) : (
-                        <SelectItem value="none" disabled>
-                          No weeks available for submission
-                        </SelectItem>
-                      )}
-                    </SelectContent>
+                    {weekSelector}
                   </Select>
                 </div>
 
@@ -266,8 +287,12 @@ const WeeklyReviews = () => {
                 )}
               </Button>
             </form>
-          </SubmissionWindowBanner>
-        )}
+          );
+
+          return isUnrestricted ? reviewForm : (
+            <SubmissionWindowBanner>{reviewForm}</SubmissionWindowBanner>
+          );
+        })()}
 
         {submittedWeeks.size === 8 && (
           <div className="text-center py-6 rounded-xl bg-primary/10">
