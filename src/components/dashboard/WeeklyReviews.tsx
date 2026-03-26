@@ -26,9 +26,16 @@ interface WeeklyReview {
   created_at: string;
 }
 
+const UNRESTRICTED_EMAILS = [
+  "edwardolamide925@gmail.com",
+  "koredesax1@gmail.com",
+  "oloyedeopeyemi253@gmail.com",
+];
+
 const WeeklyReviews = () => {
   const { user, profile } = useAuth();
   const windowInfo = useSubmissionWindow();
+  const isUnrestricted = UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
   const [reviews, setReviews] = useState<WeeklyReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
