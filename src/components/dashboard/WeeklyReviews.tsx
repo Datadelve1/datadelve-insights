@@ -175,6 +175,29 @@ const WeeklyReviews = () => {
 
         {/* Submit new review form */}
         {submittedWeeks.size < 8 && (
+        {isUnrestricted ? (
+            <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-secondary/50 p-6">
+              <h3 className="font-display font-semibold text-foreground">Submit a Review</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Select Week *</Label>
+                  <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                    <SelectTrigger className="bg-card border-border">
+                      <SelectValue placeholder="Choose week..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 8 }, (_, i) => i + 1)
+                        .filter((w) => !submittedWeeks.has(w))
+                        .map((w) => (
+                          <SelectItem key={w} value={String(w)}>
+                            Week {w} {w >= 7 ? "(Project)" : ""}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+        ) : (
           <SubmissionWindowBanner>
             <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-secondary/50 p-6">
               <h3 className="font-display font-semibold text-foreground">Submit a Review</h3>
