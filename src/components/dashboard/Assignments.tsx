@@ -17,10 +17,11 @@ import {
   RotateCcw,
   Table2,
   Clock,
+  FileText,
 } from "lucide-react";
 import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 import { useDatasets, type SqlDatasetRow } from "@/hooks/useDatasets";
-import { hasWeekAccess } from "@/lib/attendanceAccess";
+import { hasWeekAccess, hasReviewForWeek } from "@/lib/attendanceAccess";
 import type initSqlJs from "sql.js";
 
 type SqlJsStatic = Awaited<ReturnType<typeof initSqlJs>>;
@@ -69,9 +70,11 @@ function resultsMatch(a: QueryResult | null, b: QueryResult | null): boolean {
 
 const Assignments = ({
   attendance,
+  submittedReviews,
   onScoreUpdate,
 }: {
   attendance: Record<string, string>;
+  submittedReviews: Record<string, boolean>;
   onScoreUpdate: () => void;
 }) => {
   const { user, isAdmin } = useAuth();
@@ -87,13 +90,16 @@ const Assignments = ({
   const [sqlReady, setSqlReady] = useState(false);
 
   const [questionStates, setQuestionStates] = useState<
-    Record<number, {
-      query: string;
-      result: QueryResult | null;
-      error: string | null;
-      correct: boolean | null;
-      running: boolean;
-    }>
+    Record<
+      number,
+      {
+        query: string;
+        result: QueryResult | null;
+        error: string | null;
+        correct: boolean | null;
+        running: boolean;
+      }
+    >
   >({});
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -151,7 +157,10 @@ const Assignments = ({
         if (res.length > 0) {
           return { result: { columns: res[0].columns, values: res[0].values }, error: null };
         }
-        return { result: { columns: ["Result"], values: [["Query executed. No rows returned."]] }, error: null };
+        return {
+          result: { columns: ["Result"], values: [["Query executed. No rows returned."]] },
+          error: null,
+        };
       } catch (err: any) {
         return { result: null, error: err.message };
       } finally {
@@ -267,11 +276,20 @@ const Assignments = ({
           <div className="space-y-3">
             {assignments.map((assignment) => {
               const submission = submissions[assignment.id];
-              const weekAccess = hasWeekAccess(assignment.week_number, attendance, isAdmin);
+              const timingOk = hasWeekAccess(assignment.week_number, attendance, isAdmin);
+              const reviewDone = isAdmin || hasReviewForWeek(assignment.week_number, submittedReviews);
+              const weekAccess = timingOk && reviewDone;
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
-              const attended = attendance[`${assignment.week_number}-friday`] === "present" || attendance[`${assignment.week_number}-saturday`] === "present";
+              const attended =
+                attendance[`${assignment.week_number}-friday`] === "present" ||
+                attendance[`${assignment.week_number}-saturday`] === "present";
+
+              let lockMessage = "";
+              if (!attended) lockMessage = "Attendance required";
+              else if (!timingOk) lockMessage = "Available after 10 PM";
+              else if (!reviewDone) lockMessage = "Submit review first";
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
@@ -329,10 +347,13 @@ const Assignments = ({
                       ) : !weekAccess ? (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
                           {!attended ? (
-                            <>Attendance required</>
+                            <Lock className="w-3 h-3" />
+                          ) : !timingOk ? (
+                            <Clock className="w-3 h-3" />
                           ) : (
-                            <><Clock className="w-3 h-3" /> Available after 10 PM</>
+                            <FileText className="w-3 h-3" />
                           )}
+                          {lockMessage}
                         </span>
                       ) : windowClosed ? (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
@@ -356,7 +377,13 @@ const Assignments = ({
                       )}
                       {sqlReady &&
                         assignment.questions.map((q, qi) => {
-                          const qs = questionStates[qi] || { query: "", result: null, error: null, correct: null, running: false };
+                          const qs = questionStates[qi] || {
+                            query: "",
+                            result: null,
+                            error: null,
+                            correct: null,
+                            running: false,
+                          };
                           const dsObj = datasets.find((d) => d.id === q.dataset);
                           const dsLabel = dsObj?.name || q.dataset;
 
@@ -388,7 +415,15 @@ const Assignments = ({
                                   onChange={(e) =>
                                     setQuestionStates((prev) => ({
                                       ...prev,
-                                      [qi]: { ...prev[qi] || { result: null, error: null, correct: null, running: false }, query: e.target.value },
+                                      [qi]: {
+                                        ...(prev[qi] || {
+                                          result: null,
+                                          error: null,
+                                          correct: null,
+                                          running: false,
+                                        }),
+                                        query: e.target.value,
+                                      },
                                     }))
                                   }
                                   onKeyDown={(e) => {
@@ -415,9 +450,13 @@ const Assignments = ({
                                 className="gap-2"
                               >
                                 {qs.running ? (
-                                  <><Loader2 className="w-3 h-3 animate-spin" /> Running...</>
+                                  <>
+                                    <Loader2 className="w-3 h-3 animate-spin" /> Running...
+                                  </>
                                 ) : (
-                                  <><Play className="w-3 h-3" /> Run Query</>
+                                  <>
+                                    <Play className="w-3 h-3" /> Run Query
+                                  </>
                                 )}
                               </Button>
 
@@ -431,27 +470,38 @@ const Assignments = ({
                                 <div className="rounded-lg border border-border overflow-hidden">
                                   <div className="bg-secondary px-3 py-1.5 flex items-center gap-2 border-b border-border">
                                     <Table2 className="w-3 h-3 text-primary" />
-                                    <span className="text-xs font-medium text-foreground">
-                                      {qs.result.values.length} row{qs.result.values.length !== 1 ? "s" : ""}
+                                    <span className="text-xs text-muted-foreground">
+                                      {qs.result.values.length} row
+                                      {qs.result.values.length !== 1 ? "s" : ""}
                                     </span>
                                   </div>
-                                  <div className="overflow-x-auto max-h-48">
+                                  <div className="overflow-x-auto max-h-52">
                                     <table className="w-full text-xs">
                                       <thead>
                                         <tr className="bg-secondary/50">
                                           {qs.result.columns.map((col, ci) => (
-                                            <th key={ci} className="px-3 py-1.5 text-left font-semibold text-foreground border-b border-border whitespace-nowrap">
+                                            <th
+                                              key={ci}
+                                              className="px-3 py-1.5 text-left font-medium text-foreground border-b border-border"
+                                            >
                                               {col}
                                             </th>
                                           ))}
                                         </tr>
                                       </thead>
                                       <tbody>
-                                        {qs.result.values.map((row, ri) => (
-                                          <tr key={ri} className="border-b border-border last:border-0 hover:bg-secondary/30">
+                                        {qs.result.values.slice(0, 50).map((row, ri) => (
+                                          <tr key={ri} className="hover:bg-secondary/30">
                                             {row.map((cell, ci) => (
-                                              <td key={ci} className="px-3 py-1.5 text-foreground whitespace-nowrap">
-                                                {cell === null ? <span className="text-muted-foreground italic">NULL</span> : String(cell)}
+                                              <td
+                                                key={ci}
+                                                className="px-3 py-1 text-muted-foreground border-b border-border"
+                                              >
+                                                {cell === null ? (
+                                                  <span className="italic text-muted-foreground/50">NULL</span>
+                                                ) : (
+                                                  String(cell)
+                                                )}
                                               </td>
                                             ))}
                                           </tr>
@@ -466,65 +516,47 @@ const Assignments = ({
                         })}
 
                       {sqlReady && (
-                        <Button
-                          onClick={() => handleSubmitAssignment(assignment)}
-                          disabled={
-                            isSubmitting ||
-                            !assignment.questions.every((_, i) => questionStates[i]?.correct === true)
-                          }
-                          variant="hero"
-                          className="w-full h-11"
-                        >
-                          {isSubmitting ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
-                          ) : assignment.questions.every((_, i) => questionStates[i]?.correct === true) ? (
-                            "Submit Assignment ✅"
-                          ) : (
-                            "Answer all questions correctly to submit"
-                          )}
-                        </Button>
+                        <div className="flex gap-3">
+                          <Button
+                            onClick={() => handleSubmitAssignment(assignment)}
+                            disabled={isSubmitting}
+                            className="flex-1"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...
+                              </>
+                            ) : (
+                              "Submit Assignment"
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => setQuestionStates({})}
+                            className="gap-2"
+                          >
+                            <RotateCcw className="w-4 h-4" /> Reset
+                          </Button>
+                        </div>
                       )}
                     </div>
                   )}
 
-                  {submission && isActive && (
-                    <div className="p-6 border-t border-border space-y-4 bg-card">
-                      <div className="flex items-center gap-2 text-primary">
-                        <CheckCircle2 className="w-5 h-5" />
-                        <span className="font-display font-semibold text-sm">
-                          Completed — {submission.score}/{submission.total} correct
-                        </span>
-                      </div>
-                      {assignment.questions.map((q, qi) => (
-                        <div key={qi} className="rounded-lg bg-secondary/50 p-4 space-y-2">
-                          <p className="font-medium text-foreground text-sm">
-                            {qi + 1}. {q.question}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Dataset: {datasets.find((d) => d.id === q.dataset)?.name || q.dataset}
-                          </p>
-                        </div>
-                      ))}
+                  {/* Score display when expanded and already submitted */}
+                  {isActive && submission && (
+                    <div className="p-6 border-t border-border bg-primary/5 text-center">
+                      <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />
+                      <p className="font-display font-semibold text-foreground">
+                        Score: {submission.score}/{submission.total}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Submitted {new Date(submission.created_at).toLocaleDateString()}
+                      </p>
                     </div>
-                  )}
-
-                  {submission && (
-                    <button
-                      onClick={() => setActiveAssignment(isActive ? null : assignment.id)}
-                      className="w-full py-2 text-xs text-primary hover:underline border-t border-border bg-secondary/30"
-                    >
-                      {isActive ? "Hide details" : "View details"}
-                    </button>
                   )}
                 </div>
               );
             })}
-          </div>
-        )}
-
-        {assignments.length > 0 && !windowInfo.isOpen && (
-          <div className="mt-4">
-            <SubmissionWindowBanner><span /></SubmissionWindowBanner>
           </div>
         )}
       </CardContent>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,9 @@ import {
   Download,
   Play,
   ExternalLink,
+  CheckCircle2,
+  XCircle,
+  Shield,
 } from "lucide-react";
 
 const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -44,14 +48,21 @@ interface Review {
   full_name: string;
   email: string;
   week_number: number;
+  session_day: string;
   written_reflection: string | null;
   video_url: string | null;
   comments: string;
   created_at: string;
+  is_approved: boolean;
+  topic_covered: string | null;
+  tutor_name: string | null;
+  tutor_rating: string | null;
+  question_answers: any;
 }
 
 const WeeklyReports = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [loading, setLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState(0);
@@ -61,12 +72,10 @@ const WeeklyReports = () => {
     reflectionsSubmitted: 0,
   });
 
-  // Reviews state (only for primary admin)
   const isPrimaryAdmin = user?.email === "datadelve1@gmail.com";
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [viewAll, setViewAll] = useState(false);
 
   useEffect(() => {
     fetchReport(parseInt(selectedWeek));
@@ -83,10 +92,17 @@ const WeeklyReports = () => {
 
     const [profilesRes, attendanceRes, reviewsRes, submissionsRes] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase.from("student_attendance").select("id", { count: "exact", head: true }).eq("week_number", week).eq("status", "present"),
+      supabase
+        .from("student_attendance")
+        .select("id", { count: "exact", head: true })
+        .eq("week_number", week)
+        .eq("status", "present"),
       supabase.from("weekly_reviews").select("id", { count: "exact", head: true }).eq("week_number", week),
       assignmentIds.length > 0
-        ? supabase.from("assignment_submissions").select("id", { count: "exact", head: true }).in("assignment_id", assignmentIds)
+        ? supabase
+            .from("assignment_submissions")
+            .select("id", { count: "exact", head: true })
+            .in("assignment_id", assignmentIds)
         : Promise.resolve({ count: 0 }),
     ]);
 
@@ -105,21 +121,62 @@ const WeeklyReports = () => {
       .from("weekly_reviews")
       .select("*")
       .eq("week_number", week)
+      .order("session_day" as any)
       .order("created_at", { ascending: false });
-    setReviews((data as Review[]) || []);
+    setReviews((data as any as Review[]) || []);
     setReviewsLoading(false);
+  };
+
+  const handleApproveVideo = async (reviewId: string, approve: boolean) => {
+    const { error } = await supabase
+      .from("weekly_reviews")
+      .update({ is_approved: approve, approved_by: user?.id } as any)
+      .eq("id", reviewId);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    toast({
+      title: approve ? "Video approved for homepage ✅" : "Video approval removed",
+      description: approve
+        ? "This video review will now appear on the homepage."
+        : "This video has been removed from the homepage.",
+    });
+
+    fetchReviews(parseInt(selectedWeek));
+    if (selectedReview?.id === reviewId) {
+      setSelectedReview((prev) => (prev ? { ...prev, is_approved: approve } : null));
+    }
   };
 
   const downloadReviewsCSV = () => {
     if (reviews.length === 0) return;
-    const headers = ["Name", "Email", "Week", "Written Reflection", "Video URL", "Comments", "Submitted At"];
+    const headers = [
+      "Name",
+      "Email",
+      "Week",
+      "Session",
+      "Written Reflection",
+      "Video URL",
+      "Topic",
+      "Tutor",
+      "Rating",
+      "Approved",
+      "Submitted At",
+    ];
     const rows = reviews.map((r) => [
       r.full_name,
       r.email,
       r.week_number,
+      r.session_day === "friday" ? "Friday" : "Saturday",
       (r.written_reflection || "").replace(/"/g, '""'),
       r.video_url || "",
-      r.comments.replace(/"/g, '""'),
+      r.topic_covered || "",
+      r.tutor_name || "",
+      r.tutor_rating || "",
+      r.is_approved ? "Yes" : "No",
       new Date(r.created_at).toLocaleString(),
     ]);
 
@@ -136,12 +193,30 @@ const WeeklyReports = () => {
   };
 
   const total = totalStudents || 1;
+  const fridayReviews = reviews.filter((r) => r.session_day === "friday");
+  const saturdayReviews = reviews.filter((r) => r.session_day === "saturday");
+  const pendingApproval = saturdayReviews.filter((r) => r.video_url && !r.is_approved);
 
   const metrics = [
     { label: "Students Registered", value: totalStudents, icon: Users, color: "text-primary" },
-    { label: "Attended Class", value: report.attended, icon: UserCheck, pct: Math.round((report.attended / total) * 100) },
-    { label: "Assignments Submitted", value: report.assignmentsSubmitted, icon: FileText, pct: Math.round((report.assignmentsSubmitted / total) * 100) },
-    { label: "Reflections Submitted", value: report.reflectionsSubmitted, icon: Video, pct: Math.round((report.reflectionsSubmitted / total) * 100) },
+    {
+      label: "Attended Class",
+      value: report.attended,
+      icon: UserCheck,
+      pct: Math.round((report.attended / total) * 100),
+    },
+    {
+      label: "Assignments Submitted",
+      value: report.assignmentsSubmitted,
+      icon: FileText,
+      pct: Math.round((report.assignmentsSubmitted / total) * 100),
+    },
+    {
+      label: "Reviews Submitted",
+      value: report.reflectionsSubmitted,
+      icon: Video,
+      pct: Math.round((report.reflectionsSubmitted / total) * 100),
+    },
   ];
 
   return (
@@ -171,11 +246,10 @@ const WeeklyReports = () => {
         </div>
       ) : (
         <>
+          {/* Metrics */}
           <Card className="border-border bg-card">
             <CardHeader>
-              <CardTitle className="font-display text-foreground">
-                Week {selectedWeek} Report
-              </CardTitle>
+              <CardTitle className="font-display text-foreground">Week {selectedWeek} Report</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -198,102 +272,207 @@ const WeeklyReports = () => {
             </CardContent>
           </Card>
 
-          {/* Student Reviews Section - All admins can view, only primary can download */}
-          {(
-            <Card className="border-border bg-card">
-              <CardHeader className="flex flex-row items-center justify-between">
+          {/* Video Approval Queue (Super Admin only) */}
+          {isPrimaryAdmin && pendingApproval.length > 0 && (
+            <Card className="border-amber-500/30 bg-amber-500/5">
+              <CardHeader>
                 <CardTitle className="font-display text-foreground flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  Student Reviews — Week {selectedWeek}
-                  <span className="text-sm font-normal text-muted-foreground ml-2">
-                    {reviews.length} submission{reviews.length !== 1 ? "s" : ""}
-                  </span>
+                  <Shield className="w-5 h-5 text-amber-500" />
+                  Pending Video Approvals — {pendingApproval.length} video
+                  {pendingApproval.length !== 1 ? "s" : ""}
                 </CardTitle>
-                {reviews.length > 0 && isPrimaryAdmin && (
-                  <Button variant="outline" size="sm" onClick={downloadReviewsCSV}>
-                    <Download className="w-4 h-4 mr-2" /> Export CSV
-                  </Button>
-                )}
               </CardHeader>
-              <CardContent>
-                {reviewsLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <CardContent className="space-y-3">
+                {pendingApproval.map((review) => (
+                  <div
+                    key={review.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-card border border-border"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-display font-bold">
+                        {review.full_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{review.full_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Week {review.week_number} Saturday · {review.tutor_name || "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedReview(review)}>
+                        <Play className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-primary border-primary/30 hover:bg-primary/10"
+                        onClick={() => handleApproveVideo(review.id, true)}
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-1" /> Approve
+                      </Button>
+                    </div>
                   </div>
-                ) : reviews.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8 text-sm">
-                    No reviews submitted for this week yet.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Student</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Reflection</TableHead>
-                          <TableHead>Video</TableHead>
-                          <TableHead>Submitted</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {reviews.map((review) => (
-                          <TableRow key={review.id}>
-                            <TableCell className="font-medium text-foreground">
-                              {review.full_name}
-                            </TableCell>
-                            <TableCell className="text-sm text-muted-foreground">
-                              {review.email}
-                            </TableCell>
-                            <TableCell>
-                              {review.written_reflection ? (
-                                <span className="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full">
-                                  Written
-                                </span>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {review.video_url ? (
-                                <a
-                                  href={review.video_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full hover:bg-primary/20 transition-colors"
-                                >
-                                  <Play className="w-3 h-3" /> Video
-                                </a>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">—</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              {new Date(review.created_at).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedReview(review)}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
+                ))}
               </CardContent>
             </Card>
           )}
+
+          {/* Friday Written Reviews */}
+          <Card className="border-border bg-card">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="font-display text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Friday Written Reviews — Week {selectedWeek}
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  {fridayReviews.length} submission{fridayReviews.length !== 1 ? "s" : ""}
+                </span>
+              </CardTitle>
+              {fridayReviews.length > 0 && isPrimaryAdmin && (
+                <Button variant="outline" size="sm" onClick={downloadReviewsCSV}>
+                  <Download className="w-4 h-4 mr-2" /> Export CSV
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : fridayReviews.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8 text-sm">
+                  No Friday reviews for this week yet.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Topic</TableHead>
+                        <TableHead>Tutor</TableHead>
+                        <TableHead>Rating</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {fridayReviews.map((review) => (
+                        <TableRow key={review.id}>
+                          <TableCell className="font-medium text-foreground">{review.full_name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {review.topic_covered || "—"}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {review.tutor_name || "—"}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                              {review.tutor_rating || "—"}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            {new Date(review.created_at).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm" onClick={() => setSelectedReview(review)}>
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Saturday Video Reviews */}
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="font-display text-foreground flex items-center gap-2">
+                <Video className="w-5 h-5 text-primary" />
+                Saturday Video Reviews — Week {selectedWeek}
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  {saturdayReviews.length} submission{saturdayReviews.length !== 1 ? "s" : ""}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : saturdayReviews.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8 text-sm">
+                  No Saturday video reviews for this week yet.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {saturdayReviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="flex items-center justify-between p-3 rounded-lg bg-secondary gap-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-display font-bold">
+                          {review.full_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{review.full_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {review.topic_covered || "N/A"} · {review.tutor_name || "N/A"} ·{" "}
+                            {review.tutor_rating || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {review.is_approved ? (
+                          <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> Approved
+                          </span>
+                        ) : (
+                          <span className="text-xs font-medium bg-amber-500/10 text-amber-600 px-2 py-1 rounded-full">
+                            Pending
+                          </span>
+                        )}
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedReview(review)}>
+                          <Play className="w-4 h-4" />
+                        </Button>
+                        {isPrimaryAdmin && (
+                          <>
+                            {!review.is_approved ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-primary border-primary/30"
+                                onClick={() => handleApproveVideo(review.id, true)}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-destructive border-destructive/30"
+                                onClick={() => handleApproveVideo(review.id, false)}
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
 
@@ -302,12 +481,13 @@ const WeeklyReports = () => {
         <DialogContent className="bg-card border-border max-w-2xl max-h-[85vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-foreground">
-              Review: {selectedReview?.full_name}
+              {selectedReview?.full_name}'s{" "}
+              {selectedReview?.session_day === "friday" ? "Written" : "Video"} Review
             </DialogTitle>
           </DialogHeader>
           {selectedReview && (
             <div className="space-y-5">
-              {/* Student info header */}
+              {/* Header */}
               <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary">
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-display font-bold text-lg">
                   {selectedReview.full_name.charAt(0).toUpperCase()}
@@ -316,11 +496,12 @@ const WeeklyReports = () => {
                   <p className="font-display font-semibold text-foreground">{selectedReview.full_name}</p>
                   <p className="text-sm text-muted-foreground">{selectedReview.email}</p>
                 </div>
-                <div className="ml-auto text-right">
+                <div className="ml-auto text-right space-y-1">
                   <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded-full">
-                    Week {selectedReview.week_number}
+                    Week {selectedReview.week_number}{" "}
+                    {selectedReview.session_day === "friday" ? "Friday" : "Saturday"}
                   </span>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground">
                     {new Date(selectedReview.created_at).toLocaleString("en-GB", {
                       day: "numeric",
                       month: "long",
@@ -332,11 +513,45 @@ const WeeklyReports = () => {
                 </div>
               </div>
 
+              {/* Session Details */}
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="p-3 rounded-lg bg-secondary">
+                  <p className="text-xs text-muted-foreground">Topic</p>
+                  <p className="font-medium text-foreground">{selectedReview.topic_covered || "—"}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-secondary">
+                  <p className="text-xs text-muted-foreground">Tutor</p>
+                  <p className="font-medium text-foreground">{selectedReview.tutor_name || "—"}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-secondary">
+                  <p className="text-xs text-muted-foreground">Rating</p>
+                  <p className="font-medium text-foreground">{selectedReview.tutor_rating || "—"}</p>
+                </div>
+              </div>
+
+              {/* Question Answers (Friday) */}
+              {selectedReview.session_day === "friday" &&
+                selectedReview.question_answers &&
+                typeof selectedReview.question_answers === "object" &&
+                Object.keys(selectedReview.question_answers).length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-display font-semibold text-foreground text-sm">
+                      Session Question Answers
+                    </h3>
+                    {Object.entries(selectedReview.question_answers).map(([num, answer]) => (
+                      <div key={num} className="p-3 rounded-lg bg-secondary border border-border">
+                        <p className="text-xs text-muted-foreground mb-1">Question {num}</p>
+                        <p className="text-sm text-foreground whitespace-pre-wrap">{String(answer)}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
               {/* Written Reflection */}
               {selectedReview.written_reflection && (
                 <div className="space-y-2">
                   <h3 className="font-display font-semibold text-foreground text-sm flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-primary" /> Written Reflection
+                    <FileText className="w-4 h-4 text-primary" /> Written Review
                   </h3>
                   <div className="p-4 rounded-lg bg-secondary border border-border">
                     <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
@@ -346,41 +561,47 @@ const WeeklyReports = () => {
                 </div>
               )}
 
-              {/* Video Reflection */}
+              {/* Video Review */}
               {selectedReview.video_url && (
                 <div className="space-y-2">
                   <h3 className="font-display font-semibold text-foreground text-sm flex items-center gap-2">
-                    <Video className="w-4 h-4 text-primary" /> Video Reflection
+                    <Video className="w-4 h-4 text-primary" /> Video Review
+                    {selectedReview.is_approved && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-2">
+                        ✓ Approved for homepage
+                      </span>
+                    )}
                   </h3>
                   <div className="rounded-lg overflow-hidden bg-black">
-                    <video
-                      src={selectedReview.video_url}
-                      controls
-                      className="w-full"
-                    />
+                    <video src={selectedReview.video_url} controls className="w-full" />
                   </div>
-                  <a
-                    href={selectedReview.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                  >
-                    <ExternalLink className="w-3 h-3" /> Open in new tab
-                  </a>
-                </div>
-              )}
 
-              {/* Comments */}
-              {selectedReview.comments && (
-                <div className="space-y-2">
-                  <h3 className="font-display font-semibold text-foreground text-sm">
-                    Additional Comments
-                  </h3>
-                  <div className="p-4 rounded-lg bg-secondary border border-border">
-                    <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                      {selectedReview.comments}
-                    </p>
-                  </div>
+                  {/* Approval Prompt (Super Admin) */}
+                  {isPrimaryAdmin && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <p className="text-sm text-foreground flex-1">
+                        Approve this video for homepage display?
+                      </p>
+                      {!selectedReview.is_approved ? (
+                        <Button
+                          size="sm"
+                          className="bg-primary text-primary-foreground"
+                          onClick={() => handleApproveVideo(selectedReview.id, true)}
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-1" /> Approve
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-destructive border-destructive/30"
+                          onClick={() => handleApproveVideo(selectedReview.id, false)}
+                        >
+                          <XCircle className="w-4 h-4 mr-1" /> Remove
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
