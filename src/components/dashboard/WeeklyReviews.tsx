@@ -295,7 +295,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       toast({ title: "Saturday video review submitted! 🎬", description: `Week ${weekNum} Saturday review recorded.` });
       resetForm();
       onReviewSubmitted();
-      triggerGoogleReview(weekNum);
+      triggerGoogleReview(weekNum, "saturday");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
