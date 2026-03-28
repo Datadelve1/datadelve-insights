@@ -236,7 +236,7 @@ const StudentTracking = () => {
       });
       WEEKS.forEach(w => {
         row[`Week ${w} Reflection`] = s.reviewWeeks.has(w) ? "Yes" : "No";
-        if (w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
+        if (w >= 2 && w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
       });
       row["Progress"] = `${s.progress}%`;
       row["Status"] = s.status;
