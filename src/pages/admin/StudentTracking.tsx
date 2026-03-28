@@ -197,23 +197,47 @@ const StudentTracking = () => {
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const toggleAttendance = async (studentId: string, week: number, day: string, current: string | undefined) => {
-    const newStatus = current === "present" ? "absent" : "present";
+    // Cycle: blank → present → absent → blank
+    const nextStatus = !current || current === "" ? "present" : current === "present" ? "absent" : "";
     const savKey = `${studentId}-${week}-${day}`;
     setSavingAttendance(savKey);
-    const { error } = await supabase.from("student_attendance").upsert(
-      { user_id: studentId, week_number: week, session_day: day, status: newStatus, marked_by: user!.id } as any,
-      { onConflict: "user_id,week_number,session_day" }
-    );
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+
+    if (nextStatus === "") {
+      // Delete the record to reset to blank
+      const { error } = await supabase
+        .from("student_attendance")
+        .delete()
+        .eq("user_id", studentId)
+        .eq("week_number", week)
+        .eq("session_day", day);
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } else {
+        setStudents(prev =>
+          prev.map(s => {
+            if (s.id !== studentId) return s;
+            const newAtt = { ...s.attendance };
+            delete newAtt[`${week}-${day}`];
+            return { ...s, attendance: newAtt };
+          })
+        );
+      }
     } else {
-      setStudents(prev =>
-        prev.map(s =>
-          s.id === studentId
-            ? { ...s, attendance: { ...s.attendance, [`${week}-${day}`]: newStatus } }
-            : s
-        )
+      const { error } = await supabase.from("student_attendance").upsert(
+        { user_id: studentId, week_number: week, session_day: day, status: nextStatus, marked_by: user!.id } as any,
+        { onConflict: "user_id,week_number,session_day" }
       );
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      } else {
+        setStudents(prev =>
+          prev.map(s =>
+            s.id === studentId
+              ? { ...s, attendance: { ...s.attendance, [`${week}-${day}`]: nextStatus } }
+              : s
+          )
+        );
+      }
     }
     setSavingAttendance(null);
   };
