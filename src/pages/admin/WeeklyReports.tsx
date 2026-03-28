@@ -198,8 +198,8 @@ const WeeklyReports = () => {
             </CardContent>
           </Card>
 
-          {/* Student Reviews Section - Primary Admin Only */}
-          {isPrimaryAdmin && (
+          {/* Student Reviews Section - All admins can view, only primary can download */}
+          {(
             <Card className="border-border bg-card">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="font-display text-foreground flex items-center gap-2">
