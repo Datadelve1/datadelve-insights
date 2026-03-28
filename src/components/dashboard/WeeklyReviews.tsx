@@ -51,11 +51,6 @@ interface WeeklyReviewsProps {
   onReviewSubmitted: () => void;
 }
 
-const UNRESTRICTED_EMAILS = [
-  "edwardolamide925@gmail.com",
-  "koredesax1@gmail.com",
-  "oloyedeopeyemi253@gmail.com",
-];
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
@@ -69,7 +64,6 @@ const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
 const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: WeeklyReviewsProps) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
-    UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "") ||
     isAdmin ||
     ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();

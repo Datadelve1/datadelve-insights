@@ -20,11 +20,6 @@ import {
 import { useSubmissionWindow } from "./SubmissionWindowBanner";
 import { hasReviewForWeek, canSubmitReview } from "@/lib/attendanceAccess";
 
-const UNRESTRICTED_EMAILS = [
-  "edwardolamide925@gmail.com",
-  "koredesax1@gmail.com",
-  "oloyedeopeyemi253@gmail.com",
-];
 
 interface Assignment {
   id: string;
@@ -56,7 +51,6 @@ const Assignments = ({
 }) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
-    UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "") ||
     isAdmin ||
     ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
