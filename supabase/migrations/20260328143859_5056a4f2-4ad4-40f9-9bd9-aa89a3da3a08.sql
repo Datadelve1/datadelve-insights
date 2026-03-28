@@ -1,0 +1,1 @@
+DELETE FROM weekly_reviews WHERE email != 'iyamufaithofure@gmail.com';
