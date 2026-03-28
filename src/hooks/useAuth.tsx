@@ -11,10 +11,11 @@ const ADMIN_EMAILS = [
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: { full_name: string; email: string } | null;
+  profile: { full_name: string; email: string; student_status?: string } | null;
   isAdmin: boolean;
   isLoading: boolean;
   hasCommitted: boolean;
+  isWithdrawn: boolean;
   signOut: () => Promise<void>;
   refreshCommitment: () => Promise<void>;
 }
