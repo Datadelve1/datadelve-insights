@@ -34,7 +34,8 @@ interface StudentRow {
   hasCommitment: boolean;
   attendance: Record<string, string>;
   assignmentWeeks: Set<number>;
-  reviewWeeks: Set<number>;
+  /** Per-session review tracking: "1-friday", "1-saturday", etc. */
+  reviewSessions: Set<string>;
   progress: number;
   status: string;
   notes: string[];
@@ -67,7 +68,7 @@ const StudentTracking = () => {
         supabase.from("profiles").select("*").order("created_at", { ascending: false }),
         supabase.from("training_commitments").select("user_id, email"),
         supabase.from("student_attendance").select("*"),
-        supabase.from("weekly_reviews").select("user_id, week_number"),
+        supabase.from("weekly_reviews").select("user_id, week_number, session_day"),
         supabase
           .from("assignment_submissions")
           .select("user_id, assignment_id, assignments!inner(week_number)"),
@@ -84,7 +85,6 @@ const StudentTracking = () => {
     const commitUserIds = new Set(commitments.filter((c: any) => c.user_id).map((c: any) => c.user_id));
     const commitEmails = new Set(commitments.map((c: any) => c.email));
 
-    // Attendance map: userId → { "1-friday": "present", "1-saturday": "absent", ... }
     const attendanceMap = new Map<string, Record<string, string>>();
     attendance.forEach((a: any) => {
       if (!attendanceMap.has(a.user_id)) attendanceMap.set(a.user_id, {});
@@ -92,10 +92,13 @@ const StudentTracking = () => {
       attendanceMap.get(a.user_id)![key] = a.status;
     });
 
-    const reviewMap = new Map<string, Set<number>>();
+    // Per-session review map: userId → Set<"1-friday", "1-saturday", ...>
+    const reviewMap = new Map<string, Set<string>>();
     reviews.forEach((r: any) => {
+      if (!r.user_id) return;
       if (!reviewMap.has(r.user_id)) reviewMap.set(r.user_id, new Set());
-      reviewMap.get(r.user_id)!.add(r.week_number);
+      const day = r.session_day || "friday";
+      reviewMap.get(r.user_id)!.add(`${r.week_number}-${day}`);
     });
 
     const assignMap = new Map<string, Set<number>>();
@@ -114,40 +117,46 @@ const StudentTracking = () => {
 
     const rows: StudentRow[] = profiles.map((p: any) => {
       const att = attendanceMap.get(p.id) ?? {};
-      const revWeeks = reviewMap.get(p.id) ?? new Set<number>();
+      const revSessions = reviewMap.get(p.id) ?? new Set<string>();
       const assWeeks = assignMap.get(p.id) ?? new Set<number>();
       const hasCommitment = commitUserIds.has(p.id) || commitEmails.has(p.email);
 
-      // Count sessions attended (out of 16 total: 8 weeks × 2 days)
+      // Progress: attendance (16 sessions), reviews (16 sessions), assignments (8 weeks)
       const attCount = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "present").length;
+      const revCount = revSessions.size; // out of 16
       const commitScore = hasCommitment ? 10 : 0;
-      const attScore = (attCount / 16) * 40;
-      const assScore = (assWeeks.size / 6) * 25;
-      const revScore = (revWeeks.size / 8) * 25;
-      const progress = Math.round(commitScore + attScore + assScore + revScore);
+      const attScore = (attCount / 16) * 35;
+      const revScore = (revCount / 16) * 30;
+      const assScore = (assWeeks.size / 8) * 25;
+      const progress = Math.round(commitScore + attScore + revScore + assScore);
 
-      // Status based on missed items:
-      // Week 1: attendance + reviews only (no assignments)
-      // Week 2+: attendance + reviews + assignments
+      // Status based on missed items (only count sessions where student was present for reviews)
+      // Attendance: manually marked, counts absent sessions
       const missedAttendance = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
-      // Count expected review weeks that are missing
-      const expectedReviewWeeks = WEEKS.filter(w => SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
-      const missedReviews = expectedReviewWeeks.filter(w => !revWeeks.has(w)).length;
-      // Assignments only from week 2+
-      const expectedAssignmentWeeks = WEEKS.filter(w => w >= 2 && SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
+
+      // Reviews: count sessions where student was present but didn't submit review
+      const missedReviews = SESSIONS.filter(s => {
+        const key = `${s.week}-${s.day}`;
+        return att[key] === "present" && !revSessions.has(key);
+      }).length;
+
+      // Assignments: count weeks where student attended at least one session but didn't submit
+      const expectedAssignmentWeeks = WEEKS.filter(w =>
+        att[`${w}-friday`] === "present" || att[`${w}-saturday`] === "present"
+      );
       const missedAssignments = expectedAssignmentWeeks.filter(w => !assWeeks.has(w)).length;
 
       const maxMissed = Math.max(missedAttendance, missedReviews, missedAssignments);
 
-      let status = "Active"; // Green
+      let status = "Active";
       if (p.student_status === "withdrawn") {
         status = "Withdrawn";
       } else if (maxMissed >= 3) {
-        status = "Inactive"; // Red
+        status = "Inactive";
       } else if (maxMissed >= 2) {
-        status = "Action Required"; // Orange
+        status = "Action Required";
       } else if (maxMissed >= 1) {
-        status = "Monitor"; // Amber
+        status = "Monitor";
       }
 
       if (progress >= 90 && status === "Active") status = "Completed Program";
@@ -160,7 +169,7 @@ const StudentTracking = () => {
         hasCommitment,
         attendance: att,
         assignmentWeeks: assWeeks,
-        reviewWeeks: revWeeks,
+        reviewSessions: revSessions,
         progress,
         status,
         notes: notesMap.get(p.id) ?? [],
@@ -244,9 +253,12 @@ const StudentTracking = () => {
         const val = s.attendance[key];
         row[`${sess.label} Attendance`] = val === "present" ? "Present" : val === "absent" ? "Absent" : "—";
       });
+      SESSIONS.forEach(sess => {
+        const key = `${sess.week}-${sess.day}`;
+        row[`${sess.label} Review`] = s.reviewSessions.has(key) ? "Yes" : "No";
+      });
       WEEKS.forEach(w => {
-        row[`Week ${w} Reflection`] = s.reviewWeeks.has(w) ? "Yes" : "No";
-        if (w >= 2 && w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
+        row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
       });
       row["Progress"] = `${s.progress}%`;
       row["Status"] = s.status;
@@ -283,10 +295,10 @@ const StudentTracking = () => {
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed Program": return "bg-green-600/20 text-green-400 border-green-600/30";
-      case "Active": return "bg-green-600/20 text-green-400 border-green-600/30"; // Green
-      case "Monitor": return "bg-amber-500/20 text-amber-400 border-amber-500/30"; // Amber
-      case "Action Required": return "bg-orange-600/20 text-orange-400 border-orange-600/30"; // Orange
-      case "Inactive": return "bg-red-600/20 text-red-400 border-red-600/30"; // Red
+      case "Active": return "bg-green-600/20 text-green-400 border-green-600/30";
+      case "Monitor": return "bg-amber-500/20 text-amber-400 border-amber-500/30";
+      case "Action Required": return "bg-orange-600/20 text-orange-400 border-orange-600/30";
+      case "Inactive": return "bg-red-600/20 text-red-400 border-red-600/30";
       case "Withdrawn": return "bg-destructive/20 text-destructive border-destructive/30";
       default: return "bg-muted text-muted-foreground";
     }
@@ -376,14 +388,14 @@ const StudentTracking = () => {
                   {s.label}
                 </TableHead>
               ))}
-              {[2, 3, 4, 5, 6].map(w => (
-                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center text-xs">
-                  W{w} Asgn.
+              {SESSIONS.map(s => (
+                <TableHead key={`rev-${s.week}-${s.day}`} className="min-w-[60px] text-center text-xs">
+                  {s.label} Rev
                 </TableHead>
               ))}
               {WEEKS.map(w => (
-                <TableHead key={`ref-${w}`} className="min-w-[60px] text-center">
-                  W{w} Ref.
+                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center text-xs">
+                  W{w} Asgn
                 </TableHead>
               ))}
               <TableHead className="min-w-[120px]">Progress</TableHead>
@@ -408,6 +420,7 @@ const StudentTracking = () => {
                     <XCircle className="w-4 h-4 text-destructive mx-auto" />
                   )}
                 </TableCell>
+                {/* Attendance columns - manually toggled */}
                 {SESSIONS.map(sess => {
                   const key = `${sess.week}-${sess.day}`;
                   const val = s.attendance[key];
@@ -432,18 +445,23 @@ const StudentTracking = () => {
                     </TableCell>
                   );
                 })}
-                {[2, 3, 4, 5, 6].map(w => (
+                {/* Review columns - auto-tracked per session */}
+                {SESSIONS.map(sess => {
+                  const key = `${sess.week}-${sess.day}`;
+                  return (
+                    <TableCell key={`rev-${key}`} className="text-center">
+                      {s.reviewSessions.has(key) ? (
+                        <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
+                      ) : (
+                        <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
+                      )}
+                    </TableCell>
+                  );
+                })}
+                {/* Assignment columns - auto-tracked per week (W1-W8) */}
+                {WEEKS.map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
                     {s.assignmentWeeks.has(w) ? (
-                      <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                    ) : (
-                      <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
-                    )}
-                  </TableCell>
-                ))}
-                {WEEKS.map(w => (
-                  <TableCell key={`ref-${w}`} className="text-center">
-                    {s.reviewWeeks.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
                     ) : (
                       <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
