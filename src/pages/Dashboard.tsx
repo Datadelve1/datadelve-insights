@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
   const [submittedReviews, setSubmittedReviews] = useState<Record<string, boolean>>({});
-  const [googleReviewConfirmed, setGoogleReviewConfirmed] = useState<Set<number>>(new Set());
+  const [googleReviewConfirmed, setGoogleReviewConfirmed] = useState<Record<string, boolean>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
@@ -72,9 +72,11 @@ const Dashboard = () => {
     });
     setAttendance(att);
 
-    const grWeeks = new Set<number>();
-    (grData || []).forEach((g: any) => grWeeks.add(g.week_number));
-    setGoogleReviewConfirmed(grWeeks);
+    const grMap: Record<string, boolean> = {};
+    (grData || []).forEach((g: any) => {
+      grMap[`${g.week_number}-${g.session_day}`] = true;
+    });
+    setGoogleReviewConfirmed(grMap);
 
     setReviewsLoaded(true);
   };

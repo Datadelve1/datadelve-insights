@@ -77,6 +77,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGoogleReview, setShowGoogleReview] = useState(false);
   const [pendingWeek, setPendingWeek] = useState<number | null>(null);
+  const [pendingDay, setPendingDay] = useState<string | null>(null);
   const [googleReviewOpened, setGoogleReviewOpened] = useState(false);
   const [activeSession, setActiveSession] = useState<string | null>(null); // "1-friday"
 
@@ -109,8 +110,9 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
     fetchQuestions();
   }, []);
 
-  const triggerGoogleReview = (weekNum: number) => {
+  const triggerGoogleReview = (weekNum: number, day: string) => {
     setPendingWeek(weekNum);
+    setPendingDay(day);
     setGoogleReviewOpened(false);
     setShowGoogleReview(true);
   };
@@ -125,13 +127,15 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   };
 
   const handleGoogleReviewConfirm = async () => {
-    if (!user || !pendingWeek) return;
+    if (!user || !pendingWeek || !pendingDay) return;
     await supabase.from("google_review_confirmations" as any).insert({
       user_id: user.id,
       week_number: pendingWeek,
+      session_day: pendingDay,
     });
     setShowGoogleReview(false);
     setPendingWeek(null);
+    setPendingDay(null);
     setGoogleReviewOpened(false);
     toast({ title: "Google Review confirmed! ✅", description: "Thank you for supporting Delvetek." });
     onReviewSubmitted();
@@ -217,7 +221,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       toast({ title: "Friday review submitted! 🎉", description: `Week ${weekNum} Friday review recorded.` });
       resetForm();
       onReviewSubmitted();
-      triggerGoogleReview(weekNum);
+      triggerGoogleReview(weekNum, "friday");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -291,7 +295,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       toast({ title: "Saturday video review submitted! 🎬", description: `Week ${weekNum} Saturday review recorded.` });
       resetForm();
       onReviewSubmitted();
-      triggerGoogleReview(weekNum);
+      triggerGoogleReview(weekNum, "saturday");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
