@@ -76,7 +76,7 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
             <div className="space-y-3">
               {recordings.map((rec) => {
                 const unlocked = hasWeekAccess(rec.week_number, attendance, isAdmin);
-                const attended = attendance[rec.week_number] === "present";
+                const attended = attendance[`${rec.week_number}-friday`] === "present" || attendance[`${rec.week_number}-saturday`] === "present";
                 return (
                   <div
                     key={rec.id}
