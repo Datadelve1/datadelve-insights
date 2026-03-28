@@ -218,6 +218,12 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       resetForm();
       onReviewSubmitted();
       triggerGoogleReview(weekNum);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleSaturdaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
