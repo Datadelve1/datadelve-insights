@@ -239,7 +239,7 @@ const StudentTracking = () => {
       case "Active": return "bg-primary/20 text-primary border-primary/30";
       case "Falling Behind": return "bg-orange-600/20 text-orange-400 border-orange-600/30";
       case "Inactive": return "bg-destructive/20 text-destructive border-destructive/30";
-      case "Withdrawn": return "bg-red-800/20 text-red-400 border-red-800/30";
+      case "At Risk": return "bg-red-800/20 text-red-400 border-red-800/30";
       default: return "bg-muted text-muted-foreground";
     }
   };
