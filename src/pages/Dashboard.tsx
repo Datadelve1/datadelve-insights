@@ -71,6 +71,11 @@ const Dashboard = () => {
       att[`${a.week_number}-${a.session_day || "friday"}`] = a.status;
     });
     setAttendance(att);
+
+    const grWeeks = new Set<number>();
+    (grData || []).forEach((g: any) => grWeeks.add(g.week_number));
+    setGoogleReviewConfirmed(grWeeks);
+
     setReviewsLoaded(true);
   };
 
