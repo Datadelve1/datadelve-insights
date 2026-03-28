@@ -317,8 +317,8 @@ const StudentTracking = () => {
                   {s.label}
                 </TableHead>
               ))}
-              {[1, 2, 3, 4, 5, 6].map(w => (
-                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center">
+              {[2, 3, 4, 5, 6].map(w => (
+                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center text-xs">
                   W{w} Asgn.
                 </TableHead>
               ))}
