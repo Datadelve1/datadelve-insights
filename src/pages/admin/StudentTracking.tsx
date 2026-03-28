@@ -373,7 +373,7 @@ const StudentTracking = () => {
                     </TableCell>
                   );
                 })}
-                {[1, 2, 3, 4, 5, 6].map(w => (
+                {[2, 3, 4, 5, 6].map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
                     {s.assignmentWeeks.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
