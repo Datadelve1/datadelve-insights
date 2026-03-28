@@ -270,6 +270,16 @@ const StudentTracking = () => {
     }
   };
 
+  const reinstateStudent = async (studentId: string) => {
+    const { error } = await supabase.from("profiles").update({ student_status: "active" }).eq("id", studentId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Student reinstated" });
+      fetchAll();
+    }
+  };
+
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed Program": return "bg-green-600/20 text-green-400 border-green-600/30";
