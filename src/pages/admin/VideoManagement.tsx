@@ -265,22 +265,21 @@ const VideoManagement = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Week *</Label>
+                  <Label>Session *</Label>
                   <Select value={weekNumber} onValueChange={setWeekNumber}>
                     <SelectTrigger className="bg-secondary border-border">
-                      <SelectValue placeholder="Select week" />
+                      <SelectValue placeholder="Select session" />
                     </SelectTrigger>
                     <SelectContent>
-                      {WEEKS.map((w) => (
-                        <SelectItem
-                          key={w}
-                          value={String(w)}
-                          disabled={usedWeeks.has(w) && weekNumber !== String(w)}
-                        >
-                          Week {w} {w >= 7 ? "(Project)" : ""}
-                          {usedWeeks.has(w) && weekNumber !== String(w) ? " ✓" : ""}
-                        </SelectItem>
-                      ))}
+                      {SESSIONS.map((s) => {
+                        const val = `${s.week}-${s.day}`;
+                        const taken = usedWeeks.has(s.week) && weekNumber !== val;
+                        return (
+                          <SelectItem key={val} value={val}>
+                            Week {s.week} {s.day} {s.week >= 7 ? "(Project)" : ""}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
