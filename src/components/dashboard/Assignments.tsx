@@ -20,11 +20,6 @@ import {
 import { useSubmissionWindow } from "./SubmissionWindowBanner";
 import { hasReviewForWeek, canSubmitReview } from "@/lib/attendanceAccess";
 
-const UNRESTRICTED_EMAILS = [
-  "edwardolamide925@gmail.com",
-  "koredesax1@gmail.com",
-  "oloyedeopeyemi253@gmail.com",
-];
 
 interface Assignment {
   id: string;
