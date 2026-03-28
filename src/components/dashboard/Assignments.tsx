@@ -71,7 +71,7 @@ const Assignments = ({
   attendance,
   onScoreUpdate,
 }: {
-  attendance: Record<number, string>;
+  attendance: Record<string, string>;
   onScoreUpdate: () => void;
 }) => {
   const { user, isAdmin } = useAuth();
