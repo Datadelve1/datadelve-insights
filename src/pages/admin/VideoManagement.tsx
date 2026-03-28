@@ -224,6 +224,7 @@ const VideoManagement = () => {
   };
 
   const usedWeeks = new Set(recordings.map((r) => r.week_number));
+  const usedSessionKeys = new Set(recordings.map((r) => `${r.week_number}`));
 
   if (loading) {
     return (
