@@ -193,18 +193,51 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          student_status: string
         }
         Insert: {
           created_at?: string
           email: string
           full_name: string
           id: string
+          student_status?: string
         }
         Update: {
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          student_status?: string
+        }
+        Relationships: []
+      }
+      review_questions: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          question_number: number
+          question_text: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_number: number
+          question_text?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_number?: number
+          question_text?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -428,33 +461,51 @@ export type Database = {
       }
       weekly_reviews: {
         Row: {
+          class_date: string | null
+          class_name: string | null
           comments: string
           created_at: string
           email: string
           full_name: string
           id: string
+          question_answers: Json | null
+          topic_covered: string | null
+          tutor_name: string | null
+          tutor_rating: string | null
           user_id: string | null
           video_url: string | null
           week_number: number
           written_reflection: string | null
         }
         Insert: {
+          class_date?: string | null
+          class_name?: string | null
           comments?: string
           created_at?: string
           email: string
           full_name: string
           id?: string
+          question_answers?: Json | null
+          topic_covered?: string | null
+          tutor_name?: string | null
+          tutor_rating?: string | null
           user_id?: string | null
           video_url?: string | null
           week_number: number
           written_reflection?: string | null
         }
         Update: {
+          class_date?: string | null
+          class_name?: string | null
           comments?: string
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          question_answers?: Json | null
+          topic_covered?: string | null
+          tutor_name?: string | null
+          tutor_rating?: string | null
           user_id?: string | null
           video_url?: string | null
           week_number?: number
