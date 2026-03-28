@@ -329,6 +329,7 @@ const StudentTracking = () => {
               ))}
               <TableHead className="min-w-[120px]">Progress</TableHead>
               <TableHead className="min-w-[130px]">Status</TableHead>
+              <TableHead className="min-w-[100px]">Actions</TableHead>
               <TableHead className="min-w-[80px]">Notes</TableHead>
             </TableRow>
           </TableHeader>
