@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
@@ -15,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   Loader2, Search, Download, CheckCircle2, XCircle, Minus,
-  StickyNote, ChevronLeft, ChevronRight,
+  StickyNote, ChevronLeft, ChevronRight, RotateCcw,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
