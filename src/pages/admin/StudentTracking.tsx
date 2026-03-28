@@ -174,11 +174,13 @@ const StudentTracking = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const filtered = useMemo(
-    () => students.filter(s =>
-      s.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase())
-    ),
-    [students, search]
+    () => students.filter(s => {
+      const matchesSearch = s.full_name.toLowerCase().includes(search.toLowerCase()) ||
+        s.email.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === "all" || s.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    }),
+    [students, search, statusFilter]
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
