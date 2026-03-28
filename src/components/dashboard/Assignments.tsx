@@ -271,7 +271,7 @@ const Assignments = ({
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
-              const attended = attendance[assignment.week_number] === "present";
+              const attended = attendance[`${assignment.week_number}-friday`] === "present" || attendance[`${assignment.week_number}-saturday`] === "present";
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
