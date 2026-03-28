@@ -51,7 +51,6 @@ const Assignments = ({
 }) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
-    UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "") ||
     isAdmin ||
     ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
