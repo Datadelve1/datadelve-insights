@@ -297,6 +297,7 @@ const Assignments = ({
               if (!attended) lockMessage = "Attendance required";
               else if (!timingOk) lockMessage = "Available after 10 PM";
               else if (!reviewDone) lockMessage = "Submit review first";
+              else if (!googleOk) lockMessage = "Confirm Google Review for Week " + (assignment.week_number - 1);
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
