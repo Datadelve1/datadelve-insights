@@ -77,6 +77,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGoogleReview, setShowGoogleReview] = useState(false);
   const [pendingWeek, setPendingWeek] = useState<number | null>(null);
+  const [pendingDay, setPendingDay] = useState<string | null>(null);
   const [googleReviewOpened, setGoogleReviewOpened] = useState(false);
   const [activeSession, setActiveSession] = useState<string | null>(null); // "1-friday"
 
