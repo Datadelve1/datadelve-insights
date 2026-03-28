@@ -15,29 +15,30 @@ import {
   CheckCircle2,
   Loader2,
   ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
-import StudentVideoUpload from "@/components/dashboard/StudentVideoUpload";
-
 
 const Dashboard = () => {
-  const { user, profile, isLoading, hasCommitted, signOut } = useAuth();
+  const { user, profile, isLoading, isAdmin, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
+  const [attendance, setAttendance] = useState<Record<number, string>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
     if (!user) return;
-    const [{ data: reviewData }, { data: subData }] = await Promise.all([
+    const [{ data: reviewData }, { data: subData }, { data: attData }] = await Promise.all([
       supabase.from("weekly_reviews").select("week_number").eq("user_id", user.id),
       supabase
         .from("assignment_submissions")
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
+      supabase.from("student_attendance").select("week_number, status").eq("user_id", user.id),
     ]);
     setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
     const scores: Record<number, { score: number; total: number }> = {};
@@ -46,6 +47,9 @@ const Dashboard = () => {
       if (wn) scores[wn] = { score: s.score, total: s.total };
     });
     setAssignmentScores(scores);
+    const att: Record<number, string> = {};
+    (attData || []).forEach((a: any) => { att[a.week_number] = a.status; });
+    setAttendance(att);
     setReviewsLoaded(true);
   };
 
@@ -94,6 +98,14 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8 space-y-8">
+        {/* Review Submission Notice */}
+        <div className="flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
+          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+          <p className="text-sm font-display font-semibold text-foreground">
+            Review submissions open Saturdays at 8pm.
+          </p>
+        </div>
+
         {/* Welcome Section */}
         <div className="rounded-2xl border border-border bg-card p-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">
@@ -107,8 +119,8 @@ const Dashboard = () => {
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
               <CalendarDays className="w-5 h-5 shrink-0" />
               <div>
-                <p className="text-xs opacity-80">Class Day</p>
-                <p className="font-display font-semibold">Every Friday</p>
+                <p className="text-xs opacity-80">Class Days</p>
+                <p className="font-display font-semibold">Every Friday & Saturday</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
@@ -181,13 +193,10 @@ const Dashboard = () => {
         <WeeklyReviews />
 
         {/* Class Recordings */}
-        <ClassRecordings submittedWeeks={submittedWeeks} />
+        <ClassRecordings attendance={attendance} />
 
         {/* Assignments */}
-        <Assignments submittedWeeks={submittedWeeks} onScoreUpdate={fetchDashboardData} />
-
-        {/* Student Video Upload */}
-        <StudentVideoUpload />
+        <Assignments attendance={attendance} onScoreUpdate={fetchDashboardData} />
 
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">

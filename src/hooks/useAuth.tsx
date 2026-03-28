@@ -2,6 +2,12 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+const ADMIN_EMAILS = [
+  "datadelve1@gmail.com",
+  "goodydavis82@gmail.com",
+  "adewoleaderemi2019@gmail.com",
+];
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -48,7 +54,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .select("role")
       .eq("user_id", userId);
 
-    setIsAdmin(roles?.some((r: any) => r.role === "admin") ?? false);
+    const userIsAdmin = roles?.some((r: any) => r.role === "admin") ?? false;
+    setIsAdmin(userIsAdmin);
+
+    // Admins are exempt from commitment requirement
+    if (userIsAdmin || ADMIN_EMAILS.includes(email)) {
+      setHasCommitted(true);
+      return;
+    }
 
     // Check commitment
     const { data: commitments } = await supabase
@@ -77,9 +90,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Use setTimeout to avoid Supabase auth deadlock
-          setTimeout(() => {
-            fetchUserData(session.user.id, session.user.email ?? "");
+          // Use setTimeout to avoid Supabase auth deadlock, but await fetchUserData
+          setTimeout(async () => {
+            await fetchUserData(session.user.id, session.user.email ?? "");
             setIsLoading(false);
           }, 0);
         } else {
@@ -112,6 +125,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshCommitment = async () => {
     if (user) {
+      if (isAdmin || ADMIN_EMAILS.includes(user.email ?? "")) {
+        setHasCommitted(true);
+        return;
+      }
       const { data } = await supabase
         .from("training_commitments")
         .select("id")
@@ -140,3 +157,5 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export { ADMIN_EMAILS };

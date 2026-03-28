@@ -8,8 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Video, Lock, Play, Loader2, Shield } from "lucide-react";
+import { Video, Lock, Play, Loader2, Shield, Clock } from "lucide-react";
 import ProtectedVideoPlayer from "./ProtectedVideoPlayer";
+import { hasWeekAccess } from "@/lib/attendanceAccess";
 
 interface ClassRecording {
   id: string;
@@ -19,8 +20,12 @@ interface ClassRecording {
   video_url: string;
 }
 
-const ClassRecordings = ({ submittedWeeks }: { submittedWeeks: Set<number> }) => {
-  const { user } = useAuth();
+interface ClassRecordingsProps {
+  attendance: Record<number, string>;
+}
+
+const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
+  const { user, isAdmin } = useAuth();
   const [recordings, setRecordings] = useState<ClassRecording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeRecording, setActiveRecording] = useState<ClassRecording | null>(null);
@@ -70,7 +75,8 @@ const ClassRecordings = ({ submittedWeeks }: { submittedWeeks: Set<number> }) =>
           ) : (
             <div className="space-y-3">
               {recordings.map((rec) => {
-                const unlocked = submittedWeeks.has(rec.week_number);
+                const unlocked = hasWeekAccess(rec.week_number, attendance, isAdmin);
+                const attended = attendance[rec.week_number] === "present";
                 return (
                   <div
                     key={rec.id}
@@ -114,9 +120,13 @@ const ClassRecordings = ({ submittedWeeks }: { submittedWeeks: Set<number> }) =>
                         >
                           <Play className="w-4 h-4" /> Watch
                         </button>
-                      ) : (
+                      ) : !attended ? (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
-                          Submit Week {rec.week_number} review to unlock
+                          Attendance required to unlock
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Available after 9 PM
                         </span>
                       )}
                     </div>
@@ -130,7 +140,7 @@ const ClassRecordings = ({ submittedWeeks }: { submittedWeeks: Set<number> }) =>
 
       {/* Secure Video Player Modal */}
       <Dialog open={!!activeRecording} onOpenChange={(open) => !open && setActiveRecording(null)}>
-        <DialogContent className="max-w-4xl bg-card border-border p-0 overflow-hidden">
+        <DialogContent className="max-w-5xl bg-card border-border p-0 overflow-hidden">
           <DialogHeader className="p-4 pb-0">
             <DialogTitle className="font-display text-foreground flex items-center gap-2">
               <Shield className="w-4 h-4 text-primary" />
