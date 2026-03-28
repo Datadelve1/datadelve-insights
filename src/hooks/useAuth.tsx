@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<{ full_name: string; email: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string; email: string; student_status?: string } | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasCommitted, setHasCommitted] = useState(false);
@@ -44,11 +44,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Fetch profile
     const { data: profileData } = await supabase
       .from("profiles")
-      .select("full_name, email")
+      .select("full_name, email, student_status")
       .eq("id", userId)
       .single();
 
-    if (profileData) setProfile(profileData);
+    if (profileData) setProfile(profileData as any);
 
     // Check admin role
     const { data: roles } = await supabase
