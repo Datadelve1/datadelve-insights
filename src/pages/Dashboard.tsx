@@ -16,6 +16,7 @@ import {
   Loader2,
   ArrowLeft,
   AlertCircle,
+  ShieldX,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
