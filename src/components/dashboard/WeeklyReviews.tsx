@@ -110,8 +110,9 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
     fetchQuestions();
   }, []);
 
-  const triggerGoogleReview = (weekNum: number) => {
+  const triggerGoogleReview = (weekNum: number, day: string) => {
     setPendingWeek(weekNum);
+    setPendingDay(day);
     setGoogleReviewOpened(false);
     setShowGoogleReview(true);
   };
