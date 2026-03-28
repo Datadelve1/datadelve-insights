@@ -457,25 +457,40 @@ const StudentTracking = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {s.status !== "Withdrawn" && s.status !== "Completed Program" && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => {
-                        if (confirm(`Withdraw ${s.full_name}? This will mark them as withdrawn.`)) {
-                          withdrawStudent(s.id);
-                        }
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  )}
-                </TableCell>
-                <TableCell>
                   <Badge variant="outline" className={statusColor(s.status)}>
                     {s.status}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {s.status === "Withdrawn" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          if (confirm(`Reinstate ${s.full_name}? They will be able to access the dashboard again.`)) {
+                            reinstateStudent(s.id);
+                          }
+                        }}
+                      >
+                        <RotateCcw className="w-3 h-3 mr-1" /> Reinstate
+                      </Button>
+                    ) : s.status !== "Completed Program" ? (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          if (confirm(`Withdraw ${s.full_name}? They will no longer be able to access the student dashboard.`)) {
+                            withdrawStudent(s.id);
+                          }
+                        }}
+                      >
+                        Withdraw
+                      </Button>
+                    ) : null}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Dialog>
