@@ -275,10 +275,10 @@ const Dashboard = () => {
         />
 
         {/* Class Recordings */}
-        <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} />
+        <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} googleReviewConfirmed={googleReviewConfirmed} />
 
         {/* Assignments */}
-        <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} />
+        <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} googleReviewConfirmed={googleReviewConfirmed} />
 
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">

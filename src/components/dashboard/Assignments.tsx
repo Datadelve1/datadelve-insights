@@ -284,7 +284,8 @@ const Assignments = ({
               const submission = submissions[assignment.id];
               const timingOk = hasWeekAccess(assignment.week_number, attendance, isAdmin);
               const reviewDone = isAdmin || hasReviewForWeek(assignment.week_number, submittedReviews);
-              const weekAccess = timingOk && reviewDone;
+              const googleOk = isAdmin || assignment.week_number === 1 || googleReviewConfirmed.has(assignment.week_number - 1);
+              const weekAccess = timingOk && reviewDone && googleOk;
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
