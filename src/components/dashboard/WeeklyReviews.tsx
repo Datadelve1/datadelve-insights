@@ -292,6 +292,13 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       resetForm();
       onReviewSubmitted();
       triggerGoogleReview(weekNum);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
+    }
+  };
 
   const totalSubmitted = Object.values(submittedReviews).filter(Boolean).length;
 
