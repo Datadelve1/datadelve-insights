@@ -118,14 +118,31 @@ const StudentTracking = () => {
       const revScore = (revWeeks.size / 8) * 25;
       const progress = Math.round(commitScore + attScore + assScore + revScore);
 
-      let status = "Active";
-      if (progress >= 90) status = "Completed Program";
-      else if (progress <= 20 && revWeeks.size === 0 && attCount === 0) status = "Inactive";
-      else if (progress < 50) status = "Falling Behind";
+      // Status based on missed items:
+      // Week 1: attendance + reviews only (no assignments)
+      // Week 2+: attendance + reviews + assignments
+      const missedAttendance = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
+      // Count expected review weeks that are missing
+      const expectedReviewWeeks = WEEKS.filter(w => SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
+      const missedReviews = expectedReviewWeeks.filter(w => !revWeeks.has(w)).length;
+      // Assignments only from week 2+
+      const expectedAssignmentWeeks = WEEKS.filter(w => w >= 2 && SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
+      const missedAssignments = expectedAssignmentWeeks.filter(w => !assWeeks.has(w)).length;
 
-      // Flag at-risk students (3+ missed sessions) — admin decides manually
-      const missedSessions = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
-      if (missedSessions >= 3 && status !== "Inactive") status = "At Risk";
+      const maxMissed = Math.max(missedAttendance, missedReviews, missedAssignments);
+
+      let status = "Active"; // Green
+      if (p.student_status === "withdrawn") {
+        status = "Withdrawn";
+      } else if (maxMissed >= 3) {
+        status = "Inactive"; // Red
+      } else if (maxMissed >= 2) {
+        status = "Action Required"; // Orange
+      } else if (maxMissed >= 1) {
+        status = "Monitor"; // Amber
+      }
+
+      if (progress >= 90 && status === "Active") status = "Completed Program";
 
       return {
         id: p.id,
