@@ -64,6 +64,8 @@ const SESSIONS = Array.from({ length: 8 }, (_, w) => [
   { week: w + 1, day: "saturday" as const, label: `Week ${w + 1} Saturday` },
 ]).flat();
 
+const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
+
 const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: WeeklyReviewsProps) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
@@ -73,7 +75,9 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   const { toast } = useToast();
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showTrustpilot, setShowTrustpilot] = useState(false);
+  const [showGoogleReview, setShowGoogleReview] = useState(false);
+  const [pendingWeek, setPendingWeek] = useState<number | null>(null);
+  const [googleReviewOpened, setGoogleReviewOpened] = useState(false);
   const [activeSession, setActiveSession] = useState<string | null>(null); // "1-friday"
 
   // Common form state
