@@ -22,6 +22,7 @@ import StudentVideos from "./pages/admin/StudentVideos";
 import ComingSoon from "./pages/admin/ComingSoon";
 import AssignmentManagement from "./pages/admin/AssignmentManagement";
 import DatasetManagement from "./pages/admin/DatasetManagement";
+import ReviewQuestions from "./pages/admin/ReviewQuestions";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DataAnalysis from "./pages/courses/DataAnalysis";
