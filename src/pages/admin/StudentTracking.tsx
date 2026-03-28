@@ -258,7 +258,7 @@ const StudentTracking = () => {
         row[`${sess.label} Review`] = s.reviewSessions?.has(key) ? "Yes" : "No";
       });
       WEEKS.forEach(w => {
-        row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
+        row[`Week ${w} Assignment`] = s.assignmentWeeks?.has(w) ? "Yes" : "No";
       });
       row["Progress"] = `${s.progress}%`;
       row["Status"] = s.status;
