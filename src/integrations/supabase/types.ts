@@ -191,18 +191,21 @@ export type Database = {
         Row: {
           confirmed_at: string
           id: string
+          session_day: string
           user_id: string
           week_number: number
         }
         Insert: {
           confirmed_at?: string
           id?: string
+          session_day?: string
           user_id: string
           week_number: number
         }
         Update: {
           confirmed_at?: string
           id?: string
+          session_day?: string
           user_id?: string
           week_number?: number
         }
