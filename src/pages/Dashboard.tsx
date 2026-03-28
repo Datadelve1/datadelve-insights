@@ -47,8 +47,8 @@ const Dashboard = () => {
       if (wn) scores[wn] = { score: s.score, total: s.total };
     });
     setAssignmentScores(scores);
-    const att: Record<number, string> = {};
-    (attData || []).forEach((a: any) => { att[a.week_number] = a.status; });
+    const att: Record<string, string> = {};
+    (attData || []).forEach((a: any) => { att[`${a.week_number}-${a.session_day || 'friday'}`] = a.status; });
     setAttendance(att);
     setReviewsLoaded(true);
   };
