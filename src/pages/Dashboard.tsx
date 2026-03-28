@@ -27,7 +27,7 @@ const Dashboard = () => {
   const { user, profile, isLoading, isAdmin, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
-  const [attendance, setAttendance] = useState<Record<number, string>>({});
+  const [attendance, setAttendance] = useState<Record<string, string>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
