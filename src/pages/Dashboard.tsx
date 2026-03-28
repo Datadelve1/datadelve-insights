@@ -72,9 +72,11 @@ const Dashboard = () => {
     });
     setAttendance(att);
 
-    const grWeeks = new Set<number>();
-    (grData || []).forEach((g: any) => grWeeks.add(g.week_number));
-    setGoogleReviewConfirmed(grWeeks);
+    const grMap: Record<string, boolean> = {};
+    (grData || []).forEach((g: any) => {
+      grMap[`${g.week_number}-${g.session_day}`] = true;
+    });
+    setGoogleReviewConfirmed(grMap);
 
     setReviewsLoaded(true);
   };
