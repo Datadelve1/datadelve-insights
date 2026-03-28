@@ -179,7 +179,7 @@ const VideoManagement = () => {
         const { error } = await supabase.from("class_recordings").insert({
           title: title.trim(),
           description: description.trim() || null,
-          week_number: parseInt(weekNumber),
+          week_number: parsedWeek,
           video_url: finalUrl,
         });
         if (error) throw error;
