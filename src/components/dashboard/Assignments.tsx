@@ -331,7 +331,7 @@ const Assignments = ({
                           {!attended ? (
                             <>Attendance required</>
                           ) : (
-                            <><Clock className="w-3 h-3" /> Available after 9 PM</>
+                            <><Clock className="w-3 h-3" /> Available after 10 PM</>
                           )}
                         </span>
                       ) : windowClosed ? (

@@ -126,7 +126,7 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
                         </span>
                       ) : (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Available after 9 PM
+                          <Clock className="w-3 h-3" /> Available after 10 PM
                         </span>
                       )}
                     </div>

@@ -38,7 +38,7 @@ const Dashboard = () => {
         .from("assignment_submissions")
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
-      supabase.from("student_attendance").select("week_number, status").eq("user_id", user.id),
+      supabase.from("student_attendance").select("week_number, status, session_day").eq("user_id", user.id),
     ]);
     setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
     const scores: Record<number, { score: number; total: number }> = {};
