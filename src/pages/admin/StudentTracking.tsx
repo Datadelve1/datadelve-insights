@@ -255,10 +255,10 @@ const StudentTracking = () => {
       });
       SESSIONS.forEach(sess => {
         const key = `${sess.week}-${sess.day}`;
-        row[`${sess.label} Review`] = s.reviewSessions.has(key) ? "Yes" : "No";
+        row[`${sess.label} Review`] = s.reviewSessions?.has(key) ? "Yes" : "No";
       });
       WEEKS.forEach(w => {
-        row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
+        row[`Week ${w} Assignment`] = s.assignmentWeeks?.has(w) ? "Yes" : "No";
       });
       row["Progress"] = `${s.progress}%`;
       row["Status"] = s.status;
@@ -449,8 +449,8 @@ const StudentTracking = () => {
                 {SESSIONS.map(sess => {
                   const key = `${sess.week}-${sess.day}`;
                   return (
-                    <TableCell key={`rev-${key}`} className="text-center">
-                      {s.reviewSessions.has(key) ? (
+                     <TableCell key={`rev-${key}`} className="text-center">
+                      {s.reviewSessions?.has(key) ? (
                         <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
                       ) : (
                         <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
@@ -461,7 +461,7 @@ const StudentTracking = () => {
                 {/* Assignment columns - auto-tracked per week (W1-W8) */}
                 {WEEKS.map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
-                    {s.assignmentWeeks.has(w) ? (
+                    {s.assignmentWeeks?.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
                     ) : (
                       <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
