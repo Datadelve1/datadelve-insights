@@ -209,7 +209,7 @@ const WeeklyReports = () => {
                     {reviews.length} submission{reviews.length !== 1 ? "s" : ""}
                   </span>
                 </CardTitle>
-                {reviews.length > 0 && (
+                {reviews.length > 0 && isPrimaryAdmin && (
                   <Button variant="outline" size="sm" onClick={downloadReviewsCSV}>
                     <Download className="w-4 h-4 mr-2" /> Export CSV
                   </Button>
