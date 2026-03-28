@@ -449,8 +449,8 @@ const StudentTracking = () => {
                 {SESSIONS.map(sess => {
                   const key = `${sess.week}-${sess.day}`;
                   return (
-                    <TableCell key={`rev-${key}`} className="text-center">
-                      {s.reviewSessions.has(key) ? (
+                     <TableCell key={`rev-${key}`} className="text-center">
+                      {s.reviewSessions?.has(key) ? (
                         <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
                       ) : (
                         <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
