@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
@@ -15,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   Loader2, Search, Download, CheckCircle2, XCircle, Minus,
-  StickyNote, ChevronLeft, ChevronRight,
+  StickyNote, ChevronLeft, ChevronRight, RotateCcw,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -46,6 +53,7 @@ const StudentTracking = () => {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(0);
   const [noteText, setNoteText] = useState("");
   const [noteStudentId, setNoteStudentId] = useState<string | null>(null);
@@ -166,11 +174,13 @@ const StudentTracking = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const filtered = useMemo(
-    () => students.filter(s =>
-      s.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase())
-    ),
-    [students, search]
+    () => students.filter(s => {
+      const matchesSearch = s.full_name.toLowerCase().includes(search.toLowerCase()) ||
+        s.email.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus = statusFilter === "all" || s.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    }),
+    [students, search, statusFilter]
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
@@ -260,6 +270,16 @@ const StudentTracking = () => {
     }
   };
 
+  const reinstateStudent = async (studentId: string) => {
+    const { error } = await supabase.from("profiles").update({ student_status: "active" }).eq("id", studentId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Student reinstated" });
+      fetchAll();
+    }
+  };
+
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed Program": return "bg-green-600/20 text-green-400 border-green-600/30";
@@ -287,7 +307,7 @@ const StudentTracking = () => {
           <h1 className="font-display text-2xl font-bold text-foreground">Student Tracking</h1>
           <p className="text-muted-foreground text-sm">{filtered.length} students</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -297,12 +317,51 @@ const StudentTracking = () => {
               className="pl-9 w-64 bg-card border-border"
             />
           </div>
+          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(0); }}>
+            <SelectTrigger className="w-44 bg-card border-border">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Monitor">Monitor</SelectItem>
+              <SelectItem value="Action Required">Action Required</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+              <SelectItem value="Withdrawn">Withdrawn</SelectItem>
+              <SelectItem value="Completed Program">Completed</SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline" size="sm" onClick={() => exportData("xlsx")}>
             <Download className="w-4 h-4 mr-1" /> Excel
           </Button>
           <Button variant="outline" size="sm" onClick={() => exportData("csv")}>
             <Download className="w-4 h-4 mr-1" /> CSV
           </Button>
+        </div>
+      </div>
+
+      {/* Status Legend */}
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">
+        <span className="text-sm font-medium text-foreground mr-2">Status Legend:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-green-500" />
+          <span className="text-xs text-muted-foreground">Active</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-amber-500" />
+          <span className="text-xs text-muted-foreground">Monitor (1 miss)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-orange-500" />
+          <span className="text-xs text-muted-foreground">Action Required (2 misses)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-red-500" />
+          <span className="text-xs text-muted-foreground">Inactive (3+ misses)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-destructive" />
+          <span className="text-xs text-muted-foreground">Withdrawn</span>
         </div>
       </div>
 
@@ -398,25 +457,40 @@ const StudentTracking = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {s.status !== "Withdrawn" && s.status !== "Completed Program" && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => {
-                        if (confirm(`Withdraw ${s.full_name}? This will mark them as withdrawn.`)) {
-                          withdrawStudent(s.id);
-                        }
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  )}
-                </TableCell>
-                <TableCell>
                   <Badge variant="outline" className={statusColor(s.status)}>
                     {s.status}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {s.status === "Withdrawn" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          if (confirm(`Reinstate ${s.full_name}? They will be able to access the dashboard again.`)) {
+                            reinstateStudent(s.id);
+                          }
+                        }}
+                      >
+                        <RotateCcw className="w-3 h-3 mr-1" /> Reinstate
+                      </Button>
+                    ) : s.status !== "Completed Program" ? (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          if (confirm(`Withdraw ${s.full_name}? They will no longer be able to access the student dashboard.`)) {
+                            withdrawStudent(s.id);
+                          }
+                        }}
+                      >
+                        Withdraw
+                      </Button>
+                    ) : null}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Dialog>

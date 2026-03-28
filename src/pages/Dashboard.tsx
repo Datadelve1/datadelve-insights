@@ -16,6 +16,7 @@ import {
   Loader2,
   ArrowLeft,
   AlertCircle,
+  ShieldX,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
@@ -24,7 +25,7 @@ import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 
 const Dashboard = () => {
-  const { user, profile, isLoading, isAdmin, hasCommitted, signOut } = useAuth();
+  const { user, profile, isLoading, isAdmin, hasCommitted, isWithdrawn, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
@@ -85,6 +86,39 @@ const Dashboard = () => {
 
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <CommitmentGate profile={profile} signOut={signOut} />;
+
+  if (isWithdrawn && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center space-y-6 p-8">
+          <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto">
+            <ShieldX className="w-8 h-8 text-destructive" />
+          </div>
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            Account Withdrawn
+          </h1>
+          <p className="text-muted-foreground">
+            Your account has been withdrawn from the Delvetek training program. You no longer have access to the student dashboard, course materials, or assignments.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            If you believe this is an error, please contact the admin team at{" "}
+            <a href="mailto:datadelve1@gmail.com" className="text-primary underline">
+              datadelve1@gmail.com
+            </a>{" "}
+            for assistance.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" asChild>
+              <a href="/"><ArrowLeft className="w-4 h-4 mr-2" /> Home</a>
+            </Button>
+            <Button variant="ghost" onClick={signOut}>
+              <LogOut className="w-4 h-4 mr-2" /> Sign Out
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const totalReviews = Object.values(submittedReviews).filter(Boolean).length;
   const progressPercent = Math.round((totalReviews / 16) * 100);
