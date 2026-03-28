@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
   const [submittedReviews, setSubmittedReviews] = useState<Record<string, boolean>>({});
-  const [googleReviewConfirmed, setGoogleReviewConfirmed] = useState<Set<number>>(new Set());
+  const [googleReviewConfirmed, setGoogleReviewConfirmed] = useState<Record<string, boolean>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
