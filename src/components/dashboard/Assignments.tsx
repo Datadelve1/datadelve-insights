@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,12 +14,13 @@ import {
   ChevronUp,
   Database,
   Play,
-  Info,
   RotateCcw,
   Table2,
+  Clock,
 } from "lucide-react";
 import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
 import { useDatasets, type SqlDatasetRow } from "@/hooks/useDatasets";
+import { hasWeekAccess } from "@/lib/attendanceAccess";
 import type initSqlJs from "sql.js";
 
 type SqlJsStatic = Awaited<ReturnType<typeof initSqlJs>>;
@@ -53,31 +54,27 @@ interface QueryResult {
   values: (string | number | null | Uint8Array)[][];
 }
 
-// Compare two result sets (order-insensitive)
 function resultsMatch(a: QueryResult | null, b: QueryResult | null): boolean {
   if (!a || !b) return false;
   if (a.columns.length !== b.columns.length) return false;
-  // Column names must match (case-insensitive)
   const colsA = a.columns.map((c) => c.toLowerCase());
   const colsB = b.columns.map((c) => c.toLowerCase());
   if (JSON.stringify(colsA.sort()) !== JSON.stringify(colsB.sort())) return false;
   if (a.values.length !== b.values.length) return false;
-  // Sort rows for comparison
-  const sortRows = (rows: any[][]) =>
-    rows.map((r) => JSON.stringify(r)).sort();
+  const sortRows = (rows: any[][]) => rows.map((r) => JSON.stringify(r)).sort();
   const sortedA = sortRows(a.values);
   const sortedB = sortRows(b.values);
   return JSON.stringify(sortedA) === JSON.stringify(sortedB);
 }
 
 const Assignments = ({
-  submittedWeeks,
+  attendance,
   onScoreUpdate,
 }: {
-  submittedWeeks: Set<number>;
+  attendance: Record<number, string>;
   onScoreUpdate: () => void;
 }) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const windowInfo = useSubmissionWindow();
   const { datasets, loading: datasetsLoading } = useDatasets();
@@ -86,11 +83,9 @@ const Assignments = ({
   const [isLoading, setIsLoading] = useState(true);
   const [activeAssignment, setActiveAssignment] = useState<string | null>(null);
 
-  // SQL engine
   const [sqlJs, setSqlJs] = useState<SqlJsStatic | null>(null);
   const [sqlReady, setSqlReady] = useState(false);
 
-  // Per-question state
   const [questionStates, setQuestionStates] = useState<
     Record<number, {
       query: string;
@@ -103,7 +98,6 @@ const Assignments = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Init sql.js
   useEffect(() => {
     const init = async () => {
       try {
@@ -177,7 +171,6 @@ const Assignments = ({
       [qIdx]: { ...prev[qIdx], running: true, error: null, correct: null },
     }));
 
-    // Run student query
     const studentResult = runQueryOnDataset(q.dataset, state.query);
     if (studentResult.error) {
       setQuestionStates((prev) => ({
@@ -187,7 +180,6 @@ const Assignments = ({
       return;
     }
 
-    // Run expected query
     const expectedResult = runQueryOnDataset(q.dataset, q.expected_query);
     const isCorrect = resultsMatch(studentResult.result, expectedResult.result);
 
@@ -275,19 +267,19 @@ const Assignments = ({
           <div className="space-y-3">
             {assignments.map((assignment) => {
               const submission = submissions[assignment.id];
-              const reviewSubmitted = submittedWeeks.has(assignment.week_number);
+              const weekAccess = hasWeekAccess(assignment.week_number, attendance, isAdmin);
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
+              const attended = attendance[assignment.week_number] === "present";
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
-                  {/* Header */}
                   <div
                     className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
                       submission
                         ? "bg-primary/5"
-                        : reviewSubmitted && canSubmit
+                        : weekAccess && canSubmit
                         ? "bg-card hover:bg-secondary/50"
                         : "bg-secondary/50"
                     }`}
@@ -296,7 +288,7 @@ const Assignments = ({
                         setActiveAssignment(isActive ? null : assignment.id);
                         return;
                       }
-                      if (!reviewSubmitted || !canSubmit) return;
+                      if (!weekAccess || !canSubmit) return;
                       setActiveAssignment(isActive ? null : assignment.id);
                       setQuestionStates({});
                     }}
@@ -306,14 +298,14 @@ const Assignments = ({
                         className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           submission
                             ? "bg-primary/20 text-primary"
-                            : reviewSubmitted && canSubmit
+                            : weekAccess && canSubmit
                             ? "bg-secondary text-foreground"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {submission ? (
                           <Trophy className="w-5 h-5" />
-                        ) : reviewSubmitted && canSubmit ? (
+                        ) : weekAccess && canSubmit ? (
                           <Database className="w-5 h-5" />
                         ) : (
                           <Lock className="w-5 h-5" />
@@ -334,9 +326,13 @@ const Assignments = ({
                         <span className="text-sm font-display font-semibold text-primary bg-primary/10 px-3 py-1 rounded-lg">
                           {submission.score}/{submission.total} ✅
                         </span>
-                      ) : !reviewSubmitted ? (
-                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
-                          Submit Week {assignment.week_number} review first
+                      ) : !weekAccess ? (
+                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
+                          {!attended ? (
+                            <>Attendance required</>
+                          ) : (
+                            <><Clock className="w-3 h-3" /> Available after 9 PM</>
+                          )}
                         </span>
                       ) : windowClosed ? (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
@@ -351,7 +347,7 @@ const Assignments = ({
                   </div>
 
                   {/* SQL Questions (expanded, not yet submitted) */}
-                  {isActive && !submission && reviewSubmitted && canSubmit && (
+                  {isActive && !submission && weekAccess && canSubmit && (
                     <div className="p-6 border-t border-border space-y-6 bg-card">
                       {!sqlReady && (
                         <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -374,8 +370,8 @@ const Assignments = ({
                                   <span
                                     className={`text-xs px-2 py-1 rounded-lg font-medium ${
                                       qs.correct
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-700"
+                                        ? "bg-primary/20 text-primary"
+                                        : "bg-destructive/20 text-destructive"
                                     }`}
                                   >
                                     {qs.correct ? "✅ Correct" : "❌ Incorrect"}
@@ -386,7 +382,6 @@ const Assignments = ({
                                 <Database className="w-3 h-3" /> Dataset: {dsLabel}
                               </p>
 
-                              {/* SQL editor */}
                               <div className="relative">
                                 <textarea
                                   value={qs.query}
@@ -426,14 +421,12 @@ const Assignments = ({
                                 )}
                               </Button>
 
-                              {/* Error */}
                               {qs.error && (
                                 <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3">
                                   <p className="text-xs text-destructive font-mono">{qs.error}</p>
                                 </div>
                               )}
 
-                              {/* Results */}
                               {qs.result && (
                                 <div className="rounded-lg border border-border overflow-hidden">
                                   <div className="bg-secondary px-3 py-1.5 flex items-center gap-2 border-b border-border">
@@ -472,7 +465,6 @@ const Assignments = ({
                           );
                         })}
 
-                      {/* Submit button */}
                       {sqlReady && (
                         <Button
                           onClick={() => handleSubmitAssignment(assignment)}
@@ -495,7 +487,6 @@ const Assignments = ({
                     </div>
                   )}
 
-                  {/* Completed review */}
                   {submission && isActive && (
                     <div className="p-6 border-t border-border space-y-4 bg-card">
                       <div className="flex items-center gap-2 text-primary">
@@ -517,7 +508,6 @@ const Assignments = ({
                     </div>
                   )}
 
-                  {/* Toggle for completed */}
                   {submission && (
                     <button
                       onClick={() => setActiveAssignment(isActive ? null : assignment.id)}

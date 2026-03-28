@@ -28,6 +28,7 @@ import {
   LayoutDashboard,
   Database,
   FileVideo,
+  MessageSquare,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
@@ -35,6 +36,7 @@ const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Student Tracking", url: "/admin/students", icon: Users },
   { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
+  { title: "Review Questions", url: "/admin/review-questions", icon: MessageSquare },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Student Videos", url: "/admin/student-videos", icon: FileVideo },
   { title: "Assignments", url: "/admin/assignments", icon: FileText },
