@@ -257,14 +257,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       toast({ title: "Saturday video review submitted! 🎬", description: `Week ${weekNum} Saturday review recorded.` });
       resetForm();
       onReviewSubmitted();
-      setShowTrustpilot(true);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-      setUploadProgress(0);
-    }
-  };
+      triggerGoogleReview(weekNum);
 
   const totalSubmitted = Object.values(submittedReviews).filter(Boolean).length;
 
