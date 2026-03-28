@@ -23,9 +23,10 @@ interface ClassRecording {
 interface ClassRecordingsProps {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
+  googleReviewConfirmed: Set<number>;
 }
 
-const ClassRecordings = ({ attendance, submittedReviews }: ClassRecordingsProps) => {
+const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }: ClassRecordingsProps) => {
   const { user, isAdmin } = useAuth();
   const [recordings, setRecordings] = useState<ClassRecording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
