@@ -118,14 +118,31 @@ const StudentTracking = () => {
       const revScore = (revWeeks.size / 8) * 25;
       const progress = Math.round(commitScore + attScore + assScore + revScore);
 
-      let status = "Active";
-      if (progress >= 90) status = "Completed Program";
-      else if (progress <= 20 && revWeeks.size === 0 && attCount === 0) status = "Inactive";
-      else if (progress < 50) status = "Falling Behind";
+      // Status based on missed items:
+      // Week 1: attendance + reviews only (no assignments)
+      // Week 2+: attendance + reviews + assignments
+      const missedAttendance = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
+      // Count expected review weeks that are missing
+      const expectedReviewWeeks = WEEKS.filter(w => SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
+      const missedReviews = expectedReviewWeeks.filter(w => !revWeeks.has(w)).length;
+      // Assignments only from week 2+
+      const expectedAssignmentWeeks = WEEKS.filter(w => w >= 2 && SESSIONS.some(s => s.week === w && att[`${s.week}-${s.day}`] === "present"));
+      const missedAssignments = expectedAssignmentWeeks.filter(w => !assWeeks.has(w)).length;
 
-      // Flag at-risk students (3+ missed sessions) — admin decides manually
-      const missedSessions = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
-      if (missedSessions >= 3 && status !== "Inactive") status = "At Risk";
+      const maxMissed = Math.max(missedAttendance, missedReviews, missedAssignments);
+
+      let status = "Active"; // Green
+      if (p.student_status === "withdrawn") {
+        status = "Withdrawn";
+      } else if (maxMissed >= 3) {
+        status = "Inactive"; // Red
+      } else if (maxMissed >= 2) {
+        status = "Action Required"; // Orange
+      } else if (maxMissed >= 1) {
+        status = "Monitor"; // Amber
+      }
+
+      if (progress >= 90 && status === "Active") status = "Completed Program";
 
       return {
         id: p.id,
@@ -219,7 +236,7 @@ const StudentTracking = () => {
       });
       WEEKS.forEach(w => {
         row[`Week ${w} Reflection`] = s.reviewWeeks.has(w) ? "Yes" : "No";
-        if (w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
+        if (w >= 2 && w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
       });
       row["Progress"] = `${s.progress}%`;
       row["Status"] = s.status;
@@ -233,13 +250,24 @@ const StudentTracking = () => {
     XLSX.writeFile(wb, `delvetek-students.${format}`);
   };
 
+  const withdrawStudent = async (studentId: string) => {
+    const { error } = await supabase.from("profiles").update({ student_status: "withdrawn" }).eq("id", studentId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Student withdrawn" });
+      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, status: "Withdrawn" } : s));
+    }
+  };
+
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed Program": return "bg-green-600/20 text-green-400 border-green-600/30";
-      case "Active": return "bg-primary/20 text-primary border-primary/30";
-      case "Falling Behind": return "bg-orange-600/20 text-orange-400 border-orange-600/30";
-      case "Inactive": return "bg-destructive/20 text-destructive border-destructive/30";
-      case "At Risk": return "bg-red-800/20 text-red-400 border-red-800/30";
+      case "Active": return "bg-green-600/20 text-green-400 border-green-600/30"; // Green
+      case "Monitor": return "bg-amber-500/20 text-amber-400 border-amber-500/30"; // Amber
+      case "Action Required": return "bg-orange-600/20 text-orange-400 border-orange-600/30"; // Orange
+      case "Inactive": return "bg-red-600/20 text-red-400 border-red-600/30"; // Red
+      case "Withdrawn": return "bg-destructive/20 text-destructive border-destructive/30";
       default: return "bg-muted text-muted-foreground";
     }
   };
@@ -289,8 +317,8 @@ const StudentTracking = () => {
                   {s.label}
                 </TableHead>
               ))}
-              {[1, 2, 3, 4, 5, 6].map(w => (
-                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center">
+              {[2, 3, 4, 5, 6].map(w => (
+                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center text-xs">
                   W{w} Asgn.
                 </TableHead>
               ))}
@@ -301,6 +329,7 @@ const StudentTracking = () => {
               ))}
               <TableHead className="min-w-[120px]">Progress</TableHead>
               <TableHead className="min-w-[130px]">Status</TableHead>
+              <TableHead className="min-w-[100px]">Actions</TableHead>
               <TableHead className="min-w-[80px]">Notes</TableHead>
             </TableRow>
           </TableHeader>
@@ -344,7 +373,7 @@ const StudentTracking = () => {
                     </TableCell>
                   );
                 })}
-                {[1, 2, 3, 4, 5, 6].map(w => (
+                {[2, 3, 4, 5, 6].map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
                     {s.assignmentWeeks.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
@@ -367,6 +396,22 @@ const StudentTracking = () => {
                     <Progress value={s.progress} className="h-2 w-16" />
                     <span className="text-xs font-medium text-foreground">{s.progress}%</span>
                   </div>
+                </TableCell>
+                <TableCell>
+                  {s.status !== "Withdrawn" && s.status !== "Completed Program" && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        if (confirm(`Withdraw ${s.full_name}? This will mark them as withdrawn.`)) {
+                          withdrawStudent(s.id);
+                        }
+                      }}
+                    >
+                      Withdraw
+                    </Button>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className={statusColor(s.status)}>
