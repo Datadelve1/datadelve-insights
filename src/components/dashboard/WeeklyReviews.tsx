@@ -189,13 +189,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
       toast({ title: "Friday review submitted! 🎉", description: `Week ${weekNum} Friday review recorded.` });
       resetForm();
       onReviewSubmitted();
-      setShowTrustpilot(true);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      triggerGoogleReview(weekNum);
 
   const handleSaturdaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
