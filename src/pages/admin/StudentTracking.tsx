@@ -398,6 +398,22 @@ const StudentTracking = () => {
                   </div>
                 </TableCell>
                 <TableCell>
+                  {s.status !== "Withdrawn" && s.status !== "Completed Program" && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        if (confirm(`Withdraw ${s.full_name}? This will mark them as withdrawn.`)) {
+                          withdrawStudent(s.id);
+                        }
+                      }}
+                    >
+                      Withdraw
+                    </Button>
+                  )}
+                </TableCell>
+                <TableCell>
                   <Badge variant="outline" className={statusColor(s.status)}>
                     {s.status}
                   </Badge>
