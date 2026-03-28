@@ -107,7 +107,7 @@ const VideoManagement = () => {
     setEditingId(rec.id);
     setTitle(rec.title);
     setDescription(rec.description || "");
-    setWeekNumber(String(rec.week_number));
+    setWeekNumber(`${rec.week_number}-Fri`);
     setVideoSource("url");
     setVideoUrl(rec.video_url);
     setVideoFile(null);
@@ -131,13 +131,14 @@ const VideoManagement = () => {
     }
 
     setSubmitting(true);
+    const parsedWeek = parseInt(weekNumber.split("-")[0]);
     try {
       let finalUrl = videoUrl.trim();
 
       // Upload video file if provided
       if (needsUpload && videoFile) {
         const ext = videoFile.name.split(".").pop();
-        const path = `week-${weekNumber}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const path = `week-${parsedWeek}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
         setUploadProgress(10);
         const { error: uploadError } = await supabase.storage
@@ -161,7 +162,7 @@ const VideoManagement = () => {
         const updateData: any = {
           title: title.trim(),
           description: description.trim() || null,
-          week_number: parseInt(weekNumber),
+          week_number: parsedWeek,
         };
         // Only update URL if a new video was provided
         if (finalUrl && (needsUpload || hasUrl)) {
@@ -178,7 +179,7 @@ const VideoManagement = () => {
         const { error } = await supabase.from("class_recordings").insert({
           title: title.trim(),
           description: description.trim() || null,
-          week_number: parseInt(weekNumber),
+          week_number: parsedWeek,
           video_url: finalUrl,
         });
         if (error) throw error;
@@ -265,22 +266,21 @@ const VideoManagement = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Week *</Label>
+                  <Label>Session *</Label>
                   <Select value={weekNumber} onValueChange={setWeekNumber}>
                     <SelectTrigger className="bg-secondary border-border">
-                      <SelectValue placeholder="Select week" />
+                      <SelectValue placeholder="Select session" />
                     </SelectTrigger>
                     <SelectContent>
-                      {WEEKS.map((w) => (
-                        <SelectItem
-                          key={w}
-                          value={String(w)}
-                          disabled={usedWeeks.has(w) && weekNumber !== String(w)}
-                        >
-                          Week {w} {w >= 7 ? "(Project)" : ""}
-                          {usedWeeks.has(w) && weekNumber !== String(w) ? " ✓" : ""}
-                        </SelectItem>
-                      ))}
+                      {SESSIONS.map((s) => {
+                        const val = `${s.week}-${s.day}`;
+                        const taken = usedWeeks.has(s.week) && weekNumber !== val;
+                        return (
+                          <SelectItem key={val} value={val}>
+                            Week {s.week} {s.day} {s.week >= 7 ? "(Project)" : ""}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
