@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useDatasets } from "@/hooks/useDatasets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,29 +37,21 @@ import {
   Loader2,
   Pencil,
   Trash2,
-  Database,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-
-interface SqlQuestion {
-  question: string;
-  dataset: string;
-  expected_query: string;
-}
 
 interface Assignment {
   id: string;
   week_number: number;
   title: string;
   description: string | null;
-  questions: SqlQuestion[];
+  questions: string[];
   created_at: string;
 }
 
 const AssignmentManagement = () => {
   const { toast } = useToast();
-  const { datasets: datasetOptions, loading: datasetsLoading } = useDatasets();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -68,13 +59,10 @@ const AssignmentManagement = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Form state
   const [weekNumber, setWeekNumber] = useState(1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [questions, setQuestions] = useState<SqlQuestion[]>([
-    { question: "", dataset: "", expected_query: "" },
-  ]);
+  const [questions, setQuestions] = useState<string[]>(["", "", "", "", ""]);
 
   useEffect(() => {
     fetchAssignments();
@@ -100,7 +88,7 @@ const AssignmentManagement = () => {
     setWeekNumber(1);
     setTitle("");
     setDescription("");
-    setQuestions([{ question: "", dataset: "", expected_query: "" }]);
+    setQuestions(["", "", "", "", ""]);
     setEditingId(null);
   };
 
@@ -111,14 +99,14 @@ const AssignmentManagement = () => {
     setDescription(a.description || "");
     setQuestions(
       a.questions.length > 0
-        ? a.questions
-        : [{ question: "", dataset: "", expected_query: "" }]
+        ? a.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""))
+        : ["", "", "", "", ""]
     );
     setDialogOpen(true);
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { question: "", dataset: "", expected_query: "" }]);
+    setQuestions([...questions, ""]);
   };
 
   const removeQuestion = (idx: number) => {
@@ -126,9 +114,9 @@ const AssignmentManagement = () => {
     setQuestions(questions.filter((_, i) => i !== idx));
   };
 
-  const updateQuestion = (idx: number, field: keyof SqlQuestion, value: string) => {
+  const updateQuestion = (idx: number, value: string) => {
     const updated = [...questions];
-    updated[idx] = { ...updated[idx], [field]: value };
+    updated[idx] = value;
     setQuestions(updated);
   };
 
@@ -137,9 +125,9 @@ const AssignmentManagement = () => {
       toast({ title: "Title is required", variant: "destructive" });
       return;
     }
-    const valid = questions.every((q) => q.question.trim() && q.expected_query.trim());
+    const valid = questions.every((q) => q.trim());
     if (!valid) {
-      toast({ title: "All questions need a question text and expected query", variant: "destructive" });
+      toast({ title: "All question slots must be filled", variant: "destructive" });
       return;
     }
 
@@ -198,7 +186,7 @@ const AssignmentManagement = () => {
             Assignment Management
           </h1>
           <p className="text-sm text-muted-foreground">
-            Create SQL-based assignments for each week
+            Create question-based assignments for each week. Students answer in text.
           </p>
         </div>
         <Dialog
@@ -244,7 +232,7 @@ const AssignmentManagement = () => {
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. SQL Basics"
+                    placeholder="e.g. Week 1 Assignment"
                   />
                 </div>
               </div>
@@ -259,73 +247,35 @@ const AssignmentManagement = () => {
 
               <div className="border-t border-border pt-4">
                 <div className="flex items-center justify-between mb-3">
-                  <Label className="text-base font-display">SQL Questions</Label>
+                  <Label className="text-base font-display">Questions</Label>
                   <Button variant="outline" size="sm" onClick={addQuestion} className="gap-1">
                     <Plus className="w-3 h-3" /> Add Question
                   </Button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {questions.map((q, idx) => (
-                    <Card key={idx} className="border-border">
-                      <CardContent className="pt-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-foreground">
-                            Question {idx + 1}
-                          </span>
-                          {questions.length > 1 && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeQuestion(idx)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          )}
-                        </div>
-                        <div>
-                          <Label>Question</Label>
-                          <Textarea
-                            value={q.question}
-                            onChange={(e) => updateQuestion(idx, "question", e.target.value)}
-                            placeholder="e.g. Write a query to find all employees earning more than 80,000"
-                            rows={2}
-                          />
-                        </div>
-                        <div>
-                          <Label>Dataset</Label>
-                          <Select
-                            value={q.dataset}
-                            onValueChange={(v) => updateQuestion(idx, "dataset", v)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a dataset" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {datasetOptions.map((ds) => (
-                                <SelectItem key={ds.id} value={ds.id}>
-                                  <span className="flex items-center gap-2">
-                                    <Database className="w-3 h-3" /> {ds.name}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>Expected SQL Query (correct answer)</Label>
-                          <Textarea
-                            value={q.expected_query}
-                            onChange={(e) =>
-                              updateQuestion(idx, "expected_query", e.target.value)
-                            }
-                            placeholder="SELECT first_name, last_name, salary FROM employees WHERE salary > 80000;"
-                            rows={3}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="text-sm font-medium text-muted-foreground mt-2 w-6 shrink-0">
+                        {idx + 1}.
+                      </span>
+                      <Textarea
+                        value={q}
+                        onChange={(e) => updateQuestion(idx, e.target.value)}
+                        placeholder={`Question ${idx + 1}`}
+                        rows={2}
+                        className="flex-1"
+                      />
+                      {questions.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeQuestion(idx)}
+                          className="text-destructive hover:text-destructive mt-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -425,23 +375,19 @@ const AssignmentManagement = () => {
                     {a.description && (
                       <p className="text-sm text-muted-foreground">{a.description}</p>
                     )}
-                    {a.questions.map((q, qi) => (
-                      <div
-                        key={qi}
-                        className="rounded-lg bg-secondary/50 p-4 space-y-2"
-                      >
-                        <p className="text-sm font-medium text-foreground">
-                          Q{qi + 1}: {q.question}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Dataset:{" "}
-                          {datasetOptions.find((d) => d.id === q.dataset)?.name || q.dataset}
-                        </p>
-                        <pre className="text-xs font-mono bg-secondary p-3 rounded border border-border text-foreground overflow-x-auto">
-                          {q.expected_query}
-                        </pre>
-                      </div>
-                    ))}
+                    {a.questions.map((q: any, qi: number) => {
+                      const questionText = typeof q === "string" ? q : q.question || "";
+                      return (
+                        <div
+                          key={qi}
+                          className="rounded-lg bg-secondary/50 p-3"
+                        >
+                          <p className="text-sm text-foreground">
+                            <span className="font-medium">Q{qi + 1}:</span> {questionText}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </CardContent>
                 )}
               </Card>
