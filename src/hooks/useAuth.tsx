@@ -27,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   isLoading: true,
   hasCommitted: false,
+  isWithdrawn: false,
   signOut: async () => {},
   refreshCommitment: async () => {},
 });
