@@ -21,7 +21,7 @@ interface ClassRecording {
 }
 
 interface ClassRecordingsProps {
-  attendance: Record<number, string>;
+  attendance: Record<string, string>;
 }
 
 const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
