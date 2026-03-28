@@ -166,6 +166,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               Reviews open at 8 PM each session day. Videos &amp; assignments unlock at 10 PM after
               submitting your review. Friday = Written Review · Saturday = Video Review.
+              <strong> A Google Review is required each week to unlock the next week's content.</strong>
             </p>
           </div>
         </div>
