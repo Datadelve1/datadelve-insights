@@ -25,7 +25,7 @@ import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 
 const Dashboard = () => {
-  const { user, profile, isLoading, isAdmin, hasCommitted, signOut } = useAuth();
+  const { user, profile, isLoading, isAdmin, hasCommitted, isWithdrawn, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
