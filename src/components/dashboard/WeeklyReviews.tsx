@@ -127,13 +127,15 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   };
 
   const handleGoogleReviewConfirm = async () => {
-    if (!user || !pendingWeek) return;
+    if (!user || !pendingWeek || !pendingDay) return;
     await supabase.from("google_review_confirmations" as any).insert({
       user_id: user.id,
       week_number: pendingWeek,
+      session_day: pendingDay,
     });
     setShowGoogleReview(false);
     setPendingWeek(null);
+    setPendingDay(null);
     setGoogleReviewOpened(false);
     toast({ title: "Google Review confirmed! ✅", description: "Thank you for supporting Delvetek." });
     onReviewSubmitted();
