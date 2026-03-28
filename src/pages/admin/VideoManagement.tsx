@@ -55,6 +55,10 @@ interface Recording {
 }
 
 const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
+const SESSIONS = WEEKS.flatMap(w => [
+  { week: w, day: "Fri", label: `W${w} Fri` },
+  { week: w, day: "Sat", label: `W${w} Sat` },
+]);
 
 const VideoManagement = () => {
   const { user } = useAuth();
