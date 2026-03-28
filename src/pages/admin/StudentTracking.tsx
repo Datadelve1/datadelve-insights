@@ -53,6 +53,7 @@ const StudentTracking = () => {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(0);
   const [noteText, setNoteText] = useState("");
   const [noteStudentId, setNoteStudentId] = useState<string | null>(null);
