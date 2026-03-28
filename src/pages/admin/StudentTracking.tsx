@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -14,15 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Loader2, Search, Download, CheckCircle2, XCircle, Minus,
   StickyNote, ChevronLeft, ChevronRight, RotateCcw,
+  ChevronDown, ChevronUp, FileText, BookOpen, CalendarCheck,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -34,11 +33,16 @@ interface StudentRow {
   hasCommitment: boolean;
   attendance: Record<string, string>;
   assignmentWeeks: Set<number>;
-  /** Per-session review tracking: "1-friday", "1-saturday", etc. */
   reviewSessions: Set<string>;
   progress: number;
   status: string;
   notes: string[];
+  // Computed summaries
+  attendedCount: number;
+  reviewCount: number;
+  assignmentCount: number;
+  missedReviews: number;
+  missedAssignments: number;
 }
 
 const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -60,6 +64,7 @@ const StudentTracking = () => {
   const [noteStudentId, setNoteStudentId] = useState<string | null>(null);
   const [savingNote, setSavingNote] = useState(false);
   const [savingAttendance, setSavingAttendance] = useState<string | null>(null);
+  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -92,7 +97,6 @@ const StudentTracking = () => {
       attendanceMap.get(a.user_id)![key] = a.status;
     });
 
-    // Per-session review map: userId → Set<"1-friday", "1-saturday", ...>
     const reviewMap = new Map<string, Set<string>>();
     reviews.forEach((r: any) => {
       if (!r.user_id) return;
@@ -121,26 +125,19 @@ const StudentTracking = () => {
       const assWeeks = assignMap.get(p.id) ?? new Set<number>();
       const hasCommitment = commitUserIds.has(p.id) || commitEmails.has(p.email);
 
-      // Progress: attendance (16 sessions), reviews (16 sessions), assignments (8 weeks)
-      const attCount = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "present").length;
-      const revCount = revSessions.size; // out of 16
+      const attendedCount = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "present").length;
+      const revCount = revSessions.size;
       const commitScore = hasCommitment ? 10 : 0;
-      const attScore = (attCount / 16) * 35;
+      const attScore = (attendedCount / 16) * 35;
       const revScore = (revCount / 16) * 30;
       const assScore = (assWeeks.size / 8) * 25;
       const progress = Math.round(commitScore + attScore + revScore + assScore);
 
-      // Status based on missed items (only count sessions where student was present for reviews)
-      // Attendance: manually marked, counts absent sessions
       const missedAttendance = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
-
-      // Reviews: count sessions where student was present but didn't submit review
       const missedReviews = SESSIONS.filter(s => {
         const key = `${s.week}-${s.day}`;
         return att[key] === "present" && !revSessions.has(key);
       }).length;
-
-      // Assignments: count weeks where student attended at least one session but didn't submit
       const expectedAssignmentWeeks = WEEKS.filter(w =>
         att[`${w}-friday`] === "present" || att[`${w}-saturday`] === "present"
       );
@@ -158,7 +155,6 @@ const StudentTracking = () => {
       } else if (maxMissed >= 1) {
         status = "Monitor";
       }
-
       if (progress >= 90 && status === "Active") status = "Completed Program";
 
       return {
@@ -173,6 +169,11 @@ const StudentTracking = () => {
         progress,
         status,
         notes: notesMap.get(p.id) ?? [],
+        attendedCount,
+        reviewCount: revCount,
+        assignmentCount: assWeeks.size,
+        missedReviews,
+        missedAssignments,
       };
     });
 
@@ -197,8 +198,8 @@ const StudentTracking = () => {
 
   const toggleAttendance = async (studentId: string, week: number, day: string, current: string | undefined) => {
     const newStatus = current === "present" ? "absent" : "present";
-    const key = `${studentId}-${week}-${day}`;
-    setSavingAttendance(key);
+    const savKey = `${studentId}-${week}-${day}`;
+    setSavingAttendance(savKey);
     const { error } = await supabase.from("student_attendance").upsert(
       { user_id: studentId, week_number: week, session_day: day, status: newStatus, marked_by: user!.id } as any,
       { onConflict: "user_id,week_number,session_day" }
@@ -304,6 +305,18 @@ const StudentTracking = () => {
     }
   };
 
+  const statusDot = (status: string) => {
+    switch (status) {
+      case "Completed Program":
+      case "Active": return "bg-green-500";
+      case "Monitor": return "bg-amber-500";
+      case "Action Required": return "bg-orange-500";
+      case "Inactive": return "bg-red-500";
+      case "Withdrawn": return "bg-destructive";
+      default: return "bg-muted-foreground";
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -314,6 +327,7 @@ const StudentTracking = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-foreground">Student Tracking</h1>
@@ -354,218 +368,325 @@ const StudentTracking = () => {
 
       {/* Status Legend */}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">
-        <span className="text-sm font-medium text-foreground mr-2">Status Legend:</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-xs text-muted-foreground">Active</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-amber-500" />
-          <span className="text-xs text-muted-foreground">Monitor (1 miss)</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-orange-500" />
-          <span className="text-xs text-muted-foreground">Action Required (2 misses)</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-red-500" />
-          <span className="text-xs text-muted-foreground">Inactive (3+ misses)</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-destructive" />
-          <span className="text-xs text-muted-foreground">Withdrawn</span>
-        </div>
+        <span className="text-sm font-medium text-foreground mr-2">Legend:</span>
+        {[
+          { color: "bg-green-500", label: "Active (0)" },
+          { color: "bg-amber-500", label: "Monitor (1)" },
+          { color: "bg-orange-500", label: "Action (2)" },
+          { color: "bg-red-500", label: "Inactive (3+)" },
+          { color: "bg-destructive", label: "Withdrawn" },
+        ].map(l => (
+          <div key={l.label} className="flex items-center gap-1.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
+            <span className="text-xs text-muted-foreground">{l.label}</span>
+          </div>
+        ))}
       </div>
 
-      <div className="rounded-xl border border-border overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-secondary/50">
-              <TableHead className="sticky left-0 bg-secondary/50 z-10 min-w-[180px]">Student</TableHead>
-              <TableHead className="min-w-[80px]">Commitment</TableHead>
-              {SESSIONS.map(s => (
-                <TableHead key={`att-${s.week}-${s.day}`} className="min-w-[60px] text-center text-xs">
-                  {s.label}
-                </TableHead>
-              ))}
-              {SESSIONS.map(s => (
-                <TableHead key={`rev-${s.week}-${s.day}`} className="min-w-[60px] text-center text-xs">
-                  {s.label} Rev
-                </TableHead>
-              ))}
-              {WEEKS.map(w => (
-                <TableHead key={`asg-${w}`} className="min-w-[60px] text-center text-xs">
-                  W{w} Asgn
-                </TableHead>
-              ))}
-              <TableHead className="min-w-[120px]">Progress</TableHead>
-              <TableHead className="min-w-[130px]">Status</TableHead>
-              <TableHead className="min-w-[100px]">Actions</TableHead>
-              <TableHead className="min-w-[80px]">Notes</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginated.map(s => (
-              <TableRow key={s.id} className="hover:bg-secondary/30">
-                <TableCell className="sticky left-0 bg-card z-10">
-                  <div>
-                    <p className="font-medium text-foreground text-sm">{s.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{s.email}</p>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  {s.hasCommitment ? (
-                    <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-destructive mx-auto" />
-                  )}
-                </TableCell>
-                {/* Attendance columns - manually toggled */}
-                {SESSIONS.map(sess => {
-                  const key = `${sess.week}-${sess.day}`;
-                  const val = s.attendance[key];
-                  const savingKey = `${s.id}-${sess.week}-${sess.day}`;
-                  return (
-                    <TableCell key={`att-${key}`} className="text-center">
-                      <button
-                        onClick={() => toggleAttendance(s.id, sess.week, sess.day, val)}
-                        disabled={savingAttendance === savingKey}
-                        className="p-1 rounded hover:bg-secondary transition-colors"
-                      >
-                        {savingAttendance === savingKey ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mx-auto" />
-                        ) : val === "present" ? (
-                          <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                        ) : val === "absent" ? (
-                          <XCircle className="w-4 h-4 text-destructive mx-auto" />
-                        ) : (
-                          <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
-                        )}
-                      </button>
-                    </TableCell>
-                  );
-                })}
-                {/* Review columns - auto-tracked per session */}
-                {SESSIONS.map(sess => {
-                  const key = `${sess.week}-${sess.day}`;
-                  return (
-                     <TableCell key={`rev-${key}`} className="text-center">
-                      {s.reviewSessions?.has(key) ? (
-                        <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                      ) : (
-                        <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
-                      )}
-                    </TableCell>
-                  );
-                })}
-                {/* Assignment columns - auto-tracked per week (W1-W8) */}
-                {WEEKS.map(w => (
-                  <TableCell key={`asg-${w}`} className="text-center">
-                    {s.assignmentWeeks?.has(w) ? (
-                      <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                    ) : (
-                      <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
-                    )}
-                  </TableCell>
-                ))}
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Progress value={s.progress} className="h-2 w-16" />
-                    <span className="text-xs font-medium text-foreground">{s.progress}%</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusColor(s.status)}>
-                    {s.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    {s.status === "Withdrawn" ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                        onClick={() => {
-                          if (confirm(`Reinstate ${s.full_name}? They will be able to access the dashboard again.`)) {
-                            reinstateStudent(s.id);
-                          }
-                        }}
-                      >
-                        <RotateCcw className="w-3 h-3 mr-1" /> Reinstate
-                      </Button>
-                    ) : s.status !== "Completed Program" ? (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="text-xs"
-                        onClick={() => {
-                          if (confirm(`Withdraw ${s.full_name}? They will no longer be able to access the student dashboard.`)) {
-                            withdrawStudent(s.id);
-                          }
-                        }}
-                      >
-                        Withdraw
-                      </Button>
-                    ) : null}
-                  </div>
-                </TableCell>
-                <TableCell>
+      {/* Student Cards */}
+      <div className="space-y-3">
+        {paginated.map(s => {
+          const isExpanded = expandedStudent === s.id;
+
+          return (
+            <Card key={s.id} className="border-border bg-card overflow-hidden">
+              {/* Main Row - Always Visible */}
+              <div className="flex items-center gap-4 p-4">
+                {/* Status dot */}
+                <span className={`w-3 h-3 rounded-full shrink-0 ${statusDot(s.status)}`} />
+
+                {/* Student Info */}
+                <div className="min-w-0 flex-1">
+                  <p className="font-display font-semibold text-foreground text-sm truncate">{s.full_name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{s.email}</p>
+                </div>
+
+                {/* Summary Pills */}
+                <div className="hidden md:flex items-center gap-2">
+                  <span className="text-xs bg-secondary rounded-lg px-2.5 py-1 text-muted-foreground flex items-center gap-1">
+                    <CalendarCheck className="w-3 h-3" />
+                    {s.attendedCount}/16
+                  </span>
+                  <span className={`text-xs rounded-lg px-2.5 py-1 flex items-center gap-1 ${
+                    s.missedReviews > 0 ? "bg-amber-500/10 text-amber-500" : "bg-secondary text-muted-foreground"
+                  }`}>
+                    <FileText className="w-3 h-3" />
+                    {s.reviewCount}/16
+                    {s.missedReviews > 0 && <span className="text-[10px]">({s.missedReviews} missed)</span>}
+                  </span>
+                  <span className={`text-xs rounded-lg px-2.5 py-1 flex items-center gap-1 ${
+                    s.missedAssignments > 0 ? "bg-amber-500/10 text-amber-500" : "bg-secondary text-muted-foreground"
+                  }`}>
+                    <BookOpen className="w-3 h-3" />
+                    {s.assignmentCount}/8
+                    {s.missedAssignments > 0 && <span className="text-[10px]">({s.missedAssignments} missed)</span>}
+                  </span>
+                </div>
+
+                {/* Progress */}
+                <div className="hidden sm:flex items-center gap-2 w-24">
+                  <Progress value={s.progress} className="h-2 flex-1" />
+                  <span className="text-xs font-medium text-foreground w-8 text-right">{s.progress}%</span>
+                </div>
+
+                {/* Status Badge */}
+                <Badge variant="outline" className={`text-xs shrink-0 ${statusColor(s.status)}`}>
+                  {s.status}
+                </Badge>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {s.status === "Withdrawn" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7 px-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Reinstate ${s.full_name}?`)) reinstateStudent(s.id);
+                      }}
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                    </Button>
+                  ) : s.status !== "Completed Program" ? (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs h-7 px-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Withdraw ${s.full_name}?`)) withdrawStudent(s.id);
+                      }}
+                    >
+                      Withdraw
+                    </Button>
+                  ) : null}
+
+                  {/* Notes */}
                   <Dialog>
                     <DialogTrigger asChild>
-                      <button
-                        onClick={() => setNoteStudentId(s.id)}
-                        className="p-1 rounded hover:bg-secondary transition-colors relative"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 relative"
+                        onClick={(e) => { e.stopPropagation(); setNoteStudentId(s.id); }}
                       >
-                        <StickyNote className="w-4 h-4 text-muted-foreground" />
+                        <StickyNote className="w-3.5 h-3.5 text-muted-foreground" />
                         {s.notes.length > 0 && (
-                          <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary text-[8px] text-primary-foreground flex items-center justify-center">
+                          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-[8px] text-primary-foreground flex items-center justify-center">
                             {s.notes.length}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-card border-border">
                       <DialogHeader>
-                        <DialogTitle className="font-display text-foreground">
-                          Notes — {s.full_name}
-                        </DialogTitle>
+                        <DialogTitle className="font-display text-foreground">Notes — {s.full_name}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
-                        <div className="flex gap-2">
-                          <Textarea
-                            placeholder="Add a note..."
-                            value={noteStudentId === s.id ? noteText : ""}
-                            onChange={(e) => { setNoteStudentId(s.id); setNoteText(e.target.value); }}
-                            className="bg-secondary border-border"
-                          />
-                        </div>
-                        <Button
-                          size="sm"
-                          onClick={saveNote}
-                          disabled={savingNote || !noteText.trim()}
-                        >
+                        <Textarea
+                          placeholder="Add a note..."
+                          value={noteStudentId === s.id ? noteText : ""}
+                          onChange={(e) => { setNoteStudentId(s.id); setNoteText(e.target.value); }}
+                          className="bg-secondary border-border"
+                        />
+                        <Button size="sm" onClick={saveNote} disabled={savingNote || !noteText.trim()}>
                           {savingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Note"}
                         </Button>
                         {s.notes.length > 0 && (
                           <div className="space-y-2 max-h-48 overflow-auto">
                             {s.notes.map((n, i) => (
-                              <div key={i} className="text-sm text-muted-foreground bg-secondary rounded-lg p-3">
-                                {n}
-                              </div>
+                              <div key={i} className="text-sm text-muted-foreground bg-secondary rounded-lg p-3">{n}</div>
                             ))}
                           </div>
                         )}
                       </div>
                     </DialogContent>
                   </Dialog>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+
+                  {/* Expand */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => setExpandedStudent(isExpanded ? null : s.id)}
+                  >
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Mobile summary - visible only on small screens */}
+              <div className="flex md:hidden items-center gap-2 px-4 pb-3 flex-wrap">
+                <span className="text-xs bg-secondary rounded-lg px-2 py-0.5 text-muted-foreground">
+                  Attended {s.attendedCount}/16
+                </span>
+                <span className="text-xs bg-secondary rounded-lg px-2 py-0.5 text-muted-foreground">
+                  Reviews {s.reviewCount}/16
+                </span>
+                <span className="text-xs bg-secondary rounded-lg px-2 py-0.5 text-muted-foreground">
+                  Assign {s.assignmentCount}/8
+                </span>
+                <span className="text-xs text-muted-foreground">{s.progress}%</span>
+              </div>
+
+              {/* Expanded Detail Panel */}
+              {isExpanded && (
+                <CardContent className="border-t border-border bg-secondary/30 pt-4 space-y-5">
+                  {/* Attendance - Manual (interactive) */}
+                  <div>
+                    <h4 className="font-display font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
+                      <CalendarCheck className="w-4 h-4 text-primary" />
+                      Attendance
+                      <span className="text-xs font-normal text-muted-foreground">(click to toggle)</span>
+                    </h4>
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                      {SESSIONS.map(sess => {
+                        const key = `${sess.week}-${sess.day}`;
+                        const val = s.attendance[key];
+                        const savKey = `${s.id}-${sess.week}-${sess.day}`;
+                        return (
+                          <button
+                            key={`att-${key}`}
+                            onClick={() => toggleAttendance(s.id, sess.week, sess.day, val)}
+                            disabled={savingAttendance === savKey}
+                            className={`flex flex-col items-center gap-0.5 rounded-lg p-2 text-xs transition-colors border ${
+                              val === "present"
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : val === "absent"
+                                ? "bg-destructive/10 border-destructive/20 text-destructive"
+                                : "bg-card border-border text-muted-foreground hover:bg-secondary"
+                            }`}
+                          >
+                            <span className="font-medium">{sess.label}</span>
+                            {savingAttendance === savKey ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : val === "present" ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : val === "absent" ? (
+                              <XCircle className="w-3.5 h-3.5" />
+                            ) : (
+                              <Minus className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Reviews - Automated (read-only) */}
+                  <div>
+                    <h4 className="font-display font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      Session Reviews
+                      <span className="text-xs font-normal text-muted-foreground">(auto-tracked)</span>
+                      <span className="ml-auto text-xs font-normal text-muted-foreground">
+                        {s.reviewCount}/16 submitted
+                        {s.missedReviews > 0 && (
+                          <span className="text-amber-500 ml-1">· {s.missedReviews} missed</span>
+                        )}
+                      </span>
+                    </h4>
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                      {SESSIONS.map(sess => {
+                        const key = `${sess.week}-${sess.day}`;
+                        const submitted = s.reviewSessions?.has(key);
+                        const wasPresent = s.attendance[key] === "present";
+                        const missed = wasPresent && !submitted;
+                        return (
+                          <div
+                            key={`rev-${key}`}
+                            className={`flex flex-col items-center gap-0.5 rounded-lg p-2 text-xs border ${
+                              submitted
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : missed
+                                ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                                : "bg-card border-border text-muted-foreground"
+                            }`}
+                          >
+                            <span className="font-medium">{sess.label}</span>
+                            <span className="text-[10px]">
+                              {sess.day === "friday" ? "Written" : "Video"}
+                            </span>
+                            {submitted ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : missed ? (
+                              <XCircle className="w-3.5 h-3.5" />
+                            ) : (
+                              <Minus className="w-3.5 h-3.5" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Assignments - Automated (read-only) */}
+                  <div>
+                    <h4 className="font-display font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      Assignments
+                      <span className="text-xs font-normal text-muted-foreground">(auto-tracked)</span>
+                      <span className="ml-auto text-xs font-normal text-muted-foreground">
+                        {s.assignmentCount}/8 submitted
+                        {s.missedAssignments > 0 && (
+                          <span className="text-amber-500 ml-1">· {s.missedAssignments} missed</span>
+                        )}
+                      </span>
+                    </h4>
+                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                      {WEEKS.map(w => {
+                        const submitted = s.assignmentWeeks?.has(w);
+                        const attended = s.attendance[`${w}-friday`] === "present" || s.attendance[`${w}-saturday`] === "present";
+                        const missed = attended && !submitted;
+                        return (
+                          <div
+                            key={`asg-${w}`}
+                            className={`flex flex-col items-center gap-0.5 rounded-lg p-2 text-xs border ${
+                              submitted
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : missed
+                                ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                                : "bg-card border-border text-muted-foreground"
+                            }`}
+                          >
+                            <span className="font-medium">W{w}</span>
+                            {submitted ? (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            ) : missed ? (
+                              <XCircle className="w-3.5 h-3.5" />
+                            ) : (
+                              <Minus className="w-3.5 h-3.5" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Commitment & Registration */}
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      Commitment: {s.hasCommitment ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                      ) : (
+                        <XCircle className="w-3.5 h-3.5 text-destructive" />
+                      )}
+                    </span>
+                    <span>Registered: {new Date(s.created_at).toLocaleDateString()}</span>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4">
           <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(page - 1)}>
