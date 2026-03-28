@@ -642,36 +642,66 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
         </CardContent>
       </Card>
 
-      {/* Google Review Prompt */}
-      <Dialog open={showTrustpilot} onOpenChange={setShowTrustpilot}>
-        <DialogContent className="bg-card border-border max-w-md">
+      {/* Mandatory Google Review Dialog */}
+      <Dialog open={showGoogleReview} onOpenChange={() => {}}>
+        <DialogContent className="bg-card border-border max-w-md [&>button]:hidden">
           <DialogHeader>
             <DialogTitle className="font-display text-foreground text-center">
-              Thank you for your review! 🎉
+              📢 Google Review Required
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">
-              We'd love it if you could also share your experience on Google Reviews.
+              To complete your submission, you must post a Google Review for Delvetek.
+              Click the button below — a suggested review text will be copied to your clipboard.
             </p>
+            <div className="rounded-lg bg-secondary p-3 text-xs text-muted-foreground text-left">
+              <p className="font-semibold text-foreground mb-1">Suggested Review (will be copied):</p>
+              <p className="italic">
+                "I'm currently enrolled in Delvetek's Data Analysis training program and it has been an incredible experience. The sessions are practical, well-structured, and the tutors are knowledgeable. I highly recommend Delvetek for anyone looking to build a career in data and tech."
+              </p>
+              <p className="mt-2 text-primary font-medium">Feel free to personalize it!</p>
+            </div>
             <div className="flex items-center justify-center gap-1">
               {[1, 2, 3, 4, 5].map((i) => (
                 <Star key={i} className="w-6 h-6 text-amber-500 fill-amber-500" />
               ))}
             </div>
-            <Button
-              variant="hero"
-              className="w-full"
-              onClick={() => {
-                window.open("https://g.page/r/delvetek/review", "_blank");
-                setShowTrustpilot(false);
-              }}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" /> Leave a Google Review
-            </Button>
-            <Button variant="ghost" className="w-full" onClick={() => setShowTrustpilot(false)}>
-              Maybe later
-            </Button>
+
+            {!googleReviewOpened ? (
+              <Button
+                variant="hero"
+                className="w-full"
+                onClick={handleGoogleReviewOpen}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" /> Open Google Reviews & Copy Text
+              </Button>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 justify-center text-sm text-primary">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Google Review page opened</span>
+                </div>
+                <Button
+                  variant="hero"
+                  className="w-full"
+                  onClick={handleGoogleReviewConfirm}
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" /> I've Posted My Google Review
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleReviewOpen}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" /> Open Google Again
+                </Button>
+              </div>
+            )}
+
+            <p className="text-[10px] text-muted-foreground">
+              You cannot close this dialog until you confirm your Google Review.
+            </p>
           </div>
         </DialogContent>
       </Dialog>
