@@ -107,7 +107,7 @@ const VideoManagement = () => {
     setEditingId(rec.id);
     setTitle(rec.title);
     setDescription(rec.description || "");
-    setWeekNumber(String(rec.week_number));
+    setWeekNumber(`${rec.week_number}-Fri`);
     setVideoSource("url");
     setVideoUrl(rec.video_url);
     setVideoFile(null);
