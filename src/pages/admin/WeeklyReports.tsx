@@ -70,7 +70,7 @@ const WeeklyReports = () => {
 
   useEffect(() => {
     fetchReport(parseInt(selectedWeek));
-    if (isPrimaryAdmin) fetchReviews(parseInt(selectedWeek));
+    fetchReviews(parseInt(selectedWeek));
   }, [selectedWeek]);
 
   const fetchReport = async (week: number) => {
