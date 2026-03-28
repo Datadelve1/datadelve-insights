@@ -89,6 +89,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                 if (!attended) statusMessage = "Attendance required to unlock";
                 else if (!timingOk) statusMessage = "Available after 10 PM";
                 else if (!reviewDone) statusMessage = "Submit review first";
+                else if (!googleOk) statusMessage = "Confirm Google Review for Week " + (rec.week_number - 1);
 
                 return (
                   <div
