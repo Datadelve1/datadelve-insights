@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Video, Lock, Play, Loader2, Shield, Clock } from "lucide-react";
+import { Video, Lock, Play, Loader2, Shield, Clock, FileText } from "lucide-react";
 import ProtectedVideoPlayer from "./ProtectedVideoPlayer";
-import { hasWeekAccess } from "@/lib/attendanceAccess";
+import { hasWeekAccess, hasReviewForWeek } from "@/lib/attendanceAccess";
 
 interface ClassRecording {
   id: string;
@@ -22,9 +22,10 @@ interface ClassRecording {
 
 interface ClassRecordingsProps {
   attendance: Record<string, string>;
+  submittedReviews: Record<string, boolean>;
 }
 
-const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
+const ClassRecordings = ({ attendance, submittedReviews }: ClassRecordingsProps) => {
   const { user, isAdmin } = useAuth();
   const [recordings, setRecordings] = useState<ClassRecording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,8 +76,18 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
           ) : (
             <div className="space-y-3">
               {recordings.map((rec) => {
-                const unlocked = hasWeekAccess(rec.week_number, attendance, isAdmin);
-                const attended = attendance[`${rec.week_number}-friday`] === "present" || attendance[`${rec.week_number}-saturday`] === "present";
+                const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin);
+                const reviewDone = isAdmin || hasReviewForWeek(rec.week_number, submittedReviews);
+                const unlocked = timingOk && reviewDone;
+                const attended =
+                  attendance[`${rec.week_number}-friday`] === "present" ||
+                  attendance[`${rec.week_number}-saturday`] === "present";
+
+                let statusMessage = "";
+                if (!attended) statusMessage = "Attendance required to unlock";
+                else if (!timingOk) statusMessage = "Available after 10 PM";
+                else if (!reviewDone) statusMessage = "Submit review first";
+
                 return (
                   <div
                     key={rec.id}
@@ -103,7 +114,7 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
                         </div>
                         <div>
                           <p className="font-display font-semibold text-foreground text-sm">
-                            Week {rec.week_number}: {rec.title}
+                            {rec.title}
                           </p>
                           {rec.description && (
                             <p className="text-xs text-muted-foreground mt-0.5">
@@ -120,13 +131,16 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
                         >
                           <Play className="w-4 h-4" /> Watch
                         </button>
-                      ) : !attended ? (
-                        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg">
-                          Attendance required to unlock
-                        </span>
                       ) : (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Available after 10 PM
+                          {!attended ? (
+                            <Lock className="w-3 h-3" />
+                          ) : !timingOk ? (
+                            <Clock className="w-3 h-3" />
+                          ) : (
+                            <FileText className="w-3 h-3" />
+                          )}
+                          {statusMessage}
                         </span>
                       )}
                     </div>

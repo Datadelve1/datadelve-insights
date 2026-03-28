@@ -28,27 +28,45 @@ const Dashboard = () => {
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
+  const [submittedReviews, setSubmittedReviews] = useState<Record<string, boolean>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
     if (!user) return;
     const [{ data: reviewData }, { data: subData }, { data: attData }] = await Promise.all([
-      supabase.from("weekly_reviews").select("week_number").eq("user_id", user.id),
+      supabase
+        .from("weekly_reviews")
+        .select("week_number, session_day" as any)
+        .eq("user_id", user.id),
       supabase
         .from("assignment_submissions")
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
       supabase.from("student_attendance").select("week_number, status, session_day").eq("user_id", user.id),
     ]);
-    setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
+
+    // Build submittedWeeks (unique week numbers) and submittedReviews (session-specific)
+    const weeks = new Set<number>();
+    const reviews: Record<string, boolean> = {};
+    (reviewData || []).forEach((r: any) => {
+      weeks.add(r.week_number);
+      const day = r.session_day || "friday";
+      reviews[`${r.week_number}-${day}`] = true;
+    });
+    setSubmittedWeeks(weeks);
+    setSubmittedReviews(reviews);
+
     const scores: Record<number, { score: number; total: number }> = {};
     (subData || []).forEach((s: any) => {
       const wn = s.assignments?.week_number;
       if (wn) scores[wn] = { score: s.score, total: s.total };
     });
     setAssignmentScores(scores);
+
     const att: Record<string, string> = {};
-    (attData || []).forEach((a: any) => { att[`${a.week_number}-${a.session_day || 'friday'}`] = a.status; });
+    (attData || []).forEach((a: any) => {
+      att[`${a.week_number}-${a.session_day || "friday"}`] = a.status;
+    });
     setAttendance(att);
     setReviewsLoaded(true);
   };
@@ -68,7 +86,8 @@ const Dashboard = () => {
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <CommitmentGate profile={profile} signOut={signOut} />;
 
-  const progressPercent = Math.round((submittedWeeks.size / 8) * 100);
+  const totalReviews = Object.values(submittedReviews).filter(Boolean).length;
+  const progressPercent = Math.round((totalReviews / 16) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,9 +96,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
-            <span className="font-display font-bold text-xl text-foreground">
-              Student Dashboard
-            </span>
+            <span className="font-display font-bold text-xl text-foreground">Student Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden sm:block">
@@ -98,12 +115,18 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8 space-y-8">
-        {/* Review Submission Notice */}
+        {/* Schedule & Access Notice */}
         <div className="flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-          <p className="text-sm font-display font-semibold text-foreground">
-            Review submissions open every Friday and Saturday at 8 PM. Classes hold every Friday &amp; Saturday, 6 PM – 9 PM WAT.
-          </p>
+          <div className="text-sm font-display text-foreground space-y-1">
+            <p className="font-semibold">
+              Classes hold every Friday &amp; Saturday, 6 PM – 9 PM WAT.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Reviews open at 8 PM each session day. Videos &amp; assignments unlock at 10 PM after
+              submitting your review. Friday = Written Review · Saturday = Video Review.
+            </p>
+          </div>
         </div>
 
         {/* Welcome Section */}
@@ -112,22 +135,21 @@ const Dashboard = () => {
             Welcome, {profile?.full_name || "Student"}! 👋
           </h1>
           <p className="text-muted-foreground mb-6">
-            Welcome to the Delvetek Data Analysis Training Program. Stay consistent, complete your
-            weekly tasks, and unlock your full potential.
+            Stay consistent, complete your session reviews, and unlock your full potential.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
               <CalendarDays className="w-5 h-5 shrink-0" />
               <div>
                 <p className="text-xs opacity-80">Class Days</p>
-                <p className="font-display font-semibold">Every Friday & Saturday</p>
+                <p className="font-display font-semibold">Every Friday &amp; Saturday</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
               <Clock className="w-5 h-5 shrink-0" />
               <div>
                 <p className="text-xs opacity-80">Time</p>
-                <p className="font-display font-semibold">6 PM – 9 PM</p>
+                <p className="font-display font-semibold">6 PM – 9 PM WAT</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
@@ -156,25 +178,40 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
               {Array.from({ length: 8 }, (_, i) => {
                 const week = i + 1;
-                const reviewDone = submittedWeeks.has(week);
+                const friDone = !!submittedReviews[`${week}-friday`];
+                const satDone = !!submittedReviews[`${week}-saturday`];
+                const bothDone = friDone && satDone;
+                const anyDone = friDone || satDone;
                 const score = assignmentScores[week];
                 return (
                   <div
                     key={i}
                     className={`flex flex-col gap-1 rounded-lg p-3 text-sm ${
-                      reviewDone
+                      bothDone
                         ? "bg-primary/20 border border-primary/30"
+                        : anyDone
+                        ? "bg-primary/10 border border-primary/20"
                         : "bg-secondary"
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      {reviewDone ? (
+                      {bothDone ? (
                         <CheckCircle2 className="w-4 h-4 text-primary" />
+                      ) : anyDone ? (
+                        <CheckCircle2 className="w-4 h-4 text-primary/60" />
                       ) : (
                         <Lock className="w-4 h-4 text-muted-foreground" />
                       )}
-                      <span className={reviewDone ? "text-foreground font-medium" : "text-muted-foreground"}>
+                      <span className={anyDone ? "text-foreground font-medium" : "text-muted-foreground"}>
                         Week {week} {week >= 7 ? "(Project)" : ""}
+                      </span>
+                    </div>
+                    <div className="pl-6 space-y-0.5">
+                      <span className={`text-[10px] ${friDone ? "text-primary" : "text-muted-foreground"}`}>
+                        Fri {friDone ? "✓" : "○"}
+                      </span>
+                      <span className={`text-[10px] ml-2 ${satDone ? "text-primary" : "text-muted-foreground"}`}>
+                        Sat {satDone ? "✓" : "○"}
                       </span>
                     </div>
                     {score && (
@@ -190,13 +227,17 @@ const Dashboard = () => {
         </Card>
 
         {/* Weekly Reviews */}
-        <WeeklyReviews />
+        <WeeklyReviews
+          attendance={attendance}
+          submittedReviews={submittedReviews}
+          onReviewSubmitted={fetchDashboardData}
+        />
 
         {/* Class Recordings */}
-        <ClassRecordings attendance={attendance} />
+        <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} />
 
         {/* Assignments */}
-        <Assignments attendance={attendance} onScoreUpdate={fetchDashboardData} />
+        <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} />
 
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">
@@ -208,7 +249,9 @@ const Dashboard = () => {
           </div>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <div className="text-primary"><Award className="w-6 h-6" /></div>
+              <div className="text-primary">
+                <Award className="w-6 h-6" />
+              </div>
               <CardTitle className="font-display text-lg text-foreground">Ambassador Program</CardTitle>
             </div>
           </CardHeader>

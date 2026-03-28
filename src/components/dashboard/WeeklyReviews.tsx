@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -15,29 +16,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileText, CheckCircle2, Loader2, Star, ExternalLink } from "lucide-react";
-import SubmissionWindowBanner, { useSubmissionWindow } from "./SubmissionWindowBanner";
-
-interface WeeklyReview {
-  id: string;
-  week_number: number;
-  video_url: string | null;
-  written_reflection: string | null;
-  comments: string;
-  created_at: string;
-}
+import {
+  FileText,
+  CheckCircle2,
+  Loader2,
+  Star,
+  ExternalLink,
+  Lock,
+  Clock,
+  Video,
+  Upload,
+  FileVideo,
+  PenLine,
+} from "lucide-react";
+import { canSubmitReview } from "@/lib/attendanceAccess";
 
 interface ReviewQuestion {
   id: string;
   question_number: number;
   question_text: string;
   is_active: boolean;
+}
+
+interface WeeklyReviewsProps {
+  attendance: Record<string, string>;
+  submittedReviews: Record<string, boolean>;
+  onReviewSubmitted: () => void;
 }
 
 const UNRESTRICTED_EMAILS = [
@@ -48,58 +59,53 @@ const UNRESTRICTED_EMAILS = [
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
-const WeeklyReviews = () => {
+const SESSIONS = Array.from({ length: 8 }, (_, w) => [
+  { week: w + 1, day: "friday" as const, label: `Week ${w + 1} Friday` },
+  { week: w + 1, day: "saturday" as const, label: `Week ${w + 1} Saturday` },
+]).flat();
+
+const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: WeeklyReviewsProps) => {
   const { user, profile, isAdmin } = useAuth();
-  const windowInfo = useSubmissionWindow();
-  const isUnrestricted = UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "")
-    || isAdmin
-    || ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
+  const isUnrestricted =
+    UNRESTRICTED_EMAILS.includes(profile?.email ?? user?.email ?? "") ||
+    isAdmin ||
+    ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
-  const [reviews, setReviews] = useState<WeeklyReview[]>([]);
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTrustpilot, setShowTrustpilot] = useState(false);
+  const [activeSession, setActiveSession] = useState<string | null>(null); // "1-friday"
 
-  // Form state
-  const [selectedWeek, setSelectedWeek] = useState("");
+  // Common form state
   const [className, setClassName] = useState("Data Analysis");
   const [classDate, setClassDate] = useState("");
   const [topicCovered, setTopicCovered] = useState("");
   const [tutorName, setTutorName] = useState("");
   const [tutorRating, setTutorRating] = useState("");
+
+  // Friday-specific
   const [questionAnswers, setQuestionAnswers] = useState<Record<number, string>>({});
   const [mainReview, setMainReview] = useState("");
 
+  // Saturday-specific
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [optionalWrittenReview, setOptionalWrittenReview] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   useEffect(() => {
-    fetchReviews();
+    const fetchQuestions = async () => {
+      const { data } = await supabase
+        .from("review_questions" as any)
+        .select("*")
+        .eq("is_active", true)
+        .order("question_number");
+      setQuestions((data as any as ReviewQuestion[]) || []);
+    };
     fetchQuestions();
-  }, [user]);
-
-  const fetchReviews = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("weekly_reviews")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("week_number");
-    setReviews(data || []);
-    setIsLoading(false);
-  };
-
-  const fetchQuestions = async () => {
-    const { data } = await supabase
-      .from("review_questions" as any)
-      .select("*")
-      .eq("is_active", true)
-      .order("question_number");
-    setQuestions((data as any as ReviewQuestion[]) || []);
-  };
-
-  const submittedWeeks = new Set(reviews.map((r) => r.week_number));
+  }, []);
 
   const resetForm = () => {
-    setSelectedWeek("");
     setClassName("Data Analysis");
     setClassDate("");
     setTopicCovered("");
@@ -107,49 +113,55 @@ const WeeklyReviews = () => {
     setTutorRating("");
     setQuestionAnswers({});
     setMainReview("");
+    setVideoFile(null);
+    setConsent(false);
+    setOptionalWrittenReview("");
+    setUploadProgress(0);
+    setActiveSession(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedWeek) {
-      toast({ title: "Please select a week", variant: "destructive" });
-      return;
-    }
-    const weekNum = parseInt(selectedWeek);
-    if (submittedWeeks.has(weekNum)) {
-      toast({ title: "You already submitted a review for this week", variant: "destructive" });
-      return;
-    }
+  const validateCommonFields = (): boolean => {
     if (!topicCovered.trim()) {
       toast({ title: "Please enter the topic covered", variant: "destructive" });
-      return;
+      return false;
     }
     if (!tutorName.trim()) {
       toast({ title: "Please enter the tutor name", variant: "destructive" });
-      return;
+      return false;
     }
     if (!tutorRating) {
       toast({ title: "Please rate the tutor", variant: "destructive" });
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleFridaySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeSession || !user) return;
+    if (!validateCommonFields()) return;
+
     if (!mainReview.trim()) {
       toast({ title: "Please write your overall review", variant: "destructive" });
       return;
     }
-    // Check all active questions are answered
-    const unanswered = questions.filter(q => !questionAnswers[q.question_number]?.trim());
+    const unanswered = questions.filter((q) => !questionAnswers[q.question_number]?.trim());
     if (unanswered.length > 0) {
       toast({ title: `Please answer all ${questions.length} questions`, variant: "destructive" });
       return;
     }
 
+    const [weekStr] = activeSession.split("-");
+    const weekNum = parseInt(weekStr);
+
     setIsSubmitting(true);
     try {
       const { error } = await supabase.from("weekly_reviews").insert({
-        user_id: user!.id,
+        user_id: user.id,
         full_name: profile?.full_name ?? "",
-        email: profile?.email ?? user!.email ?? "",
+        email: profile?.email ?? user.email ?? "",
         week_number: weekNum,
+        session_day: "friday",
         written_reflection: mainReview.trim(),
         comments: "",
         video_url: null,
@@ -162,19 +174,17 @@ const WeeklyReviews = () => {
       } as any);
       if (error) throw error;
 
-      // Send confirmation email
       supabase.functions.invoke("send-weekly-review-confirmation", {
         body: {
-          email: profile?.email ?? user!.email,
+          email: profile?.email ?? user.email,
           full_name: profile?.full_name,
           week_number: weekNum,
         },
       });
 
-      toast({ title: "Review submitted! 🎉", description: `Week ${weekNum} review recorded.` });
+      toast({ title: "Friday review submitted! 🎉", description: `Week ${weekNum} Friday review recorded.` });
       resetForm();
-      fetchReviews();
-      // Show Trustpilot prompt
+      onReviewSubmitted();
       setShowTrustpilot(true);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -183,108 +193,192 @@ const WeeklyReviews = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <Card className="border-border bg-card">
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </CardContent>
-      </Card>
-    );
-  }
+  const handleSaturdaySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeSession || !user) return;
+    if (!validateCommonFields()) return;
+
+    if (!videoFile) {
+      toast({ title: "Please upload your face video review", variant: "destructive" });
+      return;
+    }
+    if (!consent) {
+      toast({ title: "Please provide consent to proceed", variant: "destructive" });
+      return;
+    }
+
+    const [weekStr] = activeSession.split("-");
+    const weekNum = parseInt(weekStr);
+
+    setIsSubmitting(true);
+    try {
+      // Upload video
+      const ext = videoFile.name.split(".").pop();
+      const storagePath = `reviews/${user.id}/week-${weekNum}-saturday/${Date.now()}.${ext}`;
+      setUploadProgress(10);
+
+      const { error: uploadError } = await supabase.storage
+        .from("student-videos")
+        .upload(storagePath, videoFile, { upsert: false });
+      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+      setUploadProgress(70);
+
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from("student-videos")
+        .createSignedUrl(storagePath, 365 * 24 * 60 * 60);
+      if (signedError) throw signedError;
+      setUploadProgress(90);
+
+      const { error } = await supabase.from("weekly_reviews").insert({
+        user_id: user.id,
+        full_name: profile?.full_name ?? "",
+        email: profile?.email ?? user.email ?? "",
+        week_number: weekNum,
+        session_day: "saturday",
+        written_reflection: optionalWrittenReview.trim() || null,
+        comments: "",
+        video_url: signedData.signedUrl,
+        class_name: className,
+        class_date: classDate || null,
+        topic_covered: topicCovered.trim(),
+        tutor_name: tutorName.trim(),
+        tutor_rating: tutorRating,
+        question_answers: {},
+      } as any);
+      if (error) throw error;
+      setUploadProgress(100);
+
+      supabase.functions.invoke("send-weekly-review-confirmation", {
+        body: {
+          email: profile?.email ?? user.email,
+          full_name: profile?.full_name,
+          week_number: weekNum,
+        },
+      });
+
+      toast({ title: "Saturday video review submitted! 🎬", description: `Week ${weekNum} Saturday review recorded.` });
+      resetForm();
+      onReviewSubmitted();
+      setShowTrustpilot(true);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const totalSubmitted = Object.values(submittedReviews).filter(Boolean).length;
 
   return (
     <>
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle className="font-display flex items-center gap-2 text-foreground">
-            <FileText className="w-5 h-5 text-primary" /> Weekly Reviews
+            <FileText className="w-5 h-5 text-primary" /> Session Reviews
+            <span className="ml-auto text-xs font-normal text-muted-foreground">
+              {totalSubmitted} / 16 submitted
+            </span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Submitted reviews summary */}
+          {/* Session Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {Array.from({ length: 8 }, (_, i) => {
-              const week = i + 1;
-              const submitted = submittedWeeks.has(week);
+            {SESSIONS.map((s) => {
+              const key = `${s.week}-${s.day}`;
+              const submitted = !!submittedReviews[key];
+              const attended = attendance[key] === "present";
+              const timeReady = isUnrestricted || canSubmitReview(s.week, s.day, attendance, isAdmin);
+              const available = !submitted && (isUnrestricted || (attended && timeReady));
+              const isActive = activeSession === key;
+              const isFriday = s.day === "friday";
+
               return (
-                <div
-                  key={week}
-                  className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
+                <button
+                  key={key}
+                  onClick={() => {
+                    if (submitted) return;
+                    if (!available && !isAdmin) return;
+                    setActiveSession(isActive ? null : key);
+                  }}
+                  disabled={submitted || (!available && !isAdmin)}
+                  className={`flex items-center gap-2 rounded-lg p-3 text-sm text-left transition-all ${
                     submitted
                       ? "bg-primary/10 border border-primary/20"
-                      : "bg-secondary"
+                      : isActive
+                      ? "bg-primary/20 border-2 border-primary ring-2 ring-primary/20"
+                      : available || isAdmin
+                      ? "bg-secondary hover:bg-secondary/80 border border-border cursor-pointer"
+                      : "bg-muted/50 border border-border/50"
                   }`}
                 >
                   {submitted ? (
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  ) : available || isAdmin ? (
+                    isFriday ? (
+                      <PenLine className="w-4 h-4 text-foreground shrink-0" />
+                    ) : (
+                      <Video className="w-4 h-4 text-foreground shrink-0" />
+                    )
+                  ) : !attended ? (
+                    <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
                   ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/30" />
+                    <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
                   )}
-                  <span className={submitted ? "text-foreground font-medium" : "text-muted-foreground"}>
-                    Week {week}
-                  </span>
-                </div>
+                  <div className="min-w-0">
+                    <span
+                      className={`block truncate ${
+                        submitted
+                          ? "text-foreground font-medium"
+                          : available || isAdmin
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      W{s.week} {isFriday ? "Fri" : "Sat"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {submitted
+                        ? isFriday
+                          ? "Written ✓"
+                          : "Video ✓"
+                        : isFriday
+                        ? "Written"
+                        : "Video"}
+                    </span>
+                  </div>
+                </button>
               );
             })}
           </div>
 
-          {/* Submit new review form */}
-          {submittedWeeks.size < 8 && (() => {
-            const weekSelector = isUnrestricted ? (
-              <SelectContent>
-                {Array.from({ length: 8 }, (_, i) => i + 1)
-                  .filter((w) => !submittedWeeks.has(w))
-                  .map((w) => (
-                    <SelectItem key={w} value={String(w)}>
-                      Week {w} {w >= 7 ? "(Project)" : ""}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            ) : (
-              <SelectContent>
-                {windowInfo.currentWeek && !submittedWeeks.has(windowInfo.currentWeek) ? (
-                  <SelectItem value={String(windowInfo.currentWeek)}>
-                    Week {windowInfo.currentWeek} {windowInfo.currentWeek >= 7 ? "(Project)" : ""}
-                  </SelectItem>
-                ) : (
-                  <SelectItem value="none" disabled>
-                    No weeks available for submission
-                  </SelectItem>
-                )}
-              </SelectContent>
-            );
+          {/* Active Session Form */}
+          {activeSession && (() => {
+            const [weekStr, day] = activeSession.split("-");
+            const weekNum = parseInt(weekStr);
+            const isFriday = day === "friday";
+            const sessionLabel = `Week ${weekNum} ${isFriday ? "Friday" : "Saturday"}`;
 
-            const reviewForm = (
-              <form onSubmit={handleSubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
-                <h3 className="font-display font-semibold text-foreground text-lg">Submit a Review</h3>
+            const commonFields = (
+              <>
+                <h3 className="font-display font-semibold text-foreground text-lg">
+                  {isFriday ? "📝 Written Review" : "🎬 Video Review"} — {sessionLabel}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {isFriday
+                    ? "Complete the written review for this Friday session."
+                    : "Upload a face video explaining your Delvetek experience for this Saturday session."}
+                </p>
 
-                {/* Row 1: Name, Email, Week */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Row 1: Name, Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Student Name</Label>
-                    <Input
-                      value={profile?.full_name ?? ""}
-                      disabled
-                      className="bg-card border-border"
-                    />
+                    <Input value={profile?.full_name ?? ""} disabled className="bg-card border-border" />
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input
-                      value={profile?.email ?? user?.email ?? ""}
-                      disabled
-                      className="bg-card border-border"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Select Week *</Label>
-                    <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                      <SelectTrigger className="bg-card border-border">
-                        <SelectValue placeholder="Choose week..." />
-                      </SelectTrigger>
-                      {weekSelector}
-                    </Select>
+                    <Input value={profile?.email ?? user?.email ?? ""} disabled className="bg-card border-border" />
                   </div>
                 </div>
 
@@ -348,80 +442,175 @@ const WeeklyReviews = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {TUTOR_RATINGS.map((r) => (
-                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
+              </>
+            );
 
-                {/* Dynamic Questions from Admin */}
-                {questions.length > 0 && (
-                  <div className="space-y-4 rounded-lg bg-card border border-border p-4">
-                    <h4 className="font-display font-semibold text-foreground text-sm">Session Questions</h4>
-                    {questions.map((q) => (
-                      <div key={q.id} className="space-y-2">
-                        <Label className="text-sm">
-                          {q.question_number}. {q.question_text} *
-                        </Label>
-                        <Textarea
-                          value={questionAnswers[q.question_number] || ""}
-                          onChange={(e) =>
-                            setQuestionAnswers((prev) => ({
-                              ...prev,
-                              [q.question_number]: e.target.value,
-                            }))
-                          }
-                          placeholder="Your answer..."
-                          className="bg-secondary border-border min-h-[80px]"
-                        />
-                      </div>
-                    ))}
+            if (isFriday) {
+              return (
+                <form onSubmit={handleFridaySubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
+                  {commonFields}
+
+                  {/* Dynamic Questions */}
+                  {questions.length > 0 && (
+                    <div className="space-y-4 rounded-lg bg-card border border-border p-4">
+                      <h4 className="font-display font-semibold text-foreground text-sm">Session Questions</h4>
+                      {questions.map((q) => (
+                        <div key={q.id} className="space-y-2">
+                          <Label className="text-sm">
+                            {q.question_number}. {q.question_text} *
+                          </Label>
+                          <Textarea
+                            value={questionAnswers[q.question_number] || ""}
+                            onChange={(e) =>
+                              setQuestionAnswers((prev) => ({
+                                ...prev,
+                                [q.question_number]: e.target.value,
+                              }))
+                            }
+                            placeholder="Your answer..."
+                            className="bg-secondary border-border min-h-[80px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Main Written Review */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Overall Delvetek Experience Review *</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Share your overall experience with Delvetek — not just the tutor.
+                    </p>
+                    <Textarea
+                      value={mainReview}
+                      onChange={(e) => setMainReview(e.target.value)}
+                      placeholder="Share your overall experience with Delvetek training, what you learned, and how it has helped you."
+                      className="bg-card border-border min-h-[140px]"
+                    />
                   </div>
-                )}
 
-                {/* Main Review - About Delvetek */}
+                  <Button type="submit" disabled={isSubmitting} variant="hero" className="w-full h-11">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                      </>
+                    ) : (
+                      "Submit Friday Review"
+                    )}
+                  </Button>
+                </form>
+              );
+            }
+
+            // Saturday - Video Review
+            return (
+              <form onSubmit={handleSaturdaySubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
+                {commonFields}
+
+                {/* Video Upload */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Face Video Review * 🎬</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Record a video explaining how the Delvetek training has helped you, your learning
+                    outcomes, and overall experience. Your face must be visible.
+                  </p>
+                  <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border cursor-pointer transition-colors hover:border-primary/50 bg-card">
+                    <FileVideo className="w-5 h-5 text-primary shrink-0" />
+                    <span className="text-sm text-muted-foreground truncate">
+                      {videoFile ? videoFile.name : "Click to select a video file (any format/size)"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                  {videoFile && (
+                    <p className="text-xs text-muted-foreground">
+                      Size: {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
+                    </p>
+                  )}
+                </div>
+
+                {/* Optional Written Review */}
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold">
-                    Overall Delvetek Experience Review *
+                    Overall Delvetek Experience Review (Optional)
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    This review is about your experience with Delvetek as a whole — not a specific tutor.
+                    Optionally add a written review alongside your video.
                   </p>
                   <Textarea
-                    value={mainReview}
-                    onChange={(e) => setMainReview(e.target.value)}
-                    placeholder="Please share your overall experience with Delvetek training, including what you learned, the structure of the program, and how it has helped you. Avoid focusing only on the tutor."
-                    className="bg-card border-border min-h-[140px]"
+                    value={optionalWrittenReview}
+                    onChange={(e) => setOptionalWrittenReview(e.target.value)}
+                    placeholder="Share your written thoughts (optional on Saturdays)..."
+                    className="bg-card border-border min-h-[100px]"
                   />
                 </div>
 
-                <Button type="submit" disabled={isSubmitting} variant="hero" className="w-full h-11">
+                {/* Consent */}
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-card border border-border">
+                  <Checkbox
+                    id="review-consent"
+                    checked={consent}
+                    onCheckedChange={(checked) => setConsent(!!checked)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="review-consent" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
+                    I consent to Delvetek using my submitted video for training proof and promotional
+                    purposes. I understand this video will be reviewed by the Super Admin before being
+                    published.
+                  </label>
+                </div>
+
+                {uploadProgress > 0 && uploadProgress < 100 && (
+                  <div className="space-y-1">
+                    <Progress value={uploadProgress} className="h-2" />
+                    <p className="text-xs text-muted-foreground">Uploading video...</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !consent || !videoFile}
+                  variant="hero"
+                  className="w-full h-11"
+                >
                   {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</>
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />{" "}
+                      {uploadProgress > 0 ? "Uploading..." : "Submitting..."}
+                    </>
                   ) : (
-                    "Submit Review"
+                    <>
+                      <Upload className="w-4 h-4 mr-2" /> Submit Saturday Video Review
+                    </>
                   )}
                 </Button>
               </form>
             );
-
-            return isUnrestricted ? reviewForm : (
-              <SubmissionWindowBanner>{reviewForm}</SubmissionWindowBanner>
-            );
           })()}
 
-          {submittedWeeks.size === 8 && (
+          {totalSubmitted >= 16 && (
             <div className="text-center py-6 rounded-xl bg-primary/10">
               <CheckCircle2 className="w-8 h-8 text-primary mx-auto mb-2" />
               <p className="font-display font-semibold text-foreground">All reviews submitted! 🎉</p>
-              <p className="text-sm text-muted-foreground">You've completed all 8 weekly reviews.</p>
+              <p className="text-sm text-muted-foreground">You've completed all 16 session reviews.</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Trustpilot Prompt Dialog */}
+      {/* Trustpilot Prompt */}
       <Dialog open={showTrustpilot} onOpenChange={setShowTrustpilot}>
         <DialogContent className="bg-card border-border max-w-md">
           <DialogHeader>
@@ -431,8 +620,7 @@ const WeeklyReviews = () => {
           </DialogHeader>
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">
-              We'd love it if you could also share your experience on Trustpilot. 
-              Your feedback helps other students discover Delvetek!
+              We'd love it if you could also share your experience on Trustpilot.
             </p>
             <div className="flex items-center justify-center gap-1">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -449,12 +637,7 @@ const WeeklyReviews = () => {
             >
               <ExternalLink className="w-4 h-4 mr-2" /> Leave a Trustpilot Review
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full"
-              onClick={() => setShowTrustpilot(false)}
-            >
+            <Button variant="ghost" className="w-full" onClick={() => setShowTrustpilot(false)}>
               Maybe later
             </Button>
           </div>
