@@ -274,7 +274,11 @@ const Assignments = ({
           </div>
         ) : (
           <div className="space-y-3">
-            {assignments.map((assignment) => {
+            {assignments.filter((a) => {
+              // Week 1 has no assignments; week 2+ available from April 3rd 1 AM WAT
+              if (a.week_number <= 1) return false;
+              return true;
+            }).map((assignment) => {
               const submission = submissions[assignment.id];
               const timingOk = hasWeekAccess(assignment.week_number, attendance, isAdmin);
               const reviewDone = isAdmin || hasReviewForWeek(assignment.week_number, submittedReviews);

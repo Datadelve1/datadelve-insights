@@ -610,7 +610,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
         </CardContent>
       </Card>
 
-      {/* Trustpilot Prompt */}
+      {/* Google Review Prompt */}
       <Dialog open={showTrustpilot} onOpenChange={setShowTrustpilot}>
         <DialogContent className="bg-card border-border max-w-md">
           <DialogHeader>
@@ -620,7 +620,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
           </DialogHeader>
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">
-              We'd love it if you could also share your experience on Trustpilot.
+              We'd love it if you could also share your experience on Google Reviews.
             </p>
             <div className="flex items-center justify-center gap-1">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -631,11 +631,11 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
               variant="hero"
               className="w-full"
               onClick={() => {
-                window.open("https://www.trustpilot.com/review/delvetek.com", "_blank");
+                window.open("https://g.page/r/delvetek/review", "_blank");
                 setShowTrustpilot(false);
               }}
             >
-              <ExternalLink className="w-4 h-4 mr-2" /> Leave a Trustpilot Review
+              <ExternalLink className="w-4 h-4 mr-2" /> Leave a Google Review
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setShowTrustpilot(false)}>
               Maybe later

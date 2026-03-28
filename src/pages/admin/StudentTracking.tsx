@@ -250,13 +250,24 @@ const StudentTracking = () => {
     XLSX.writeFile(wb, `delvetek-students.${format}`);
   };
 
+  const withdrawStudent = async (studentId: string) => {
+    const { error } = await supabase.from("profiles").update({ student_status: "withdrawn" }).eq("id", studentId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Student withdrawn" });
+      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, status: "Withdrawn" } : s));
+    }
+  };
+
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed Program": return "bg-green-600/20 text-green-400 border-green-600/30";
-      case "Active": return "bg-primary/20 text-primary border-primary/30";
-      case "Falling Behind": return "bg-orange-600/20 text-orange-400 border-orange-600/30";
-      case "Inactive": return "bg-destructive/20 text-destructive border-destructive/30";
-      case "At Risk": return "bg-red-800/20 text-red-400 border-red-800/30";
+      case "Active": return "bg-green-600/20 text-green-400 border-green-600/30"; // Green
+      case "Monitor": return "bg-amber-500/20 text-amber-400 border-amber-500/30"; // Amber
+      case "Action Required": return "bg-orange-600/20 text-orange-400 border-orange-600/30"; // Orange
+      case "Inactive": return "bg-red-600/20 text-red-400 border-red-600/30"; // Red
+      case "Withdrawn": return "bg-destructive/20 text-destructive border-destructive/30";
       default: return "bg-muted text-muted-foreground";
     }
   };
