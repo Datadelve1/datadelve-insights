@@ -79,7 +79,10 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
               {recordings.map((rec) => {
                 const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin);
                 const reviewDone = isAdmin || hasReviewForWeek(rec.week_number, submittedReviews);
-                const googleOk = isAdmin || rec.week_number === 1 || googleReviewConfirmed.has(rec.week_number - 1);
+                const prevWeek = rec.week_number - 1;
+                const googleOk = isAdmin || rec.week_number === 1 || (
+                  !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
+                );
                 const unlocked = timingOk && reviewDone && googleOk;
                 const attended =
                   attendance[`${rec.week_number}-friday`] === "present" ||
