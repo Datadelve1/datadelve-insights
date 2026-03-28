@@ -72,10 +72,12 @@ const Assignments = ({
   attendance,
   submittedReviews,
   onScoreUpdate,
+  googleReviewConfirmed,
 }: {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
   onScoreUpdate: () => void;
+  googleReviewConfirmed: Set<number>;
 }) => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
@@ -282,7 +284,8 @@ const Assignments = ({
               const submission = submissions[assignment.id];
               const timingOk = hasWeekAccess(assignment.week_number, attendance, isAdmin);
               const reviewDone = isAdmin || hasReviewForWeek(assignment.week_number, submittedReviews);
-              const weekAccess = timingOk && reviewDone;
+              const googleOk = isAdmin || assignment.week_number === 1 || googleReviewConfirmed.has(assignment.week_number - 1);
+              const weekAccess = timingOk && reviewDone && googleOk;
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
@@ -294,6 +297,7 @@ const Assignments = ({
               if (!attended) lockMessage = "Attendance required";
               else if (!timingOk) lockMessage = "Available after 10 PM";
               else if (!reviewDone) lockMessage = "Submit review first";
+              else if (!googleOk) lockMessage = "Confirm Google Review for Week " + (assignment.week_number - 1);
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">

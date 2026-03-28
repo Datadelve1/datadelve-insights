@@ -30,11 +30,12 @@ const Dashboard = () => {
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
   const [attendance, setAttendance] = useState<Record<string, string>>({});
   const [submittedReviews, setSubmittedReviews] = useState<Record<string, boolean>>({});
+  const [googleReviewConfirmed, setGoogleReviewConfirmed] = useState<Set<number>>(new Set());
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
     if (!user) return;
-    const [{ data: reviewData }, { data: subData }, { data: attData }] = await Promise.all([
+    const [{ data: reviewData }, { data: subData }, { data: attData }, { data: grData }] = await Promise.all([
       supabase
         .from("weekly_reviews")
         .select("week_number, session_day" as any)
@@ -44,6 +45,7 @@ const Dashboard = () => {
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
       supabase.from("student_attendance").select("week_number, status, session_day").eq("user_id", user.id),
+      supabase.from("google_review_confirmations" as any).select("week_number").eq("user_id", user.id),
     ]);
 
     // Build submittedWeeks (unique week numbers) and submittedReviews (session-specific)
@@ -69,6 +71,11 @@ const Dashboard = () => {
       att[`${a.week_number}-${a.session_day || "friday"}`] = a.status;
     });
     setAttendance(att);
+
+    const grWeeks = new Set<number>();
+    (grData || []).forEach((g: any) => grWeeks.add(g.week_number));
+    setGoogleReviewConfirmed(grWeeks);
+
     setReviewsLoaded(true);
   };
 
@@ -159,6 +166,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               Reviews open at 8 PM each session day. Videos &amp; assignments unlock at 10 PM after
               submitting your review. Friday = Written Review · Saturday = Video Review.
+              <strong> A Google Review is required each week to unlock the next week's content.</strong>
             </p>
           </div>
         </div>
@@ -268,10 +276,10 @@ const Dashboard = () => {
         />
 
         {/* Class Recordings */}
-        <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} />
+        <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} googleReviewConfirmed={googleReviewConfirmed} />
 
         {/* Assignments */}
-        <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} />
+        <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} googleReviewConfirmed={googleReviewConfirmed} />
 
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">

@@ -23,9 +23,10 @@ interface ClassRecording {
 interface ClassRecordingsProps {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
+  googleReviewConfirmed: Set<number>;
 }
 
-const ClassRecordings = ({ attendance, submittedReviews }: ClassRecordingsProps) => {
+const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }: ClassRecordingsProps) => {
   const { user, isAdmin } = useAuth();
   const [recordings, setRecordings] = useState<ClassRecording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +79,8 @@ const ClassRecordings = ({ attendance, submittedReviews }: ClassRecordingsProps)
               {recordings.map((rec) => {
                 const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin);
                 const reviewDone = isAdmin || hasReviewForWeek(rec.week_number, submittedReviews);
-                const unlocked = timingOk && reviewDone;
+                const googleOk = isAdmin || rec.week_number === 1 || googleReviewConfirmed.has(rec.week_number - 1);
+                const unlocked = timingOk && reviewDone && googleOk;
                 const attended =
                   attendance[`${rec.week_number}-friday`] === "present" ||
                   attendance[`${rec.week_number}-saturday`] === "present";
@@ -87,6 +89,7 @@ const ClassRecordings = ({ attendance, submittedReviews }: ClassRecordingsProps)
                 if (!attended) statusMessage = "Attendance required to unlock";
                 else if (!timingOk) statusMessage = "Available after 10 PM";
                 else if (!reviewDone) statusMessage = "Submit review first";
+                else if (!googleOk) statusMessage = "Confirm Google Review for Week " + (rec.week_number - 1);
 
                 return (
                   <div
