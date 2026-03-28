@@ -149,9 +149,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const isWithdrawn = profile?.student_status === "withdrawn";
+
   return (
     <AuthContext.Provider
-      value={{ user, session, profile, isAdmin, isLoading, hasCommitted, signOut, refreshCommitment }}
+      value={{ user, session, profile, isAdmin, isLoading, hasCommitted, isWithdrawn, signOut, refreshCommitment }}
     >
       {children}
     </AuthContext.Provider>
