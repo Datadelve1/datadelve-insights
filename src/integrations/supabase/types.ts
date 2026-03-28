@@ -276,6 +276,7 @@ export type Database = {
           created_at: string
           id: string
           marked_by: string | null
+          session_day: string
           status: string
           updated_at: string
           user_id: string
@@ -285,6 +286,7 @@ export type Database = {
           created_at?: string
           id?: string
           marked_by?: string | null
+          session_day?: string
           status?: string
           updated_at?: string
           user_id: string
@@ -294,6 +296,7 @@ export type Database = {
           created_at?: string
           id?: string
           marked_by?: string | null
+          session_day?: string
           status?: string
           updated_at?: string
           user_id?: string
