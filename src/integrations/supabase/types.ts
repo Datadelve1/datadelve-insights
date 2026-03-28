@@ -464,6 +464,7 @@ export type Database = {
       }
       weekly_reviews: {
         Row: {
+          approved_by: string | null
           class_date: string | null
           class_name: string | null
           comments: string
@@ -471,7 +472,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          is_approved: boolean
           question_answers: Json | null
+          session_day: string
           topic_covered: string | null
           tutor_name: string | null
           tutor_rating: string | null
@@ -481,6 +484,7 @@ export type Database = {
           written_reflection: string | null
         }
         Insert: {
+          approved_by?: string | null
           class_date?: string | null
           class_name?: string | null
           comments?: string
@@ -488,7 +492,9 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          is_approved?: boolean
           question_answers?: Json | null
+          session_day?: string
           topic_covered?: string | null
           tutor_name?: string | null
           tutor_rating?: string | null
@@ -498,6 +504,7 @@ export type Database = {
           written_reflection?: string | null
         }
         Update: {
+          approved_by?: string | null
           class_date?: string | null
           class_name?: string | null
           comments?: string
@@ -505,7 +512,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          is_approved?: boolean
           question_answers?: Json | null
+          session_day?: string
           topic_covered?: string | null
           tutor_name?: string | null
           tutor_rating?: string | null
