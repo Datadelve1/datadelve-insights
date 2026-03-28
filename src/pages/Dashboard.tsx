@@ -35,7 +35,7 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     if (!user) return;
-    const [{ data: reviewData }, { data: subData }, { data: attData }] = await Promise.all([
+    const [{ data: reviewData }, { data: subData }, { data: attData }, { data: grData }] = await Promise.all([
       supabase
         .from("weekly_reviews")
         .select("week_number, session_day" as any)
@@ -45,6 +45,7 @@ const Dashboard = () => {
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
       supabase.from("student_attendance").select("week_number, status, session_day").eq("user_id", user.id),
+      supabase.from("google_review_confirmations" as any).select("week_number").eq("user_id", user.id),
     ]);
 
     // Build submittedWeeks (unique week numbers) and submittedReviews (session-specific)
