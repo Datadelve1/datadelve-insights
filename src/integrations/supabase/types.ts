@@ -187,6 +187,27 @@ export type Database = {
         }
         Relationships: []
       }
+      google_review_confirmations: {
+        Row: {
+          confirmed_at: string
+          id: string
+          user_id: string
+          week_number: number
+        }
+        Insert: {
+          confirmed_at?: string
+          id?: string
+          user_id: string
+          week_number: number
+        }
+        Update: {
+          confirmed_at?: string
+          id?: string
+          user_id?: string
+          week_number?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
