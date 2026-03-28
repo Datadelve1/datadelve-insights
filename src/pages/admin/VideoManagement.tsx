@@ -131,13 +131,14 @@ const VideoManagement = () => {
     }
 
     setSubmitting(true);
+    const parsedWeek = parseInt(weekNumber.split("-")[0]);
     try {
       let finalUrl = videoUrl.trim();
 
       // Upload video file if provided
       if (needsUpload && videoFile) {
         const ext = videoFile.name.split(".").pop();
-        const path = `week-${weekNumber}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const path = `week-${parsedWeek}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
         setUploadProgress(10);
         const { error: uploadError } = await supabase.storage
