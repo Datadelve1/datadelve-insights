@@ -461,7 +461,7 @@ const StudentTracking = () => {
                 {/* Assignment columns - auto-tracked per week (W1-W8) */}
                 {WEEKS.map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
-                    {s.assignmentWeeks.has(w) ? (
+                    {s.assignmentWeeks?.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
                     ) : (
                       <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
