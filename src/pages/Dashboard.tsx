@@ -102,7 +102,7 @@ const Dashboard = () => {
         <div className="flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
           <p className="text-sm font-display font-semibold text-foreground">
-            Review submissions open Saturdays at 8pm.
+            Review submissions open every Friday and Saturday at 8 PM. Classes hold every Friday &amp; Saturday, 6 PM – 9 PM WAT.
           </p>
         </div>
 
