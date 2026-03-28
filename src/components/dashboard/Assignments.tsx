@@ -71,7 +71,7 @@ const Assignments = ({
   attendance,
   onScoreUpdate,
 }: {
-  attendance: Record<number, string>;
+  attendance: Record<string, string>;
   onScoreUpdate: () => void;
 }) => {
   const { user, isAdmin } = useAuth();
@@ -271,7 +271,7 @@ const Assignments = ({
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
-              const attended = attendance[assignment.week_number] === "present";
+              const attended = attendance[`${assignment.week_number}-friday`] === "present" || attendance[`${assignment.week_number}-saturday`] === "present";
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
@@ -331,7 +331,7 @@ const Assignments = ({
                           {!attended ? (
                             <>Attendance required</>
                           ) : (
-                            <><Clock className="w-3 h-3" /> Available after 9 PM</>
+                            <><Clock className="w-3 h-3" /> Available after 10 PM</>
                           )}
                         </span>
                       ) : windowClosed ? (

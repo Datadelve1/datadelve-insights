@@ -27,7 +27,7 @@ const Dashboard = () => {
   const { user, profile, isLoading, isAdmin, hasCommitted, signOut } = useAuth();
   const [submittedWeeks, setSubmittedWeeks] = useState<Set<number>>(new Set());
   const [assignmentScores, setAssignmentScores] = useState<Record<number, { score: number; total: number }>>({});
-  const [attendance, setAttendance] = useState<Record<number, string>>({});
+  const [attendance, setAttendance] = useState<Record<string, string>>({});
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
 
   const fetchDashboardData = async () => {
@@ -38,7 +38,7 @@ const Dashboard = () => {
         .from("assignment_submissions")
         .select("assignment_id, score, total, assignments!inner(week_number)")
         .eq("user_id", user.id),
-      supabase.from("student_attendance").select("week_number, status").eq("user_id", user.id),
+      supabase.from("student_attendance").select("week_number, status, session_day").eq("user_id", user.id),
     ]);
     setSubmittedWeeks(new Set((reviewData || []).map((r) => r.week_number)));
     const scores: Record<number, { score: number; total: number }> = {};
@@ -47,8 +47,8 @@ const Dashboard = () => {
       if (wn) scores[wn] = { score: s.score, total: s.total };
     });
     setAssignmentScores(scores);
-    const att: Record<number, string> = {};
-    (attData || []).forEach((a: any) => { att[a.week_number] = a.status; });
+    const att: Record<string, string> = {};
+    (attData || []).forEach((a: any) => { att[`${a.week_number}-${a.session_day || 'friday'}`] = a.status; });
     setAttendance(att);
     setReviewsLoaded(true);
   };
@@ -102,7 +102,7 @@ const Dashboard = () => {
         <div className="flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
           <p className="text-sm font-display font-semibold text-foreground">
-            Review submissions open Saturdays at 8pm.
+            Review submissions open every Friday and Saturday at 8 PM. Classes hold every Friday &amp; Saturday, 6 PM – 9 PM WAT.
           </p>
         </div>
 

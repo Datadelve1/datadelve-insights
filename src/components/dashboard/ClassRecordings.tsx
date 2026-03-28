@@ -21,7 +21,7 @@ interface ClassRecording {
 }
 
 interface ClassRecordingsProps {
-  attendance: Record<number, string>;
+  attendance: Record<string, string>;
 }
 
 const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
@@ -76,7 +76,7 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
             <div className="space-y-3">
               {recordings.map((rec) => {
                 const unlocked = hasWeekAccess(rec.week_number, attendance, isAdmin);
-                const attended = attendance[rec.week_number] === "present";
+                const attended = attendance[`${rec.week_number}-friday`] === "present" || attendance[`${rec.week_number}-saturday`] === "present";
                 return (
                   <div
                     key={rec.id}
@@ -126,7 +126,7 @@ const ClassRecordings = ({ attendance }: ClassRecordingsProps) => {
                         </span>
                       ) : (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Available after 9 PM
+                          <Clock className="w-3 h-3" /> Available after 10 PM
                         </span>
                       )}
                     </div>

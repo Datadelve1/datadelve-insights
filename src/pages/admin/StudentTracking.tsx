@@ -7,31 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Loader2,
-  Search,
-  Download,
-  CheckCircle2,
-  XCircle,
-  Minus,
-  StickyNote,
-  ChevronLeft,
-  ChevronRight,
+  Loader2, Search, Download, CheckCircle2, XCircle, Minus,
+  StickyNote, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -41,7 +25,7 @@ interface StudentRow {
   email: string;
   created_at: string;
   hasCommitment: boolean;
-  attendance: Record<number, string>;
+  attendance: Record<string, string>;
   assignmentWeeks: Set<number>;
   reviewWeeks: Set<number>;
   progress: number;
@@ -50,6 +34,10 @@ interface StudentRow {
 }
 
 const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
+const SESSIONS = WEEKS.flatMap(w => [
+  { week: w, day: "friday" as const, label: `W${w} Fri` },
+  { week: w, day: "saturday" as const, label: `W${w} Sat` },
+]);
 const PAGE_SIZE = 20;
 
 const StudentTracking = () => {
@@ -85,14 +73,15 @@ const StudentTracking = () => {
     const submissions = submissionsRes.data ?? [];
     const notes = notesRes.data ?? [];
 
-    // Build lookup maps
     const commitUserIds = new Set(commitments.filter((c: any) => c.user_id).map((c: any) => c.user_id));
     const commitEmails = new Set(commitments.map((c: any) => c.email));
 
-    const attendanceMap = new Map<string, Record<number, string>>();
+    // Attendance map: userId → { "1-friday": "present", "1-saturday": "absent", ... }
+    const attendanceMap = new Map<string, Record<string, string>>();
     attendance.forEach((a: any) => {
       if (!attendanceMap.has(a.user_id)) attendanceMap.set(a.user_id, {});
-      attendanceMap.get(a.user_id)![a.week_number] = a.status;
+      const key = `${a.week_number}-${a.session_day || 'friday'}`;
+      attendanceMap.get(a.user_id)![key] = a.status;
     });
 
     const reviewMap = new Map<string, Set<number>>();
@@ -121,11 +110,11 @@ const StudentTracking = () => {
       const assWeeks = assignMap.get(p.id) ?? new Set<number>();
       const hasCommitment = commitUserIds.has(p.id) || commitEmails.has(p.email);
 
-      // Progress: commitment(10%) + attendance(40%) + assignments(25%) + reflections(25%)
-      const attCount = Object.values(att).filter((v) => v === "present").length;
+      // Count sessions attended (out of 16 total: 8 weeks × 2 days)
+      const attCount = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "present").length;
       const commitScore = hasCommitment ? 10 : 0;
-      const attScore = (attCount / 8) * 40;
-      const assScore = (assWeeks.size / 6) * 25; // 6 assignment weeks
+      const attScore = (attCount / 16) * 40;
+      const assScore = (assWeeks.size / 6) * 25;
       const revScore = (revWeeks.size / 8) * 25;
       const progress = Math.round(commitScore + attScore + assScore + revScore);
 
@@ -133,6 +122,10 @@ const StudentTracking = () => {
       if (progress >= 90) status = "Completed Program";
       else if (progress <= 20 && revWeeks.size === 0 && attCount === 0) status = "Inactive";
       else if (progress < 50) status = "Falling Behind";
+
+      // Auto-withdrawal: 3+ missed sessions
+      const missedSessions = SESSIONS.filter(s => att[`${s.week}-${s.day}`] === "absent").length;
+      if (missedSessions >= 3) status = "Withdrawn";
 
       return {
         id: p.id,
@@ -153,37 +146,34 @@ const StudentTracking = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchAll();
-  }, []);
+  useEffect(() => { fetchAll(); }, []);
 
   const filtered = useMemo(
-    () =>
-      students.filter(
-        (s) =>
-          s.full_name.toLowerCase().includes(search.toLowerCase()) ||
-          s.email.toLowerCase().includes(search.toLowerCase())
-      ),
+    () => students.filter(s =>
+      s.full_name.toLowerCase().includes(search.toLowerCase()) ||
+      s.email.toLowerCase().includes(search.toLowerCase())
+    ),
     [students, search]
   );
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  const toggleAttendance = async (studentId: string, week: number, current: string | undefined) => {
+  const toggleAttendance = async (studentId: string, week: number, day: string, current: string | undefined) => {
     const newStatus = current === "present" ? "absent" : "present";
-    setSavingAttendance(`${studentId}-${week}`);
+    const key = `${studentId}-${week}-${day}`;
+    setSavingAttendance(key);
     const { error } = await supabase.from("student_attendance").upsert(
-      { user_id: studentId, week_number: week, status: newStatus, marked_by: user!.id },
-      { onConflict: "user_id,week_number" }
+      { user_id: studentId, week_number: week, session_day: day, status: newStatus, marked_by: user!.id } as any,
+      { onConflict: "user_id,week_number,session_day" }
     );
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      setStudents((prev) =>
-        prev.map((s) =>
+      setStudents(prev =>
+        prev.map(s =>
           s.id === studentId
-            ? { ...s, attendance: { ...s.attendance, [week]: newStatus } }
+            ? { ...s, attendance: { ...s.attendance, [`${week}-${day}`]: newStatus } }
             : s
         )
       );
@@ -203,8 +193,8 @@ const StudentTracking = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Note saved" });
-      setStudents((prev) =>
-        prev.map((s) =>
+      setStudents(prev =>
+        prev.map(s =>
           s.id === noteStudentId ? { ...s, notes: [noteText.trim(), ...s.notes] } : s
         )
       );
@@ -215,16 +205,19 @@ const StudentTracking = () => {
   };
 
   const exportData = (format: "xlsx" | "csv") => {
-    const rows = filtered.map((s) => {
+    const rows = filtered.map(s => {
       const row: Record<string, any> = {
         Name: s.full_name,
         Email: s.email,
         "Date Registered": new Date(s.created_at).toLocaleDateString(),
-        "Dashboard Account": "Yes",
         "Commitment Form": s.hasCommitment ? "Yes" : "No",
       };
-      WEEKS.forEach((w) => {
-        row[`Week ${w} Attendance`] = s.attendance[w] === "present" ? "Present" : s.attendance[w] === "absent" ? "Absent" : "—";
+      SESSIONS.forEach(sess => {
+        const key = `${sess.week}-${sess.day}`;
+        const val = s.attendance[key];
+        row[`${sess.label} Attendance`] = val === "present" ? "Present" : val === "absent" ? "Absent" : "—";
+      });
+      WEEKS.forEach(w => {
         row[`Week ${w} Reflection`] = s.reviewWeeks.has(w) ? "Yes" : "No";
         if (w <= 6) row[`Week ${w} Assignment`] = s.assignmentWeeks.has(w) ? "Yes" : "No";
       });
@@ -246,6 +239,7 @@ const StudentTracking = () => {
       case "Active": return "bg-primary/20 text-primary border-primary/30";
       case "Falling Behind": return "bg-orange-600/20 text-orange-400 border-orange-600/30";
       case "Inactive": return "bg-destructive/20 text-destructive border-destructive/30";
+      case "Withdrawn": return "bg-red-800/20 text-red-400 border-red-800/30";
       default: return "bg-muted text-muted-foreground";
     }
   };
@@ -290,17 +284,17 @@ const StudentTracking = () => {
             <TableRow className="bg-secondary/50">
               <TableHead className="sticky left-0 bg-secondary/50 z-10 min-w-[180px]">Student</TableHead>
               <TableHead className="min-w-[80px]">Commitment</TableHead>
-              {WEEKS.map((w) => (
-                <TableHead key={`att-${w}`} className="min-w-[60px] text-center">
-                  W{w} Att.
+              {SESSIONS.map(s => (
+                <TableHead key={`att-${s.week}-${s.day}`} className="min-w-[60px] text-center text-xs">
+                  {s.label}
                 </TableHead>
               ))}
-              {[1, 2, 3, 4, 5, 6].map((w) => (
+              {[1, 2, 3, 4, 5, 6].map(w => (
                 <TableHead key={`asg-${w}`} className="min-w-[60px] text-center">
                   W{w} Asgn.
                 </TableHead>
               ))}
-              {WEEKS.map((w) => (
+              {WEEKS.map(w => (
                 <TableHead key={`ref-${w}`} className="min-w-[60px] text-center">
                   W{w} Ref.
                 </TableHead>
@@ -311,7 +305,7 @@ const StudentTracking = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginated.map((s) => (
+            {paginated.map(s => (
               <TableRow key={s.id} className="hover:bg-secondary/30">
                 <TableCell className="sticky left-0 bg-card z-10">
                   <div>
@@ -326,26 +320,31 @@ const StudentTracking = () => {
                     <XCircle className="w-4 h-4 text-destructive mx-auto" />
                   )}
                 </TableCell>
-                {WEEKS.map((w) => (
-                  <TableCell key={`att-${w}`} className="text-center">
-                    <button
-                      onClick={() => toggleAttendance(s.id, w, s.attendance[w])}
-                      disabled={savingAttendance === `${s.id}-${w}`}
-                      className="p-1 rounded hover:bg-secondary transition-colors"
-                    >
-                      {savingAttendance === `${s.id}-${w}` ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mx-auto" />
-                      ) : s.attendance[w] === "present" ? (
-                        <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
-                      ) : s.attendance[w] === "absent" ? (
-                        <XCircle className="w-4 h-4 text-destructive mx-auto" />
-                      ) : (
-                        <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
-                      )}
-                    </button>
-                  </TableCell>
-                ))}
-                {[1, 2, 3, 4, 5, 6].map((w) => (
+                {SESSIONS.map(sess => {
+                  const key = `${sess.week}-${sess.day}`;
+                  const val = s.attendance[key];
+                  const savingKey = `${s.id}-${sess.week}-${sess.day}`;
+                  return (
+                    <TableCell key={`att-${key}`} className="text-center">
+                      <button
+                        onClick={() => toggleAttendance(s.id, sess.week, sess.day, val)}
+                        disabled={savingAttendance === savingKey}
+                        className="p-1 rounded hover:bg-secondary transition-colors"
+                      >
+                        {savingAttendance === savingKey ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground mx-auto" />
+                        ) : val === "present" ? (
+                          <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
+                        ) : val === "absent" ? (
+                          <XCircle className="w-4 h-4 text-destructive mx-auto" />
+                        ) : (
+                          <Minus className="w-4 h-4 text-muted-foreground mx-auto" />
+                        )}
+                      </button>
+                    </TableCell>
+                  );
+                })}
+                {[1, 2, 3, 4, 5, 6].map(w => (
                   <TableCell key={`asg-${w}`} className="text-center">
                     {s.assignmentWeeks.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />
@@ -354,7 +353,7 @@ const StudentTracking = () => {
                     )}
                   </TableCell>
                 ))}
-                {WEEKS.map((w) => (
+                {WEEKS.map(w => (
                   <TableCell key={`ref-${w}`} className="text-center">
                     {s.reviewWeeks.has(w) ? (
                       <CheckCircle2 className="w-4 h-4 text-primary mx-auto" />

@@ -1,4 +1,6 @@
-import { Quote } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Quote, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Carousel,
   CarouselContent,
@@ -7,11 +9,16 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-const testimonials = [
+interface StudentReview {
+  full_name: string;
+  written_reflection: string;
+}
+
+const staticTestimonials = [
   {
     name: "Sarah Mitchell",
     role: "Data Analyst at TechCorp",
-    content: "DataDelve transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months. The personalized approach made all the difference.",
+    content: "DataDelve transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months. The personalised approach made all the difference.",
     avatar: "SM",
   },
   {
@@ -23,13 +30,13 @@ const testimonials = [
   {
     name: "Amara Okonkwo",
     role: "Junior Data Scientist",
-    content: "From knowing nothing about SQL to confidently querying databases daily. The capstone project became the centerpiece of my portfolio.",
+    content: "From knowing nothing about SQL to confidently querying databases daily. The capstone project became the centrepiece of my portfolio.",
     avatar: "AO",
   },
   {
     name: "Michael Torres",
     role: "Marketing Analyst",
-    content: "The Data Visualization course opened my eyes to storytelling with data. Now I create reports that actually drive decisions.",
+    content: "The Data Visualisation course opened my eyes to storytelling with data. Now I create reports that actually drive decisions.",
     avatar: "MT",
   },
   {
@@ -47,6 +54,46 @@ const testimonials = [
 ];
 
 const Testimonials = () => {
+  const [studentReviews, setStudentReviews] = useState<StudentReview[]>([]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const { data } = await supabase
+        .from("weekly_reviews")
+        .select("full_name, written_reflection")
+        .not("written_reflection", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (data) {
+        setStudentReviews(
+          data.filter((r: any) => r.written_reflection && r.written_reflection.trim().length > 20)
+        );
+      }
+    };
+    fetchReviews();
+  }, []);
+
+  // Merge static + real reviews
+  const allTestimonials = [
+    ...staticTestimonials.map(t => ({
+      name: t.name,
+      role: t.role,
+      content: t.content,
+      avatar: t.avatar,
+    })),
+    ...studentReviews.map(r => ({
+      name: r.full_name,
+      role: "Delvetek Student",
+      content: r.written_reflection,
+      avatar: r.full_name
+        .split(" ")
+        .map(w => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2),
+    })),
+  ];
+
   return (
     <section id="testimonials" className="py-24 relative">
       {/* Background */}
@@ -67,22 +114,19 @@ const Testimonials = () => {
         {/* Testimonials Carousel */}
         <div className="max-w-6xl mx-auto px-12">
           <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
+            opts={{ align: "start", loop: true }}
             className="w-full"
           >
             <CarouselContent className="-ml-4">
-              {testimonials.map((testimonial) => (
-                <CarouselItem key={testimonial.name} className="pl-4 md:basis-1/2 lg:basis-1/3">
+              {allTestimonials.map((testimonial, idx) => (
+                <CarouselItem key={`${testimonial.name}-${idx}`} className="pl-4 md:basis-1/2 lg:basis-1/3">
                   <div className="h-full p-8 rounded-2xl glass hover:bg-card/80 transition-all duration-500 hover:shadow-xl hover:shadow-primary/5 relative">
                     <Quote className="w-10 h-10 text-primary/20 absolute top-6 right-6" />
-                    
-                    <p className="text-muted-foreground leading-relaxed mb-6 relative z-10">
+
+                    <p className="text-muted-foreground leading-relaxed mb-6 relative z-10 line-clamp-6">
                       "{testimonial.content}"
                     </p>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold">
                         {testimonial.avatar}
