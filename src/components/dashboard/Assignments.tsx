@@ -77,7 +77,7 @@ const Assignments = ({
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
   onScoreUpdate: () => void;
-  googleReviewConfirmed: Set<number>;
+  googleReviewConfirmed: Record<string, boolean>;
 }) => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
