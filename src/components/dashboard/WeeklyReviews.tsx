@@ -51,11 +51,6 @@ interface WeeklyReviewsProps {
   onReviewSubmitted: () => void;
 }
 
-const UNRESTRICTED_EMAILS = [
-  "edwardolamide925@gmail.com",
-  "koredesax1@gmail.com",
-  "oloyedeopeyemi253@gmail.com",
-];
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
