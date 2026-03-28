@@ -23,7 +23,7 @@ interface ClassRecording {
 interface ClassRecordingsProps {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
-  googleReviewConfirmed: Set<number>;
+  googleReviewConfirmed: Record<string, boolean>;
 }
 
 const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }: ClassRecordingsProps) => {
