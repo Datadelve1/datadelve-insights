@@ -472,23 +472,23 @@ const VideoManagement = () => {
         </div>
       )}
 
-      {/* Week coverage overview */}
+      {/* Session coverage overview */}
       <Card className="border-border bg-card">
         <CardHeader className="pb-3">
-          <CardTitle className="font-display text-sm text-foreground">Week Coverage</CardTitle>
+          <CardTitle className="font-display text-sm text-foreground">Session Coverage</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-            {WEEKS.map((w) => (
+            {SESSIONS.map((s) => (
               <div
-                key={w}
-                className={`text-center rounded-lg p-2 text-sm ${
-                  usedWeeks.has(w)
+                key={s.label}
+                className={`text-center rounded-lg p-2 text-xs ${
+                  usedWeeks.has(s.week)
                     ? "bg-primary/10 border border-primary/20 text-primary font-medium"
                     : "bg-secondary text-muted-foreground"
                 }`}
               >
-                W{w}
+                {s.label}
               </div>
             ))}
           </div>
