@@ -109,6 +109,34 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
     fetchQuestions();
   }, []);
 
+  const triggerGoogleReview = (weekNum: number) => {
+    setPendingWeek(weekNum);
+    setGoogleReviewOpened(false);
+    setShowGoogleReview(true);
+  };
+
+  const handleGoogleReviewOpen = () => {
+    const suggestedText = `I'm currently enrolled in Delvetek's Data Analysis training program and it has been an incredible experience. The sessions are practical, well-structured, and the tutors are knowledgeable. I highly recommend Delvetek for anyone looking to build a career in data and tech.`;
+    navigator.clipboard.writeText(suggestedText).then(() => {
+      toast({ title: "Review text copied! 📋", description: "Paste it in the Google Review box and customize it." });
+    }).catch(() => {});
+    window.open(GOOGLE_REVIEW_URL, "_blank");
+    setGoogleReviewOpened(true);
+  };
+
+  const handleGoogleReviewConfirm = async () => {
+    if (!user || !pendingWeek) return;
+    await supabase.from("google_review_confirmations" as any).insert({
+      user_id: user.id,
+      week_number: pendingWeek,
+    });
+    setShowGoogleReview(false);
+    setPendingWeek(null);
+    setGoogleReviewOpened(false);
+    toast({ title: "Google Review confirmed! ✅", description: "Thank you for supporting Delvetek." });
+    onReviewSubmitted();
+  };
+
   const resetForm = () => {
     setClassName("Data Analysis");
     setClassDate("");
