@@ -107,7 +107,7 @@ const VideoManagement = () => {
     setEditingId(rec.id);
     setTitle(rec.title);
     setDescription(rec.description || "");
-    setWeekNumber(`${rec.week_number}-Fri`);
+    setWeekNumber(`${rec.week_number}-${(rec as any).session_day === "saturday" ? "Sat" : "Fri"}`);
     setVideoSource("url");
     setVideoUrl(rec.video_url);
     setVideoFile(null);
@@ -131,7 +131,9 @@ const VideoManagement = () => {
     }
 
     setSubmitting(true);
-    const parsedWeek = parseInt(weekNumber.split("-")[0]);
+    const parts = weekNumber.split("-");
+    const parsedWeek = parseInt(parts[0]);
+    const sessionDay = parts[1]?.toLowerCase() === "sat" ? "saturday" : "friday";
     try {
       let finalUrl = videoUrl.trim();
 
@@ -163,6 +165,7 @@ const VideoManagement = () => {
           title: title.trim(),
           description: description.trim() || null,
           week_number: parsedWeek,
+          session_day: sessionDay,
         };
         // Only update URL if a new video was provided
         if (finalUrl && (needsUpload || hasUrl)) {
@@ -180,8 +183,9 @@ const VideoManagement = () => {
           title: title.trim(),
           description: description.trim() || null,
           week_number: parsedWeek,
+          session_day: sessionDay,
           video_url: finalUrl,
-        });
+        } as any);
         if (error) throw error;
         toast({ title: "Recording added! 🎬" });
       }
@@ -412,7 +416,7 @@ const VideoManagement = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          Week {rec.week_number}
+                          Week {rec.week_number} {(rec as any).session_day === "saturday" ? "Sat" : "Fri"}
                         </span>
                         <h3 className="font-display font-semibold text-foreground">
                           {rec.title}

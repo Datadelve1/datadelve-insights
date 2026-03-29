@@ -244,7 +244,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
     try {
       // Upload video
       const ext = videoFile.name.split(".").pop();
-      const storagePath = `reviews/${user.id}/week-${weekNum}-saturday/${Date.now()}.${ext}`;
+      const storagePath = `${user.id}/reviews/week-${weekNum}-saturday/${Date.now()}.${ext}`;
       setUploadProgress(10);
 
       const { error: uploadError } = await supabase.storage

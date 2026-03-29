@@ -165,6 +165,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          session_day: string
           title: string
           video_url: string
           week_number: number
@@ -173,6 +174,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          session_day?: string
           title: string
           video_url: string
           week_number: number
@@ -181,6 +183,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          session_day?: string
           title?: string
           video_url?: string
           week_number?: number
