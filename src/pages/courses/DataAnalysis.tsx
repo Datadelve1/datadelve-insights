@@ -6,6 +6,7 @@ const DataAnalysis = () => (
     title="Data Analysis"
     tagline="Master data analysis from fundamentals to advanced, and build a portfolio of real-world projects."
     icon={BarChart2}
+    registrationClosed
     skills={["SQL", "Excel", "Power BI", "Data Cleaning", "Visualization", "Reporting"]}
     faqs={[
       { question: "Do I need prior experience?", answer: "No, the program covers fundamentals to advanced topics so you can start from scratch." },
