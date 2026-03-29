@@ -1,0 +1,1 @@
+ALTER TABLE public.class_recordings DROP CONSTRAINT class_recordings_week_number_key;
