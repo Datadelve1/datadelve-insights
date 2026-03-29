@@ -183,8 +183,9 @@ const VideoManagement = () => {
           title: title.trim(),
           description: description.trim() || null,
           week_number: parsedWeek,
+          session_day: sessionDay,
           video_url: finalUrl,
-        });
+        } as any);
         if (error) throw error;
         toast({ title: "Recording added! 🎬" });
       }
