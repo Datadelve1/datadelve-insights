@@ -416,7 +416,7 @@ const VideoManagement = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          Week {rec.week_number}
+                          Week {rec.week_number} {(rec as any).session_day === "saturday" ? "Sat" : "Fri"}
                         </span>
                         <h3 className="font-display font-semibold text-foreground">
                           {rec.title}
