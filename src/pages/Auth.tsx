@@ -40,53 +40,44 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: form.email.trim(),
-          password: form.password,
-        });
-        if (error) throw error;
+      const { error } = await supabase.auth.signInWithPassword({
+        email: form.email.trim(),
+        password: form.password,
+      });
+      if (error) throw error;
 
-        // Check if user is admin and redirect accordingly
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser) {
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", authUser.id);
-          const hasAdmin = roles?.some((r: any) => r.role === "admin");
-          if (hasAdmin) {
-            navigate("/admin/dashboard");
-            return;
-          }
-        }
-        navigate("/dashboard");
-      } else {
-        if (!form.full_name.trim()) {
-          toast({ title: "Full name is required", variant: "destructive" });
+      // Check if student is withdrawn
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("student_status")
+          .eq("id", authUser.id)
+          .single();
+
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", authUser.id);
+        const hasAdmin = roles?.some((r: any) => r.role === "admin");
+
+        if (!hasAdmin && profileData?.student_status === "withdrawn") {
+          await supabase.auth.signOut();
+          toast({
+            title: "Account Withdrawn",
+            description: "You have been withdrawn from the Delvetek program. Please contact support if you believe this is an error.",
+            variant: "destructive",
+          });
           setIsLoading(false);
           return;
         }
-        if (form.password.length < 6) {
-          toast({ title: "Password must be at least 6 characters", variant: "destructive" });
-          setIsLoading(false);
+
+        if (hasAdmin) {
+          navigate("/admin/dashboard");
           return;
         }
-        const { error } = await supabase.auth.signUp({
-          email: form.email.trim(),
-          password: form.password,
-          options: {
-            data: { full_name: form.full_name.trim() },
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (error) throw error;
-        toast({
-          title: "Account created! 🎉",
-          description: "You can now sign in with your credentials.",
-        });
-        setIsLogin(true);
       }
+      navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
