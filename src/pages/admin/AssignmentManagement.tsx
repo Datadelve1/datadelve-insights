@@ -39,6 +39,8 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
+  Users,
+  Eye,
 } from "lucide-react";
 
 interface Assignment {
@@ -48,6 +50,18 @@ interface Assignment {
   description: string | null;
   questions: string[];
   created_at: string;
+}
+
+interface Submission {
+  id: string;
+  user_id: string;
+  assignment_id: string;
+  answers: any[];
+  score: number;
+  total: number;
+  created_at: string;
+  studentName?: string;
+  studentEmail?: string;
 }
 
 const AssignmentManagement = () => {
@@ -63,6 +77,14 @@ const AssignmentManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<string[]>(["", "", "", "", ""]);
+
+  // Submissions state
+  const [submissionsDialogOpen, setSubmissionsDialogOpen] = useState(false);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
+  const [expandedSubmissionId, setExpandedSubmissionId] = useState<string | null>(null);
+  const [submissionCounts, setSubmissionCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchAssignments();
@@ -82,6 +104,66 @@ const AssignmentManagement = () => {
     }));
     setAssignments(parsed);
     setLoading(false);
+
+    // Fetch submission counts per assignment
+    if (parsed.length > 0) {
+      const { data: subData } = await supabase
+        .from("assignment_submissions")
+        .select("assignment_id");
+      if (subData) {
+        const counts: Record<string, number> = {};
+        subData.forEach((s: any) => {
+          counts[s.assignment_id] = (counts[s.assignment_id] || 0) + 1;
+        });
+        setSubmissionCounts(counts);
+      }
+    }
+  };
+
+  const fetchSubmissions = async (assignment: Assignment) => {
+    setViewingAssignment(assignment);
+    setSubmissionsDialogOpen(true);
+    setSubmissionsLoading(true);
+    setExpandedSubmissionId(null);
+
+    const { data: subData, error } = await supabase
+      .from("assignment_submissions")
+      .select("*")
+      .eq("assignment_id", assignment.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({ title: "Error loading submissions", description: error.message, variant: "destructive" });
+      setSubmissionsLoading(false);
+      return;
+    }
+
+    const subs = (subData || []) as any[];
+
+    // Fetch student profiles for these submissions
+    const userIds = [...new Set(subs.map((s) => s.user_id))];
+    let profileMap: Record<string, { full_name: string; email: string }> = {};
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+      if (profiles) {
+        profiles.forEach((p: any) => {
+          profileMap[p.id] = { full_name: p.full_name, email: p.email };
+        });
+      }
+    }
+
+    setSubmissions(
+      subs.map((s) => ({
+        ...s,
+        answers: typeof s.answers === "string" ? JSON.parse(s.answers) : s.answers,
+        studentName: profileMap[s.user_id]?.full_name || "Unknown",
+        studentEmail: profileMap[s.user_id]?.email || "",
+      }))
+    );
+    setSubmissionsLoading(false);
   };
 
   const resetForm = () => {
@@ -307,6 +389,7 @@ const AssignmentManagement = () => {
         <div className="space-y-3">
           {assignments.map((a) => {
             const expanded = expandedId === a.id;
+            const subCount = submissionCounts[a.id] || 0;
             return (
               <Card key={a.id} className="border-border">
                 <div
@@ -322,11 +405,22 @@ const AssignmentManagement = () => {
                         {a.title}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {a.questions.length} question{a.questions.length !== 1 ? "s" : ""}
+                        {a.questions.length} question{a.questions.length !== 1 ? "s" : ""} · {subCount} submission{subCount !== 1 ? "s" : ""}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchSubmissions(a);
+                      }}
+                    >
+                      <Eye className="w-4 h-4" /> Submissions
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -395,6 +489,85 @@ const AssignmentManagement = () => {
           })}
         </div>
       )}
+
+      {/* Submissions Dialog */}
+      <Dialog open={submissionsDialogOpen} onOpenChange={setSubmissionsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              Submissions — {viewingAssignment?.title}
+            </DialogTitle>
+          </DialogHeader>
+
+          {submissionsLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : submissions.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-muted-foreground text-sm">No submissions yet for this assignment.</p>
+            </div>
+          ) : (
+            <div className="space-y-3 mt-2">
+              <p className="text-sm text-muted-foreground">{submissions.length} student{submissions.length !== 1 ? "s" : ""} submitted</p>
+              {submissions.map((sub) => {
+                const isExpanded = expandedSubmissionId === sub.id;
+                return (
+                  <Card key={sub.id} className="border-border">
+                    <div
+                      className="flex items-center justify-between p-4 cursor-pointer"
+                      onClick={() => setExpandedSubmissionId(isExpanded ? null : sub.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-display font-bold text-xs">
+                          {sub.studentName?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{sub.studentName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {sub.studentEmail} · {new Date(sub.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-foreground">
+                          {sub.score}/{sub.total}
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    {isExpanded && viewingAssignment && (
+                      <CardContent className="border-t border-border pt-4 space-y-3">
+                        {viewingAssignment.questions.map((q: any, qi: number) => {
+                          const questionText = typeof q === "string" ? q : q.question || "";
+                          const answer = Array.isArray(sub.answers) ? sub.answers[qi] : null;
+                          const answerText = typeof answer === "string" ? answer : (answer as any)?.answer || "No answer";
+                          return (
+                            <div key={qi} className="rounded-lg bg-secondary/50 p-3 space-y-1">
+                              <p className="text-xs font-medium text-muted-foreground">
+                                Q{qi + 1}: {questionText}
+                              </p>
+                              <p className="text-sm text-foreground whitespace-pre-wrap">
+                                {answerText}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </CardContent>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
