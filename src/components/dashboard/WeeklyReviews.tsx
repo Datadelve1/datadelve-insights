@@ -151,6 +151,10 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   };
 
   const validateCommonFields = (): boolean => {
+    if (!classDate) {
+      toast({ title: "Please select the class date", variant: "destructive" });
+      return false;
+    }
     if (!topicCovered.trim()) {
       toast({ title: "Please enter the topic covered", variant: "destructive" });
       return false;
