@@ -23,9 +23,10 @@ interface CourseDetailProps {
   icon: LucideIcon;
   skills: string[];
   faqs: CourseFAQ[];
+  registrationClosed?: boolean;
 }
 
-const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDetailProps) => {
+const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrationClosed }: CourseDetailProps) => {
   // Add certificate FAQ if not already present
   const allFaqs = [...faqs];
   const hasCertFaq = faqs.some(f => f.question.toLowerCase().includes("certificate"));
