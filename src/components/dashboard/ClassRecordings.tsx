@@ -125,7 +125,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                         </div>
                         <div>
                           <p className="font-display font-semibold text-foreground text-sm">
-                            {rec.title}
+                            {rec.title} {day === "saturday" ? "(Sat)" : "(Fri)"}
                           </p>
                           {rec.description && (
                             <p className="text-xs text-muted-foreground mt-0.5">
