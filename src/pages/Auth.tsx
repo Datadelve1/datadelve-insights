@@ -9,7 +9,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  
   const [isForgot, setIsForgot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
