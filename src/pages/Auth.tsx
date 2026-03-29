@@ -106,19 +106,6 @@ const Auth = () => {
         {/* Form */}
         <div className="rounded-2xl border border-border bg-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && !isForgot && (
-              <div className="space-y-2">
-                <Label className="text-foreground">Full Name</Label>
-                <Input
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  required={!isLogin}
-                  className="bg-secondary border-border"
-                />
-              </div>
-            )}
 
             <div className="space-y-2">
               <Label className="text-foreground">Email Address</Label>
