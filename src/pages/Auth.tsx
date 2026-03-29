@@ -159,7 +159,7 @@ const Auth = () => {
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            {isLogin && !isForgot && (
+            {!isForgot && (
               <button
                 onClick={() => setIsForgot(true)}
                 className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
@@ -167,14 +167,6 @@ const Auth = () => {
                 Forgot your password?
               </button>
             )}
-            <button
-              onClick={() => { setIsLogin(!isLogin); setIsForgot(false); }}
-              className="text-sm text-primary hover:underline block mx-auto"
-            >
-              {isLogin || isForgot
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Sign in"}
-            </button>
             {isForgot && (
               <button
                 onClick={() => setIsForgot(false)}
