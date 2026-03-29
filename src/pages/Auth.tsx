@@ -9,7 +9,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  
   const [isForgot, setIsForgot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +17,6 @@ const Auth = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    full_name: "",
     email: "",
     password: "",
   });
@@ -40,53 +39,44 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: form.email.trim(),
-          password: form.password,
-        });
-        if (error) throw error;
+      const { error } = await supabase.auth.signInWithPassword({
+        email: form.email.trim(),
+        password: form.password,
+      });
+      if (error) throw error;
 
-        // Check if user is admin and redirect accordingly
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser) {
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", authUser.id);
-          const hasAdmin = roles?.some((r: any) => r.role === "admin");
-          if (hasAdmin) {
-            navigate("/admin/dashboard");
-            return;
-          }
-        }
-        navigate("/dashboard");
-      } else {
-        if (!form.full_name.trim()) {
-          toast({ title: "Full name is required", variant: "destructive" });
+      // Check if student is withdrawn
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("student_status")
+          .eq("id", authUser.id)
+          .single();
+
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", authUser.id);
+        const hasAdmin = roles?.some((r: any) => r.role === "admin");
+
+        if (!hasAdmin && profileData?.student_status === "withdrawn") {
+          await supabase.auth.signOut();
+          toast({
+            title: "Account Withdrawn",
+            description: "You have been withdrawn from the Delvetek program. Please contact support if you believe this is an error.",
+            variant: "destructive",
+          });
           setIsLoading(false);
           return;
         }
-        if (form.password.length < 6) {
-          toast({ title: "Password must be at least 6 characters", variant: "destructive" });
-          setIsLoading(false);
+
+        if (hasAdmin) {
+          navigate("/admin/dashboard");
           return;
         }
-        const { error } = await supabase.auth.signUp({
-          email: form.email.trim(),
-          password: form.password,
-          options: {
-            data: { full_name: form.full_name.trim() },
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (error) throw error;
-        toast({
-          title: "Account created! 🎉",
-          description: "You can now sign in with your credentials.",
-        });
-        setIsLogin(true);
       }
+      navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -103,33 +93,18 @@ const Auth = () => {
             <img src={delvetekLogo} alt="Delvetek" className="h-14 w-auto rounded-xl" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join Delvetek"}
+            {isForgot ? "Reset Password" : "Welcome Back"}
           </h1>
           <p className="text-muted-foreground mt-2">
             {isForgot
               ? "Enter your email to receive a reset link"
-              : isLogin
-              ? "Sign in to access your student dashboard"
-              : "Create your account to start learning"}
+              : "Sign in to access your student dashboard"}
           </p>
         </div>
 
         {/* Form */}
         <div className="rounded-2xl border border-border bg-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && !isForgot && (
-              <div className="space-y-2">
-                <Label className="text-foreground">Full Name</Label>
-                <Input
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={form.full_name}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                  required={!isLogin}
-                  className="bg-secondary border-border"
-                />
-              </div>
-            )}
 
             <div className="space-y-2">
               <Label className="text-foreground">Email Address</Label>
@@ -176,16 +151,14 @@ const Auth = () => {
                 <><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</>
               ) : isForgot ? (
                 "Send Reset Link"
-              ) : isLogin ? (
-                "Sign In"
               ) : (
-                "Create Account"
+                "Sign In"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            {isLogin && !isForgot && (
+            {!isForgot && (
               <button
                 onClick={() => setIsForgot(true)}
                 className="text-sm text-muted-foreground hover:text-primary hover:underline block mx-auto"
@@ -193,14 +166,6 @@ const Auth = () => {
                 Forgot your password?
               </button>
             )}
-            <button
-              onClick={() => { setIsLogin(!isLogin); setIsForgot(false); }}
-              className="text-sm text-primary hover:underline block mx-auto"
-            >
-              {isLogin || isForgot
-                ? "Don't have an account? Sign up"
-                : "Already have an account? Sign in"}
-            </button>
             {isForgot && (
               <button
                 onClick={() => setIsForgot(false)}
