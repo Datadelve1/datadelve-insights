@@ -38,7 +38,8 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
       const { data } = await supabase
         .from("class_recordings")
         .select("*")
-        .order("week_number");
+        .order("week_number")
+        .order("session_day");
       setRecordings(data || []);
       setIsLoading(false);
     };
