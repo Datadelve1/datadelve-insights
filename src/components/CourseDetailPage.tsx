@@ -23,9 +23,10 @@ interface CourseDetailProps {
   icon: LucideIcon;
   skills: string[];
   faqs: CourseFAQ[];
+  registrationClosed?: boolean;
 }
 
-const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDetailProps) => {
+const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrationClosed }: CourseDetailProps) => {
   // Add certificate FAQ if not already present
   const allFaqs = [...faqs];
   const hasCertFaq = faqs.some(f => f.question.toLowerCase().includes("certificate"));
@@ -159,11 +160,22 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs }: CourseDe
 
           {/* CTA */}
           <div className="text-center">
-            <Button variant="hero" size="lg" asChild>
-              <Link to="/auth">
-                <BookOpen className="w-5 h-5" /> Enroll Now
-              </Link>
-            </Button>
+            {registrationClosed ? (
+              <div className="space-y-3">
+                <p className="text-lg font-semibold text-muted-foreground">
+                  🚫 Registration for this cohort is now closed.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Follow us on social media or join our WhatsApp group to be notified when the next cohort opens.
+                </p>
+              </div>
+            ) : (
+              <Button variant="hero" size="lg" asChild>
+                <Link to="/auth">
+                  <BookOpen className="w-5 h-5" /> Enroll Now
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </main>
