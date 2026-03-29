@@ -152,10 +152,8 @@ const Auth = () => {
                 <><Loader2 className="w-4 h-4 animate-spin" /> Please wait...</>
               ) : isForgot ? (
                 "Send Reset Link"
-              ) : isLogin ? (
-                "Sign In"
               ) : (
-                "Create Account"
+                "Sign In"
               )}
             </Button>
           </form>
