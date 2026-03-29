@@ -599,7 +599,6 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                     I consent to Delvetek using my submitted video for training proof and promotional
                     purposes.
                   </label>
-                  </label>
                 </div>
 
                 {uploadProgress > 0 && uploadProgress < 100 && (
