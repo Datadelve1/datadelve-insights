@@ -14,9 +14,9 @@ const WebinarRegistration = () => {
       title: "Data Analytics Fundamentals",
       date: "March 27th, 2026",
       time: "6:00 PM (GMT+1)",
-      spots: "25 slots available – Closing soon",
+      spots: "Registration closed",
       description: "Learn the basics of data analytics, including Excel, SQL fundamentals, and data visualization principles.",
-      registerAction: handleRegisterClick,
+      closed: true,
     },
     {
       title: "Project Management",
@@ -93,11 +93,16 @@ const WebinarRegistration = () => {
                     Coming Soon
                   </Link>
                 </Button>
+              ) : (training as any).closed ? (
+                <div className="text-center py-2">
+                  <p className="text-sm font-semibold text-muted-foreground">🚫 This cohort is now closed</p>
+                  <p className="text-xs text-muted-foreground mt-1">Follow us for next cohort updates</p>
+                </div>
               ) : (
                 <Button 
                   variant="hero-outline" 
                   className="w-full group/btn"
-                  onClick={training.registerAction}
+                  onClick={(training as any).registerAction}
                 >
                   Register Now
                   <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
