@@ -165,6 +165,7 @@ const VideoManagement = () => {
           title: title.trim(),
           description: description.trim() || null,
           week_number: parsedWeek,
+          session_day: sessionDay,
         };
         // Only update URL if a new video was provided
         if (finalUrl && (needsUpload || hasUrl)) {
