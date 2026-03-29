@@ -597,8 +597,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                   />
                   <label htmlFor="review-consent" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
                     I consent to Delvetek using my submitted video for training proof and promotional
-                    purposes. I understand this video will be reviewed by the Super Admin before being
-                    published.
+                    purposes.
+                  </label>
                   </label>
                 </div>
 
