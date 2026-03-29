@@ -18,6 +18,7 @@ interface ClassRecording {
   title: string;
   description: string;
   video_url: string;
+  session_day: string;
 }
 
 interface ClassRecordingsProps {
