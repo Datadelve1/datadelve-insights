@@ -131,7 +131,9 @@ const VideoManagement = () => {
     }
 
     setSubmitting(true);
-    const parsedWeek = parseInt(weekNumber.split("-")[0]);
+    const parts = weekNumber.split("-");
+    const parsedWeek = parseInt(parts[0]);
+    const sessionDay = parts[1]?.toLowerCase() === "sat" ? "saturday" : "friday";
     try {
       let finalUrl = videoUrl.trim();
 
