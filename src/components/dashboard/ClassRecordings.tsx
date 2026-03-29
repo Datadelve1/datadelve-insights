@@ -79,6 +79,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
           ) : (
             <div className="space-y-3">
               {recordings.map((rec) => {
+                const day = (rec as any).session_day || "friday";
                 const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin);
                 const reviewDone = isAdmin || hasReviewForWeek(rec.week_number, submittedReviews);
                 const prevWeek = rec.week_number - 1;
@@ -86,7 +87,9 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                   !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
                 );
                 const unlocked = timingOk && reviewDone && googleOk;
+                const attKey = `${rec.week_number}-${day}`;
                 const attended =
+                  attendance[attKey] === "present" ||
                   attendance[`${rec.week_number}-friday`] === "present" ||
                   attendance[`${rec.week_number}-saturday`] === "present";
 
