@@ -14,9 +14,9 @@ const WebinarRegistration = () => {
       title: "Data Analytics Fundamentals",
       date: "March 27th, 2026",
       time: "6:00 PM (GMT+1)",
-      spots: "25 slots available – Closing soon",
+      spots: "Registration closed",
       description: "Learn the basics of data analytics, including Excel, SQL fundamentals, and data visualization principles.",
-      registerAction: handleRegisterClick,
+      closed: true,
     },
     {
       title: "Project Management",
