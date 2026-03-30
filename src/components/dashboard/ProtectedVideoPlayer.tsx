@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Shield, AlertTriangle } from "lucide-react";
 
 interface ProtectedVideoPlayerProps {
@@ -7,16 +7,6 @@ interface ProtectedVideoPlayerProps {
   onClose?: () => void;
 }
 
-/**
- * Secure video player with protections against:
- * - Right-click download
- * - Keyboard shortcuts (Ctrl+S, PrintScreen, etc.)
- * - Screen recording detection (via Visibility API + blur)
- * - DevTools detection (resize heuristic)
- * - Watermark overlay for deterrence
- * - No download attribute on video element
- * - CSS overlay to block direct video interaction
- */
 const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,6 +15,55 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+
+  const pauseVideo = useCallback(() => {
+    if (videoRef.current && !videoRef.current.paused) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, []);
+
+  // Screen capture detection via Permissions API
+  useEffect(() => {
+    let permissionStatus: PermissionStatus | null = null;
+
+    const checkScreenCapturePermission = async () => {
+      try {
+        // Check if display-capture permission was granted (screen sharing active)
+        permissionStatus = await navigator.permissions.query(
+          { name: "display-capture" as PermissionName }
+        );
+        if (permissionStatus.state === "granted") {
+          setScreenRecordDetected(true);
+          pauseVideo();
+        }
+        permissionStatus.addEventListener("change", () => {
+          if (permissionStatus?.state === "granted") {
+            setScreenRecordDetected(true);
+            pauseVideo();
+          }
+        });
+      } catch {
+        // Permission API may not support display-capture in all browsers
+      }
+    };
+
+    checkScreenCapturePermission();
+
+    return () => {
+      permissionStatus?.removeEventListener("change", () => {});
+    };
+  }, [pauseVideo]);
+
+  // Monitor for Picture-in-Picture on OTHER elements (potential capture workaround)
+  useEffect(() => {
+    const handlePipEnter = () => {
+      pauseVideo();
+      setScreenRecordDetected(true);
+    };
+    document.addEventListener("enterpictureinpicture", handlePipEnter);
+    return () => document.removeEventListener("enterpictureinpicture", handlePipEnter);
+  }, [pauseVideo]);
 
   useEffect(() => {
     // Block right-click
@@ -35,7 +74,6 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
 
     // Block keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Block Ctrl+S, Ctrl+Shift+I, F12, PrintScreen, Ctrl+U, Ctrl+Shift+J
       if (
         (e.ctrlKey && e.key === "s") ||
         (e.ctrlKey && e.shiftKey && e.key === "I") ||
@@ -50,54 +88,59 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
       }
     };
 
-    // Detect screen sharing / recording via navigator.mediaDevices
-    const checkScreenCapture = async () => {
-      try {
-        if (navigator.mediaDevices && "getDisplayMedia" in navigator.mediaDevices) {
-          // We can't directly detect, but we use visibility API
-        }
-      } catch {}
-    };
-
-    // Pause video when tab is not visible (potential screen recording)
+    // Pause video when tab is not visible
     const handleVisibilityChange = () => {
-      if (document.hidden && videoRef.current && !videoRef.current.paused) {
-        videoRef.current.pause();
-        setIsPlaying(false);
+      if (document.hidden) {
+        pauseVideo();
       }
     };
 
-    // Detect window blur (alt-tab to screen recorder)
+    // Pause on window blur (alt-tab to screen recorder, OBS, etc.)
     const handleBlur = () => {
-      // Don't pause on blur as it's too aggressive for normal use
+      pauseVideo();
+    };
+
+    // Detect window resize (potential DevTools or screen capture tools)
+    let lastWidth = window.outerWidth;
+    let lastHeight = window.outerHeight;
+    const handleResize = () => {
+      const widthDiff = Math.abs(window.outerWidth - lastWidth);
+      const heightDiff = Math.abs(window.outerHeight - lastHeight);
+      // Large sudden resize could indicate DevTools opening
+      if (widthDiff > 200 || heightDiff > 200) {
+        pauseVideo();
+      }
+      lastWidth = window.outerWidth;
+      lastHeight = window.outerHeight;
     };
 
     document.addEventListener("contextmenu", handleContextMenu);
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleBlur);
-    checkScreenCapture();
+    window.addEventListener("resize", handleResize);
 
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [pauseVideo]);
 
-  // Disable PiP (picture-in-picture) which could allow external viewing
+  // Disable PiP and download
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       video.disablePictureInPicture = true;
-      // controlsList is not in TS types but works in browsers
       (video as any).controlsList?.add("nodownload");
       (video as any).controlsList?.add("noplaybackrate");
     }
   }, []);
 
   const togglePlay = () => {
+    if (screenRecordDetected) return;
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
@@ -110,15 +153,11 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
+    if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
   };
 
   const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
+    if (videoRef.current) setDuration(videoRef.current.duration);
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,8 +199,14 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
           <AlertTriangle className="w-12 h-12 text-destructive mx-auto" />
           <p className="text-foreground font-display font-bold">Screen Recording Detected</p>
           <p className="text-muted-foreground text-sm">
-            Video playback has been paused for content protection.
+            Video playback has been disabled. Screen recording or sharing is not permitted.
           </p>
+          <button
+            onClick={() => setScreenRecordDetected(false)}
+            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            I've stopped recording — Resume
+          </button>
         </div>
       </div>
     );
@@ -174,7 +219,6 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
       onDragStart={(e) => e.preventDefault()}
       style={{ userSelect: "none", WebkitUserSelect: "none" }}
     >
-      {/* Video element — no native controls to prevent download button */}
       <video
         ref={videoRef}
         src={src}
@@ -195,10 +239,14 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
         onContextMenu={(e) => e.preventDefault()}
       />
 
-      {/* Watermark overlay for deterrence */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.04]">
-        <div className="text-white text-4xl font-bold rotate-[-30deg] whitespace-nowrap">
-          DELVETEK CONFIDENTIAL
+      {/* Watermark overlay */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.06]">
+        <div className="absolute inset-0 flex flex-wrap items-center justify-center gap-16 rotate-[-30deg] scale-150">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <span key={i} className="text-white text-2xl font-bold whitespace-nowrap">
+              DELVETEK CONFIDENTIAL
+            </span>
+          ))}
         </div>
       </div>
 
@@ -218,7 +266,6 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
 
       {/* Custom controls */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 space-y-2">
-        {/* Progress bar */}
         <input
           type="range"
           min={0}
@@ -228,10 +275,8 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
           onChange={handleSeek}
           className="w-full h-1 accent-primary cursor-pointer"
         />
-
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* Play/Pause */}
             <button onClick={togglePlay} className="text-white hover:text-primary transition-colors">
               {isPlaying ? (
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -243,13 +288,9 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
                 </svg>
               )}
             </button>
-
-            {/* Time */}
             <span className="text-white text-xs font-mono">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
-
-            {/* Volume */}
             <input
               type="range"
               min={0}
@@ -260,14 +301,10 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
               className="w-16 h-1 accent-primary cursor-pointer"
             />
           </div>
-
           <div className="flex items-center gap-3">
-            {/* Protected badge */}
             <span className="flex items-center gap-1 text-[10px] text-white/50">
               <Shield className="w-3 h-3" /> Protected
             </span>
-
-            {/* Fullscreen */}
             <button onClick={toggleFullscreen} className="text-white hover:text-primary transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
@@ -277,7 +314,6 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
         </div>
       </div>
 
-      {/* Anti-screenshot CSS: blur on print */}
       <style>{`
         @media print {
           video { display: none !important; }
