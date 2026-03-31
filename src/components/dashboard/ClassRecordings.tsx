@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Video, Lock, Play, Loader2, Shield, Clock, FileText } from "lucide-react";
 import ProtectedVideoPlayer from "./ProtectedVideoPlayer";
-import { hasWeekAccess, hasReviewForWeek } from "@/lib/attendanceAccess";
+import { hasWeekAccess, hasReviewForWeek, isVideoExempt } from "@/lib/attendanceAccess";
 
 interface ClassRecording {
   id: string;
