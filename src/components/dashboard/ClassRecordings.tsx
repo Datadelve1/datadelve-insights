@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Video, Lock, Play, Loader2, Shield, Clock, FileText } from "lucide-react";
 import ProtectedVideoPlayer from "./ProtectedVideoPlayer";
-import { hasWeekAccess, hasReviewForWeek } from "@/lib/attendanceAccess";
+import { hasWeekAccess, hasReviewForWeek, isVideoExempt } from "@/lib/attendanceAccess";
 
 interface ClassRecording {
   id: string;
@@ -80,10 +80,10 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
             <div className="space-y-3">
               {recordings.map((rec) => {
                 const day = (rec as any).session_day || "friday";
-                const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin);
-                const reviewDone = isAdmin || hasReviewForWeek(rec.week_number, submittedReviews);
+                const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin, user?.id);
+                const reviewDone = isAdmin || isVideoExempt(user?.id) || hasReviewForWeek(rec.week_number, submittedReviews);
                 const prevWeek = rec.week_number - 1;
-                const googleOk = isAdmin || rec.week_number === 1 || (
+                const googleOk = isAdmin || isVideoExempt(user?.id) || rec.week_number === 1 || (
                   !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
                 );
                 const unlocked = timingOk && reviewDone && googleOk;
