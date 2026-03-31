@@ -52,6 +52,8 @@ export function hasWeekAccess(
   return (friPresent && isAfter10PMForSession(weekNumber, 'friday')) ||
          (satPresent && isAfter10PMForSession(weekNumber, 'saturday'));
 }
+
+/**
  * Full content access: attendance + timing + review gate.
  * Must have submitted review before accessing videos/assignments.
  */
