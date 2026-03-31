@@ -43,16 +43,15 @@ export function isAfter8PMForSession(weekNumber: number, day: 'friday' | 'saturd
 export function hasWeekAccess(
   weekNumber: number,
   attendance: Record<string, string>,
-  isAdmin: boolean
+  isAdmin: boolean,
+  userId?: string
 ): boolean {
-  if (isAdmin) return true;
+  if (isAdmin || isVideoExempt(userId)) return true;
   const friPresent = attendance[`${weekNumber}-friday`] === "present";
   const satPresent = attendance[`${weekNumber}-saturday`] === "present";
   return (friPresent && isAfter10PMForSession(weekNumber, 'friday')) ||
          (satPresent && isAfter10PMForSession(weekNumber, 'saturday'));
 }
-
-/**
  * Full content access: attendance + timing + review gate.
  * Must have submitted review before accessing videos/assignments.
  */
