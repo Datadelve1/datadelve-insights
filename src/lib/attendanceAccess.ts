@@ -6,7 +6,17 @@
  * 3. Review must be submitted before accessing videos/assignments
  *
  * Admins are exempt from all restrictions.
+ * Certain students are exempted from attendance/timing checks for video access.
  */
+
+/** Students who get unrestricted access to all recordings regardless of attendance */
+const VIDEO_EXEMPT_USER_IDS = new Set([
+  "5037fadb-d49c-4a29-b09b-d44e7982ecb2", // Ikediashi Joshua
+]);
+
+export function isVideoExempt(userId: string | undefined): boolean {
+  return !!userId && VIDEO_EXEMPT_USER_IDS.has(userId);
+}
 
 const PROGRAM_START_MS = new Date("2026-03-27T18:00:00+01:00").getTime();
 
