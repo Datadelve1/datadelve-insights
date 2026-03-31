@@ -59,10 +59,11 @@ export function hasContentAccess(
   weekNumber: number,
   attendance: Record<string, string>,
   submittedReviews: Record<string, boolean>,
-  isAdmin: boolean
+  isAdmin: boolean,
+  userId?: string
 ): boolean {
-  if (isAdmin) return true;
-  const weekAccess = hasWeekAccess(weekNumber, attendance, isAdmin);
+  if (isAdmin || isVideoExempt(userId)) return true;
+  const weekAccess = hasWeekAccess(weekNumber, attendance, isAdmin, userId);
   const reviewDone = hasReviewForWeek(weekNumber, submittedReviews);
   return weekAccess && reviewDone;
 }
