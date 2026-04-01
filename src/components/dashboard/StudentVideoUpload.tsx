@@ -255,7 +255,7 @@ const StudentVideoUpload = () => {
             {uploadProgress > 0 && uploadProgress < 100 && (
               <div className="space-y-1">
                 <Progress value={uploadProgress} className="h-2" />
-                <p className="text-xs text-muted-foreground">Uploading video...</p>
+                <p className="text-xs text-muted-foreground">Uploading video... {uploadProgress}%</p>
               </div>
             )}
 
