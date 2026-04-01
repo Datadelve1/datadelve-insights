@@ -36,8 +36,13 @@ const WeeklyReviewForm = () => {
   const uploadFile = async (file: File) => {
     const ext = file.name.split(".").pop();
     const path = `weekly-videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { error } = await supabase.storage.from("form-uploads").upload(path, file);
-    if (error) throw new Error(`Upload failed: ${error.message}`);
+    const { uploadWithProgress } = await import("@/lib/uploadWithProgress");
+    await uploadWithProgress({
+      bucket: "form-uploads",
+      path,
+      file,
+      onProgress: (p) => setUploadProgress(p),
+    });
     const { data } = supabase.storage.from("form-uploads").getPublicUrl(path);
     return data.publicUrl;
   };
