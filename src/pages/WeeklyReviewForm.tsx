@@ -80,10 +80,12 @@ const WeeklyReviewForm = () => {
       toast({ title: "Review submitted! 🎉", description: "Check your email for confirmation." });
       setForm({ full_name: "", email: "", week_number: "", written_reflection: "", comments: "" });
       setVideoFile(null);
+      setUploadProgress(0);
     } catch (err: any) {
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
+      setUploadProgress(0);
     }
   };
 
