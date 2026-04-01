@@ -203,12 +203,19 @@ const WeeklyReviewForm = () => {
               </div>
             </div>
 
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="space-y-1">
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-xs" style={{ color: theme.textMuted }}>Uploading video... {uploadProgress}%</p>
+              </div>
+            )}
+
             <Button
               type="submit" disabled={isLoading}
               className="w-full h-12 font-display font-semibold text-base"
               style={{ background: theme.gold, color: "#FFFFFF" }}
             >
-              {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : "Submit Review"}
+              {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> {uploadProgress > 0 ? `Uploading... ${uploadProgress}%` : "Submitting..."}</> : "Submit Review"}
             </Button>
           </form>
         </div>
