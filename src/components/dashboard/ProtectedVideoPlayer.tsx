@@ -356,4 +356,5 @@ const ProtectedVideoPlayer = ({ src, title, onClose }: ProtectedVideoPlayerProps
   );
 };
 
+
 export default ProtectedVideoPlayer;
