@@ -142,13 +142,13 @@ const VideoManagement = () => {
         const ext = videoFile.name.split(".").pop();
         const path = `week-${parsedWeek}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-        setUploadProgress(10);
-        const { error: uploadError } = await supabase.storage
-          .from("class-videos")
-          .upload(path, videoFile, { upsert: true });
-
-        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
-        setUploadProgress(80);
+        const { uploadWithProgress } = await import("@/lib/uploadWithProgress");
+        await uploadWithProgress({
+          bucket: "class-videos",
+          path,
+          file: videoFile,
+          onProgress: (p) => setUploadProgress(p),
+        });
 
         // Generate a signed URL (valid for 1 year) since bucket is private
         const { data: signedData, error: signedError } = await supabase.storage
@@ -371,7 +371,7 @@ const VideoManagement = () => {
               {uploadProgress > 0 && uploadProgress < 100 && (
                 <div className="space-y-1">
                   <Progress value={uploadProgress} className="h-2" />
-                  <p className="text-xs text-muted-foreground">Uploading video...</p>
+                  <p className="text-xs text-muted-foreground">Uploading video... {uploadProgress}%</p>
                 </div>
               )}
 

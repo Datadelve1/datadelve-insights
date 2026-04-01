@@ -8,9 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { Progress } from "@/components/ui/progress";
+
 const WeeklyReviewForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
@@ -33,8 +36,13 @@ const WeeklyReviewForm = () => {
   const uploadFile = async (file: File) => {
     const ext = file.name.split(".").pop();
     const path = `weekly-videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { error } = await supabase.storage.from("form-uploads").upload(path, file);
-    if (error) throw new Error(`Upload failed: ${error.message}`);
+    const { uploadWithProgress } = await import("@/lib/uploadWithProgress");
+    await uploadWithProgress({
+      bucket: "form-uploads",
+      path,
+      file,
+      onProgress: (p) => setUploadProgress(p),
+    });
     const { data } = supabase.storage.from("form-uploads").getPublicUrl(path);
     return data.publicUrl;
   };
@@ -72,10 +80,12 @@ const WeeklyReviewForm = () => {
       toast({ title: "Review submitted! 🎉", description: "Check your email for confirmation." });
       setForm({ full_name: "", email: "", week_number: "", written_reflection: "", comments: "" });
       setVideoFile(null);
+      setUploadProgress(0);
     } catch (err: any) {
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -193,12 +203,19 @@ const WeeklyReviewForm = () => {
               </div>
             </div>
 
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="space-y-1">
+                <Progress value={uploadProgress} className="h-2" />
+                <p className="text-xs" style={{ color: theme.textMuted }}>Uploading video... {uploadProgress}%</p>
+              </div>
+            )}
+
             <Button
               type="submit" disabled={isLoading}
               className="w-full h-12 font-display font-semibold text-base"
               style={{ background: theme.gold, color: "#FFFFFF" }}
             >
-              {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : "Submit Review"}
+              {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> {uploadProgress > 0 ? `Uploading... ${uploadProgress}%` : "Submitting..."}</> : "Submit Review"}
             </Button>
           </form>
         </div>
