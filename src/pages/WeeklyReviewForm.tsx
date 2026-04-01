@@ -8,9 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { Progress } from "@/components/ui/progress";
+
 const WeeklyReviewForm = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
