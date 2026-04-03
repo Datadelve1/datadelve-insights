@@ -75,11 +75,15 @@ Deno.serve(async (req) => {
       adminClient.from("video_access_logs").delete().eq("accessed_by", studentId),
     ]);
 
-    // Delete auth user (cascades to profiles table)
-    const { error: deleteError } = await adminClient.auth.admin.deleteUser(studentId);
-    if (deleteError) {
-      console.error("Failed to delete auth user:", deleteError);
-      return new Response(JSON.stringify({ error: "Failed to delete student account" }), {
+    // Mark student as withdrawn (keep auth user so they see a proper message on login)
+    const { error: updateError } = await adminClient
+      .from("profiles")
+      .update({ student_status: "withdrawn" })
+      .eq("id", studentId);
+
+    if (updateError) {
+      console.error("Failed to update student status:", updateError);
+      return new Response(JSON.stringify({ error: "Failed to withdraw student" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
