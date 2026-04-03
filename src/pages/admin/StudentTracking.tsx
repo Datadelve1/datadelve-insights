@@ -483,7 +483,7 @@ const StudentTracking = () => {
                       className="text-xs h-7 px-2"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm(`Withdraw ${s.full_name}?`)) withdrawStudent(s.id);
+                        if (confirm(`⚠️ Permanently withdraw ${s.full_name}? This will DELETE all their data and account. They will receive a withdrawal email and will no longer be able to log in. This action cannot be undone.`)) withdrawStudent(s.id);
                       }}
                     >
                       Withdraw
