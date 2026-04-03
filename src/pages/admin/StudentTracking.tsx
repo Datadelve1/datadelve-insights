@@ -298,12 +298,16 @@ const StudentTracking = () => {
   };
 
   const withdrawStudent = async (studentId: string) => {
-    const { error } = await supabase.from("profiles").update({ student_status: "withdrawn" }).eq("id", studentId);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Student withdrawn" });
-      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, status: "Withdrawn" } : s));
+    try {
+      const { data, error } = await supabase.functions.invoke("withdraw-student", {
+        body: { studentId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Student withdrawn", description: data?.message || "Student has been removed and notified." });
+      setStudents(prev => prev.filter(s => s.id !== studentId));
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
