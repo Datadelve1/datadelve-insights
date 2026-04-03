@@ -298,12 +298,16 @@ const StudentTracking = () => {
   };
 
   const withdrawStudent = async (studentId: string) => {
-    const { error } = await supabase.from("profiles").update({ student_status: "withdrawn" }).eq("id", studentId);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Student withdrawn" });
-      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, status: "Withdrawn" } : s));
+    try {
+      const { data, error } = await supabase.functions.invoke("withdraw-student", {
+        body: { studentId },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Student withdrawn", description: data?.message || "Student has been removed and notified." });
+      setStudents(prev => prev.filter(s => s.id !== studentId));
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
@@ -479,7 +483,7 @@ const StudentTracking = () => {
                       className="text-xs h-7 px-2"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (confirm(`Withdraw ${s.full_name}?`)) withdrawStudent(s.id);
+                        if (confirm(`⚠️ Permanently withdraw ${s.full_name}? This will DELETE all their data and account. They will receive a withdrawal email and will no longer be able to log in. This action cannot be undone.`)) withdrawStudent(s.id);
                       }}
                     >
                       Withdraw
