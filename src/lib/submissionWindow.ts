@@ -5,17 +5,7 @@
  * Weekly cycle starting from Week 1 class on Friday March 27, 2026
  */
 
-const PROGRAM_START = new Date("2026-03-27T18:00:00+01:00"); // Friday March 27 2026, 6PM WAT
-const TOTAL_WEEKS = 8;
-
-// WAT = UTC+1
-const WAT_OFFSET_MS = 1 * 60 * 60 * 1000;
-
-function nowWAT(): Date {
-  const now = new Date();
-  // Convert to WAT by getting UTC time + 1 hour
-  return new Date(now.getTime() + WAT_OFFSET_MS + now.getTimezoneOffset() * 60 * 1000);
-}
+import { PROGRAM_START, TOTAL_WEEKS } from "./programDates";
 
 export interface SubmissionWindowInfo {
   /** Is any submission window currently open? */
@@ -33,17 +23,14 @@ export interface SubmissionWindowInfo {
 }
 
 function getWindowForWeek(week: number): { open: Date; close: Date } {
-  // Week N class is on Friday of that week
-  // Friday = PROGRAM_START + (week-1)*7 days
+  // Week N's Friday = PROGRAM_START + (week-1)*7 days
   const fridayMs = PROGRAM_START.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000;
   
-  // Saturday 8 PM WAT = Friday + 1 day + 20 hours = Friday + 44 hours
-  // In UTC: Saturday 8PM WAT = Saturday 7PM UTC
-  const openMs = fridayMs + (26 * 60 * 60 * 1000); // +26 hours from Friday 6PM = Saturday 8PM
+  // Saturday 8 PM WAT = Friday 6PM WAT + 26 hours
+  const openMs = fridayMs + (26 * 60 * 60 * 1000);
   
-  // Wednesday 11:59 PM WAT = Friday + 5 days + 23h59m
-  // From Friday 6PM WAT: +5 days + 5h59m = +125h59m
-  const closeMs = fridayMs + (125 * 60 + 59) * 60 * 1000; // +125h59m from Friday 6PM
+  // Wednesday 11:59 PM WAT = Friday 6PM WAT + 125h59m
+  const closeMs = fridayMs + (125 * 60 + 59) * 60 * 1000;
 
   return {
     open: new Date(openMs),
@@ -115,8 +102,6 @@ export function getOpenWeeks(): Set<number> {
   const weeks = new Set<number>();
   for (let week = 1; week <= TOTAL_WEEKS; week++) {
     const { close } = getWindowForWeek(week);
-    // A week's window has been available if we're past its close
-    // or currently within its window
     if (now <= close) {
       const { open } = getWindowForWeek(week);
       if (now >= open) weeks.add(week);
