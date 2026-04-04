@@ -332,6 +332,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                     if (submitted) return;
                     if (!available && !isAdmin) return;
                     setActiveSession(isActive ? null : key);
+                    // Auto-fill class date when selecting a session
+                    setClassDate(s.fullDate);
                   }}
                   disabled={submitted || (!available && !isAdmin)}
                   className={`flex items-center gap-2 rounded-lg p-3 text-sm text-left transition-all ${
@@ -370,7 +372,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                       W{s.week} {isFriday ? "Fri" : "Sat"}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      {submitted
+                      {s.dateLabel} · {submitted
                         ? isFriday
                           ? "Written ✓"
                           : "Video ✓"
