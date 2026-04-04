@@ -82,11 +82,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                 const day = (rec as any).session_day || "friday";
                 const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin, user?.id);
                 const reviewDone = isAdmin || isVideoExempt(user?.id) || hasReviewForWeek(rec.week_number, submittedReviews);
-                const prevWeek = rec.week_number - 1;
-                const googleOk = isAdmin || isVideoExempt(user?.id) || rec.week_number === 1 || (
-                  !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
-                );
-                const unlocked = timingOk && reviewDone && googleOk;
+                const unlocked = timingOk && reviewDone;
                 const attKey = `${rec.week_number}-${day}`;
                 const attended =
                   attendance[attKey] === "present" ||
