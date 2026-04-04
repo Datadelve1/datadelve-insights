@@ -391,7 +391,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
             const [weekStr, day] = activeSession.split("-");
             const weekNum = parseInt(weekStr);
             const isFriday = day === "friday";
-            const sessionLabel = `Week ${weekNum} ${isFriday ? "Friday" : "Saturday"}`;
+            const sessionInfo = SESSIONS.find(s => s.week === weekNum && s.day === (isFriday ? "friday" : "saturday"));
+            const sessionLabel = `Week ${weekNum} ${isFriday ? "Friday" : "Saturday"} (${sessionInfo?.dateLabel || ""})`;
 
             const commonFields = (
               <>
