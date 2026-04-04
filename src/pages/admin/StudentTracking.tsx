@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { ALL_SESSIONS as PROGRAM_SESSIONS, getWeekSessions } from "@/lib/programDates";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -46,10 +47,11 @@ interface StudentRow {
 }
 
 const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
-const SESSIONS = WEEKS.flatMap(w => [
-  { week: w, day: "friday" as const, label: `W${w} Fri` },
-  { week: w, day: "saturday" as const, label: `W${w} Sat` },
-]);
+const SESSIONS = PROGRAM_SESSIONS.map(s => ({
+  week: s.week,
+  day: s.day,
+  label: `${s.shortLabel} (${s.dateLabel})`,
+}));
 const PAGE_SIZE = 20;
 
 const StudentTracking = () => {

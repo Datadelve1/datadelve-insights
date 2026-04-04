@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { ALL_SESSIONS as PROGRAM_SESSIONS, getSessionISODate } from "@/lib/programDates";
 import { ADMIN_EMAILS } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -54,10 +55,7 @@ interface WeeklyReviewsProps {
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
-const SESSIONS = Array.from({ length: 8 }, (_, w) => [
-  { week: w + 1, day: "friday" as const, label: `Week ${w + 1} Friday` },
-  { week: w + 1, day: "saturday" as const, label: `Week ${w + 1} Saturday` },
-]).flat();
+const SESSIONS = PROGRAM_SESSIONS;
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
 
@@ -334,6 +332,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                     if (submitted) return;
                     if (!available && !isAdmin) return;
                     setActiveSession(isActive ? null : key);
+                    // Auto-fill class date when selecting a session
+                    setClassDate(s.fullDate);
                   }}
                   disabled={submitted || (!available && !isAdmin)}
                   className={`flex items-center gap-2 rounded-lg p-3 text-sm text-left transition-all ${
@@ -372,7 +372,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                       W{s.week} {isFriday ? "Fri" : "Sat"}
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      {submitted
+                      {s.dateLabel} · {submitted
                         ? isFriday
                           ? "Written ✓"
                           : "Video ✓"
@@ -391,7 +391,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
             const [weekStr, day] = activeSession.split("-");
             const weekNum = parseInt(weekStr);
             const isFriday = day === "friday";
-            const sessionLabel = `Week ${weekNum} ${isFriday ? "Friday" : "Saturday"}`;
+            const sessionInfo = SESSIONS.find(s => s.week === weekNum && s.day === (isFriday ? "friday" : "saturday"));
+            const sessionLabel = `Week ${weekNum} ${isFriday ? "Friday" : "Saturday"} (${sessionInfo?.dateLabel || ""})`;
 
             const commonFields = (
               <>

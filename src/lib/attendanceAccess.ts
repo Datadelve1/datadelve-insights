@@ -9,6 +9,8 @@
  * Certain students are exempted from attendance/timing checks for video access.
  */
 
+import { PROGRAM_START } from "./programDates";
+
 /** Students who get unrestricted access to all recordings regardless of attendance */
 const VIDEO_EXEMPT_USER_IDS = new Set([
   "5037fadb-d49c-4a29-b09b-d44e7982ecb2", // Ikediashi Joshua
@@ -18,10 +20,12 @@ export function isVideoExempt(userId: string | undefined): boolean {
   return !!userId && VIDEO_EXEMPT_USER_IDS.has(userId);
 }
 
-const PROGRAM_START_MS = new Date("2026-03-27T18:00:00+01:00").getTime();
+const PROGRAM_START_MS = PROGRAM_START.getTime();
 
 /** Check if the current time is past 10 PM WAT for a specific session */
 export function isAfter10PMForSession(weekNumber: number, day: 'friday' | 'saturday'): boolean {
+  // Friday 10 PM WAT = PROGRAM_START (Fri 6 PM WAT) + 4 hours
+  // Saturday 10 PM WAT = PROGRAM_START + 28 hours
   const dayOffset = day === 'friday' ? 4 : 28;
   const sessionTime = PROGRAM_START_MS + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000 + dayOffset * 60 * 60 * 1000;
   return Date.now() >= sessionTime;

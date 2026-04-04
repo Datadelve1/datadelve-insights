@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { getWeekSessions } from "@/lib/programDates";
 import { useAuth } from "@/hooks/useAuth";
+import { getCurrentWeek } from "@/lib/programDates";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,7 +65,7 @@ interface Review {
 const WeeklyReports = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedWeek, setSelectedWeek] = useState("1");
+  const [selectedWeek, setSelectedWeek] = useState(String(getCurrentWeek() || 1));
   const [loading, setLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState(0);
   const [report, setReport] = useState({
@@ -231,11 +233,16 @@ const WeeklyReports = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {WEEKS.map((w) => (
-              <SelectItem key={w} value={String(w)}>
-                Week {w} {w >= 7 ? "(Project)" : ""}
-              </SelectItem>
-            ))}
+            {WEEKS.map((w) => {
+              const sessions = getWeekSessions(w);
+              const friDate = sessions.find(s => s.day === "friday")?.dateLabel || "";
+              const satDate = sessions.find(s => s.day === "saturday")?.dateLabel || "";
+              return (
+                <SelectItem key={w} value={String(w)}>
+                  Week {w} {w >= 7 ? "(Project)" : ""} — {friDate} &amp; {satDate}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
