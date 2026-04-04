@@ -65,7 +65,7 @@ interface Review {
 const WeeklyReports = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedWeek, setSelectedWeek] = useState("1");
+  const [selectedWeek, setSelectedWeek] = useState(String(getCurrentWeek() || 1));
   const [loading, setLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState(0);
   const [report, setReport] = useState({
