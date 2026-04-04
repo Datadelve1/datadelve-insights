@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getWeekSessions } from "@/lib/programDates";
 import { useAuth } from "@/hooks/useAuth";
+import { getCurrentWeek } from "@/lib/programDates";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
