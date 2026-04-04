@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { ALL_SESSIONS as PROGRAM_SESSIONS, getSessionISODate } from "@/lib/programDates";
 import { ADMIN_EMAILS } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
