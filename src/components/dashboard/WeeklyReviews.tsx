@@ -55,10 +55,7 @@ interface WeeklyReviewsProps {
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
-const SESSIONS = Array.from({ length: 8 }, (_, w) => [
-  { week: w + 1, day: "friday" as const, label: `Week ${w + 1} Friday` },
-  { week: w + 1, day: "saturday" as const, label: `Week ${w + 1} Saturday` },
-]).flat();
+const SESSIONS = PROGRAM_SESSIONS;
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
 
