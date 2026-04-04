@@ -232,11 +232,16 @@ const WeeklyReports = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {WEEKS.map((w) => (
-              <SelectItem key={w} value={String(w)}>
-                Week {w} {w >= 7 ? "(Project)" : ""}
-              </SelectItem>
-            ))}
+            {WEEKS.map((w) => {
+              const sessions = getWeekSessions(w);
+              const friDate = sessions.find(s => s.day === "friday")?.dateLabel || "";
+              const satDate = sessions.find(s => s.day === "saturday")?.dateLabel || "";
+              return (
+                <SelectItem key={w} value={String(w)}>
+                  Week {w} {w >= 7 ? "(Project)" : ""} — {friDate} &amp; {satDate}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
