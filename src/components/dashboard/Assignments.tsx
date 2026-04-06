@@ -170,12 +170,7 @@ const Assignments = ({
 
               const reviewDone = isAdmin || isUnrestricted || hasReviewForWeek(assignment.week_number, submittedReviews);
 
-              const prevWeek = assignment.week_number - 1;
-              const googleOk = isAdmin || isUnrestricted || assignment.week_number === 1 || (
-                !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
-              );
-
-              const weekAccess = timingOk && reviewDone && googleOk;
+              const weekAccess = timingOk && reviewDone;
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
