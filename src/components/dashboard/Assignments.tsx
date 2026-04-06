@@ -42,12 +42,10 @@ const Assignments = ({
   attendance,
   submittedReviews,
   onScoreUpdate,
-  googleReviewConfirmed,
 }: {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
   onScoreUpdate: () => void;
-  googleReviewConfirmed: Record<string, boolean>;
 }) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
@@ -172,12 +170,7 @@ const Assignments = ({
 
               const reviewDone = isAdmin || isUnrestricted || hasReviewForWeek(assignment.week_number, submittedReviews);
 
-              const prevWeek = assignment.week_number - 1;
-              const googleOk = isAdmin || isUnrestricted || assignment.week_number === 1 || (
-                !!googleReviewConfirmed[`${prevWeek}-friday`] && !!googleReviewConfirmed[`${prevWeek}-saturday`]
-              );
-
-              const weekAccess = timingOk && reviewDone && googleOk;
+              const weekAccess = timingOk && reviewDone;
               const isActive = activeAssignment === assignment.id;
               const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
               const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
@@ -186,7 +179,6 @@ const Assignments = ({
               if (!attended && !isAdmin && !isUnrestricted) lockMessage = "Attendance required";
               else if (!timingOk) lockMessage = "Available after 8 PM";
               else if (!reviewDone) lockMessage = "Submit review first";
-              else if (!googleOk) lockMessage = `Confirm Google Review for Week ${prevWeek}`;
 
               return (
                 <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
