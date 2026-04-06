@@ -42,12 +42,10 @@ const Assignments = ({
   attendance,
   submittedReviews,
   onScoreUpdate,
-  googleReviewConfirmed,
 }: {
   attendance: Record<string, string>;
   submittedReviews: Record<string, boolean>;
   onScoreUpdate: () => void;
-  googleReviewConfirmed: Record<string, boolean>;
 }) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
