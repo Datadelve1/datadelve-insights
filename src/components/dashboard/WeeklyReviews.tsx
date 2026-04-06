@@ -244,22 +244,24 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
 
     setIsSubmitting(true);
     try {
-      // Upload video
+      // Upload video with real-time progress
       const ext = videoFile.name.split(".").pop();
       const storagePath = `${user.id}/reviews/week-${weekNum}-saturday/${Date.now()}.${ext}`;
-      setUploadProgress(10);
 
-      const { error: uploadError } = await supabase.storage
-        .from("student-videos")
-        .upload(storagePath, videoFile, { upsert: false });
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
-      setUploadProgress(70);
+      const { uploadWithProgress } = await import("@/lib/uploadWithProgress");
+      await uploadWithProgress({
+        bucket: "student-videos",
+        path: storagePath,
+        file: videoFile,
+        onProgress: (p) => setUploadProgress(p),
+      });
+      setUploadProgress(92);
 
       const { data: signedData, error: signedError } = await supabase.storage
         .from("student-videos")
         .createSignedUrl(storagePath, 365 * 24 * 60 * 60);
       if (signedError) throw signedError;
-      setUploadProgress(90);
+      setUploadProgress(95);
 
       const { error } = await supabase.from("weekly_reviews").insert({
         user_id: user.id,
