@@ -141,6 +141,9 @@ const Assignments = ({
         <CardTitle className="font-display flex items-center gap-2 text-foreground">
           <BookOpen className="w-5 h-5 text-primary" /> Weekly Assignments
         </CardTitle>
+        <p className="text-xs text-muted-foreground mt-1">
+          ⏰ Assignment submissions close every <span className="font-semibold text-foreground">Wednesday at 11:59 PM WAT</span>
+        </p>
       </CardHeader>
       <CardContent>
         {assignments.length === 0 ? (
