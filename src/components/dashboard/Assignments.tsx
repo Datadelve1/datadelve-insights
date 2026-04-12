@@ -6,9 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
   BookOpen,
-  CheckCircle2,
   Lock,
   Loader2,
   Trophy,
@@ -16,10 +16,11 @@ import {
   ChevronUp,
   Clock,
   FileText,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
 } from "lucide-react";
 import { useSubmissionWindow } from "./SubmissionWindowBanner";
-import { hasReviewForWeek, canSubmitReview } from "@/lib/attendanceAccess";
-
 
 interface Assignment {
   id: string;
@@ -29,14 +30,64 @@ interface Assignment {
   questions: string[];
 }
 
+interface Evaluation {
+  result: string;
+  score: number;
+  feedback: string;
+  correct_answer: string;
+}
+
 interface Submission {
   id: string;
   assignment_id: string;
   score: number;
   total: number;
   answers: any;
+  evaluation: Evaluation[] | null;
   created_at: string;
 }
+
+// Model answers and key concepts for AI evaluation
+const MODEL_DATA: Record<number, { modelAnswers: string[]; keyConcepts: string[] }> = {
+  // Week-based mapping; currently all assignments use same set
+};
+
+const DEFAULT_MODEL_DATA = {
+  modelAnswers: [
+    "A JOIN combines data from multiple tables horizontally by linking columns based on a relationship, while UNION combines the results of multiple queries vertically by stacking rows.",
+    "All SELECT queries must have the same number of columns, compatible data types, and the same column order.",
+    "UNION removes duplicate rows from the result set, while UNION ALL includes all rows, including duplicates.",
+    "Yes, ORDER BY can be used, and it must be placed at the end of the entire UNION query, not within individual SELECT statements.",
+    "JOINs can be used inside individual SELECT statements to combine related tables, and then UNION can be used to combine the results of those SELECT queries into a single result set.",
+  ],
+  keyConcepts: [
+    "JOIN combines columns; UNION combines rows; horizontal vs vertical",
+    "same number of columns; compatible data types; same column order",
+    "UNION removes duplicates; UNION ALL keeps duplicates",
+    "ORDER BY allowed; placed at end of query; not inside individual SELECTs",
+    "JOIN used inside SELECT; UNION combines SELECT results; both can be used together",
+  ],
+};
+
+const getResultIcon = (result: string) => {
+  const r = result.toLowerCase();
+  if (r === "correct") return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+  if (r.includes("partial")) return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+  return <XCircle className="w-5 h-5 text-red-500" />;
+};
+
+const getResultColor = (result: string) => {
+  const r = result.toLowerCase();
+  if (r === "correct") return "border-green-500/30 bg-green-500/5";
+  if (r.includes("partial")) return "border-yellow-500/30 bg-yellow-500/5";
+  return "border-red-500/30 bg-red-500/5";
+};
+
+const getScoreColor = (score: number) => {
+  if (score >= 5) return "text-green-500";
+  if (score >= 3) return "text-yellow-500";
+  return "text-red-500";
+};
 
 const Assignments = ({
   attendance,
@@ -49,8 +100,7 @@ const Assignments = ({
 }) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
-    isAdmin ||
-    ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
+    isAdmin || ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
   const { toast } = useToast();
   const windowInfo = useSubmissionWindow();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -59,6 +109,9 @@ const Assignments = ({
   const [activeAssignment, setActiveAssignment] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
+  const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -72,7 +125,8 @@ const Assignments = ({
     ]);
     const parsedAssignments = (assignData || []).map((a: any) => ({
       ...a,
-      questions: typeof a.questions === "string" ? JSON.parse(a.questions) : a.questions,
+      questions:
+        typeof a.questions === "string" ? JSON.parse(a.questions) : a.questions,
     }));
     setAssignments(parsedAssignments);
     const subMap: Record<string, Submission> = {};
@@ -84,8 +138,12 @@ const Assignments = ({
   };
 
   const handleSubmitAssignment = async (assignment: Assignment) => {
-    const questions = assignment.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""));
-    const unanswered = questions.filter((_: string, i: number) => !answers[i]?.trim());
+    const questions = assignment.questions.map((q: any) =>
+      typeof q === "string" ? q : q.question || ""
+    );
+    const unanswered = questions.filter(
+      (_: string, i: number) => !answers[i]?.trim()
+    );
     if (unanswered.length > 0) {
       toast({
         title: "Please answer all questions",
@@ -96,22 +154,58 @@ const Assignments = ({
     }
 
     setIsSubmitting(true);
+    setIsEvaluating(true);
+    setLatestEvaluation(null);
+
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
+      const modelData = MODEL_DATA[assignment.week_number] || DEFAULT_MODEL_DATA;
+
+      // Call AI evaluation
+      let evaluations: Evaluation[] | null = null;
+      try {
+        const { data: evalData, error: evalError } = await supabase.functions.invoke(
+          "evaluate-assignment",
+          {
+            body: {
+              questions,
+              studentAnswers: answersData,
+              modelAnswers: modelData.modelAnswers,
+              keyConcepts: modelData.keyConcepts,
+            },
+          }
+        );
+        if (!evalError && evalData?.evaluations) {
+          evaluations = evalData.evaluations;
+        }
+      } catch (e) {
+        console.error("Evaluation error:", e);
+      }
+
+      const totalScore = evaluations
+        ? evaluations.reduce((sum, ev) => sum + (ev.score || 0), 0)
+        : questions.length;
+      const totalPossible = questions.length * 5;
 
       const { error } = await supabase.from("assignment_submissions").insert({
         assignment_id: assignment.id,
         user_id: user!.id,
         answers: answersData,
-        score: questions.length,
-        total: questions.length,
+        score: totalScore,
+        total: totalPossible,
+        evaluation: evaluations,
       } as any);
 
       if (error) throw error;
 
+      setLatestEvaluation(evaluations);
+      setShowEvaluation(assignment.id);
+
       toast({
-        title: "Assignment submitted! ✅",
-        description: "Your answers have been recorded.",
+        title: "Assignment submitted & evaluated! ✅",
+        description: evaluations
+          ? `You scored ${totalScore}/${totalPossible} points.`
+          : "Your answers have been recorded.",
       });
 
       setActiveAssignment(null);
@@ -119,9 +213,14 @@ const Assignments = ({
       fetchData();
       onScoreUpdate();
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
+      setIsEvaluating(false);
     }
   };
 
@@ -142,7 +241,10 @@ const Assignments = ({
           <BookOpen className="w-5 h-5 text-primary" /> Weekly Assignments
         </CardTitle>
         <p className="text-xs text-muted-foreground mt-1">
-          ⏰ Assignment submissions close every <span className="font-semibold text-foreground">Wednesday at 11:59 PM WAT</span>
+          ⏰ Assignment submissions close every{" "}
+          <span className="font-semibold text-foreground">
+            Wednesday at 11:59 PM WAT
+          </span>
         </p>
       </CardHeader>
       <CardContent>
@@ -162,29 +264,36 @@ const Assignments = ({
                 typeof q === "string" ? q : q.question || ""
               );
 
-              // Access: attendance present + after 8 PM for session
-              const friAttended = attendance[`${assignment.week_number}-friday`] === "present";
-              const satAttended = attendance[`${assignment.week_number}-saturday`] === "present";
+              const friAttended =
+                attendance[`${assignment.week_number}-friday`] === "present";
+              const satAttended =
+                attendance[`${assignment.week_number}-saturday`] === "present";
               const attended = friAttended || satAttended;
 
-              const friReviewTime = isUnrestricted || canSubmitReview(assignment.week_number, "friday", attendance, isAdmin);
-              const satReviewTime = isUnrestricted || canSubmitReview(assignment.week_number, "saturday", attendance, isAdmin);
-              const timingOk = isAdmin || isUnrestricted || (friAttended && friReviewTime) || (satAttended && satReviewTime);
-
-              const reviewDone = isAdmin || isUnrestricted || hasReviewForWeek(assignment.week_number, submittedReviews);
-
-              const weekAccess = timingOk && reviewDone;
+              const weekAccess = isAdmin || isUnrestricted || attended;
               const isActive = activeAssignment === assignment.id;
-              const canSubmit = windowInfo.isOpen && windowInfo.currentWeek === assignment.week_number;
-              const windowClosed = !windowInfo.isOpen || windowInfo.currentWeek !== assignment.week_number;
+              const canSubmit =
+                windowInfo.isOpen &&
+                windowInfo.currentWeek === assignment.week_number;
+              const windowClosed =
+                !windowInfo.isOpen ||
+                windowInfo.currentWeek !== assignment.week_number;
+
+              const evalResults =
+                showEvaluation === assignment.id && latestEvaluation
+                  ? latestEvaluation
+                  : submission?.evaluation || null;
 
               let lockMessage = "";
-              if (!attended && !isAdmin && !isUnrestricted) lockMessage = "Attendance required";
-              else if (!timingOk) lockMessage = "Available after 8 PM";
-              else if (!reviewDone) lockMessage = "Submit review first";
+              if (!attended && !isAdmin && !isUnrestricted)
+                lockMessage = "Attendance required";
 
               return (
-                <div key={assignment.id} className="rounded-xl border border-border overflow-hidden">
+                <div
+                  key={assignment.id}
+                  className="rounded-xl border border-border overflow-hidden"
+                >
+                  {/* Header row */}
                   <div
                     className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
                       submission
@@ -226,7 +335,9 @@ const Assignments = ({
                           Week {assignment.week_number}: {assignment.title}
                         </p>
                         {assignment.description && (
-                          <p className="text-xs text-muted-foreground">{assignment.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {assignment.description}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -234,17 +345,13 @@ const Assignments = ({
                     <div className="flex items-center gap-2">
                       {submission ? (
                         <span className="text-sm font-display font-semibold text-primary bg-primary/10 px-3 py-1 rounded-lg">
-                          Submitted ✅
+                          {submission.total > 0
+                            ? `${submission.score}/${submission.total} pts`
+                            : "Submitted ✅"}
                         </span>
                       ) : !weekAccess ? (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
-                          {!attended && !isAdmin && !isUnrestricted ? (
-                            <Lock className="w-3 h-3" />
-                          ) : !timingOk ? (
-                            <Clock className="w-3 h-3" />
-                          ) : (
-                            <FileText className="w-3 h-3" />
-                          )}
+                          <Lock className="w-3 h-3" />
                           {lockMessage}
                         </span>
                       ) : windowClosed ? (
@@ -253,7 +360,11 @@ const Assignments = ({
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
-                          {isActive ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                          {isActive ? (
+                            <ChevronUp className="w-5 h-5" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5" />
+                          )}
                         </span>
                       )}
                     </div>
@@ -263,17 +374,24 @@ const Assignments = ({
                   {isActive && !submission && weekAccess && canSubmit && (
                     <div className="p-6 border-t border-border space-y-5 bg-card">
                       <p className="text-sm text-muted-foreground">
-                        Answer all questions below and submit before Wednesday 11:59 PM WAT.
+                        Answer all questions below and submit before Wednesday
+                        11:59 PM WAT. Your answers will be evaluated by AI.
                       </p>
                       {questions.map((q: string, qi: number) => (
-                        <div key={qi} className="space-y-2 rounded-lg border border-border p-4">
+                        <div
+                          key={qi}
+                          className="space-y-2 rounded-lg border border-border p-4"
+                        >
                           <p className="font-medium text-foreground text-sm">
                             {qi + 1}. {q}
                           </p>
                           <Textarea
                             value={answers[qi] || ""}
                             onChange={(e) =>
-                              setAnswers((prev) => ({ ...prev, [qi]: e.target.value }))
+                              setAnswers((prev) => ({
+                                ...prev,
+                                [qi]: e.target.value,
+                              }))
                             }
                             placeholder="Your answer..."
                             className="bg-secondary border-border min-h-[100px]"
@@ -288,7 +406,10 @@ const Assignments = ({
                       >
                         {isSubmitting ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            {isEvaluating
+                              ? "Evaluating your answers..."
+                              : "Submitting..."}
                           </>
                         ) : (
                           "Submit Assignment"
@@ -297,29 +418,132 @@ const Assignments = ({
                     </div>
                   )}
 
-                  {/* Submitted answers display */}
+                  {/* Evaluation / submitted answers display */}
                   {isActive && submission && (
                     <div className="p-6 border-t border-border bg-primary/5 space-y-4">
-                      <div className="text-center">
-                        <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />
+                      {/* Score summary */}
+                      <div className="text-center space-y-2">
+                        <Trophy className="w-8 h-8 text-primary mx-auto" />
                         <p className="font-display font-semibold text-foreground">
-                          Assignment Submitted
+                          Assignment Evaluated
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Submitted {new Date(submission.created_at).toLocaleDateString()}
+                        {submission.total > 0 && (
+                          <div className="space-y-1">
+                            <p className="text-lg font-bold text-foreground">
+                              {submission.score}/{submission.total} points
+                            </p>
+                            <Progress
+                              value={
+                                (submission.score / submission.total) * 100
+                              }
+                              className="h-3 mx-auto max-w-xs"
+                            />
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Submitted{" "}
+                          {new Date(submission.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      {Array.isArray(submission.answers) && (
+
+                      {/* Per-question evaluation */}
+                      {evalResults && Array.isArray(evalResults) ? (
                         <div className="space-y-3">
-                          {submission.answers.map((ans: string, i: number) => (
-                            <div key={i} className="rounded-lg bg-secondary/50 p-3">
-                              <p className="text-xs font-medium text-muted-foreground mb-1">
-                                Q{i + 1}: {questions[i] || `Question ${i + 1}`}
-                              </p>
-                              <p className="text-sm text-foreground">{ans}</p>
+                          {evalResults.map((ev: Evaluation, i: number) => (
+                            <div
+                              key={i}
+                              className={`rounded-lg border p-4 space-y-2 ${getResultColor(
+                                ev.result
+                              )}`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Q{i + 1}:{" "}
+                                  {questions[i] || `Question ${i + 1}`}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  {getResultIcon(ev.result)}
+                                  <span
+                                    className={`text-sm font-bold ${getScoreColor(
+                                      ev.score
+                                    )}`}
+                                  >
+                                    {ev.score}/5
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="rounded-md bg-secondary/50 p-3">
+                                <p className="text-xs font-medium text-muted-foreground mb-1">
+                                  Your Answer:
+                                </p>
+                                <p className="text-sm text-foreground">
+                                  {Array.isArray(submission.answers)
+                                    ? submission.answers[i]
+                                    : "—"}
+                                </p>
+                              </div>
+
+                              <div className="flex items-start gap-2">
+                                {getResultIcon(ev.result)}
+                                <div>
+                                  <span
+                                    className={`text-sm font-semibold ${
+                                      ev.result.toLowerCase() === "correct"
+                                        ? "text-green-500"
+                                        : ev.result
+                                            .toLowerCase()
+                                            .includes("partial")
+                                        ? "text-yellow-500"
+                                        : "text-red-500"
+                                    }`}
+                                  >
+                                    {ev.result}
+                                  </span>
+                                  {ev.feedback && (
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {ev.feedback}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {(ev.result.toLowerCase() !== "correct" ||
+                                ev.correct_answer) && (
+                                <div className="rounded-md bg-primary/10 p-3">
+                                  <p className="text-xs font-medium text-primary mb-1">
+                                    ✅ Correct Answer:
+                                  </p>
+                                  <p className="text-sm text-foreground">
+                                    {ev.correct_answer}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
+                      ) : (
+                        // Fallback: show raw answers if no evaluation
+                        Array.isArray(submission.answers) && (
+                          <div className="space-y-3">
+                            {submission.answers.map(
+                              (ans: string, i: number) => (
+                                <div
+                                  key={i}
+                                  className="rounded-lg bg-secondary/50 p-3"
+                                >
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                                    Q{i + 1}:{" "}
+                                    {questions[i] || `Question ${i + 1}`}
+                                  </p>
+                                  <p className="text-sm text-foreground">
+                                    {ans}
+                                  </p>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )
                       )}
                     </div>
                   )}
