@@ -23,6 +23,7 @@ import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
+import CertificatePayment from "@/components/dashboard/CertificatePayment";
 
 const Dashboard = () => {
   const { user, profile, isLoading, isAdmin, hasCommitted, isWithdrawn, signOut } = useAuth();
@@ -282,6 +283,9 @@ const Dashboard = () => {
 
         {/* Assignments */}
         <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} />
+
+        {/* Certificate Payment */}
+        <CertificatePayment />
 
         {/* Locked Features */}
         <Card className="border-border bg-card relative overflow-hidden">
