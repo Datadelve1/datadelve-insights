@@ -49,6 +49,8 @@ interface Assignment {
   title: string;
   description: string | null;
   questions: string[];
+  model_answers: string[];
+  key_concepts: string[];
   created_at: string;
 }
 
@@ -77,6 +79,8 @@ const AssignmentManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<string[]>(["", "", "", "", ""]);
+  const [modelAnswers, setModelAnswers] = useState<string[]>(["", "", "", "", ""]);
+  const [keyConcepts, setKeyConcepts] = useState<string[]>(["", "", "", "", ""]);
 
   // Submissions state
   const [submissionsDialogOpen, setSubmissionsDialogOpen] = useState(false);
@@ -101,6 +105,8 @@ const AssignmentManagement = () => {
         typeof a.questions === "string"
           ? JSON.parse(a.questions)
           : a.questions,
+      model_answers: Array.isArray(a.model_answers) ? a.model_answers : [],
+      key_concepts: Array.isArray(a.key_concepts) ? a.key_concepts : [],
     }));
     setAssignments(parsed);
     setLoading(false);
@@ -171,6 +177,8 @@ const AssignmentManagement = () => {
     setTitle("");
     setDescription("");
     setQuestions(["", "", "", "", ""]);
+    setModelAnswers(["", "", "", "", ""]);
+    setKeyConcepts(["", "", "", "", ""]);
     setEditingId(null);
   };
 
@@ -179,27 +187,50 @@ const AssignmentManagement = () => {
     setWeekNumber(a.week_number);
     setTitle(a.title);
     setDescription(a.description || "");
-    setQuestions(
-      a.questions.length > 0
-        ? a.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""))
-        : ["", "", "", "", ""]
-    );
+    const qList = a.questions.length > 0
+      ? a.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""))
+      : ["", "", "", "", ""];
+    setQuestions(qList);
+    // Pad model answers/key concepts to match question count
+    const padded = (arr: string[], len: number) => {
+      const result = [...arr];
+      while (result.length < len) result.push("");
+      return result.slice(0, len);
+    };
+    setModelAnswers(padded(a.model_answers, qList.length));
+    setKeyConcepts(padded(a.key_concepts, qList.length));
     setDialogOpen(true);
   };
 
   const addQuestion = () => {
     setQuestions([...questions, ""]);
+    setModelAnswers([...modelAnswers, ""]);
+    setKeyConcepts([...keyConcepts, ""]);
   };
 
   const removeQuestion = (idx: number) => {
     if (questions.length <= 1) return;
     setQuestions(questions.filter((_, i) => i !== idx));
+    setModelAnswers(modelAnswers.filter((_, i) => i !== idx));
+    setKeyConcepts(keyConcepts.filter((_, i) => i !== idx));
   };
 
   const updateQuestion = (idx: number, value: string) => {
     const updated = [...questions];
     updated[idx] = value;
     setQuestions(updated);
+  };
+
+  const updateModelAnswer = (idx: number, value: string) => {
+    const updated = [...modelAnswers];
+    updated[idx] = value;
+    setModelAnswers(updated);
+  };
+
+  const updateKeyConcept = (idx: number, value: string) => {
+    const updated = [...keyConcepts];
+    updated[idx] = value;
+    setKeyConcepts(updated);
   };
 
   const handleSave = async () => {
@@ -220,6 +251,8 @@ const AssignmentManagement = () => {
         title: title.trim(),
         description: description.trim() || null,
         questions: questions as any,
+        model_answers: modelAnswers as any,
+        key_concepts: keyConcepts as any,
       };
 
       if (editingId) {
