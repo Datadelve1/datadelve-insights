@@ -141,6 +141,8 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          key_concepts: Json
+          model_answers: Json
           questions: Json
           title: string
           week_number: number
@@ -149,6 +151,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          key_concepts?: Json
+          model_answers?: Json
           questions?: Json
           title: string
           week_number: number
@@ -157,6 +161,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          key_concepts?: Json
+          model_answers?: Json
           questions?: Json
           title?: string
           week_number?: number
