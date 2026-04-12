@@ -1,0 +1,1 @@
+ALTER TABLE public.assignment_submissions ADD COLUMN evaluation jsonb DEFAULT NULL;
