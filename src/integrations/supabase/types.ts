@@ -100,6 +100,7 @@ export type Database = {
           answers: Json
           assignment_id: string
           created_at: string
+          evaluation: Json | null
           id: string
           score: number
           total: number
@@ -109,6 +110,7 @@ export type Database = {
           answers?: Json
           assignment_id: string
           created_at?: string
+          evaluation?: Json | null
           id?: string
           score?: number
           total?: number
@@ -118,6 +120,7 @@ export type Database = {
           answers?: Json
           assignment_id?: string
           created_at?: string
+          evaluation?: Json | null
           id?: string
           score?: number
           total?: number
