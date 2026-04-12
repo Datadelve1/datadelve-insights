@@ -2,3 +2,9 @@ project_id = "cszwkukwkcrecirbvvee"
 
 [functions.send-webinar-confirmation]
 verify_jwt = false
+
+[functions.initialize-certificate-payment]
+verify_jwt = false
+
+[functions.verify-certificate-payment]
+verify_jwt = false
