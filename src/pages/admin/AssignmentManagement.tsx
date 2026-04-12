@@ -367,29 +367,49 @@ const AssignmentManagement = () => {
                     <Plus className="w-3 h-3" /> Add Question
                   </Button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {questions.map((q, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <span className="text-sm font-medium text-muted-foreground mt-2 w-6 shrink-0">
-                        {idx + 1}.
-                      </span>
+                    <div key={idx} className="rounded-lg border border-border p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-display font-semibold text-foreground">
+                          Question {idx + 1}
+                        </span>
+                        {questions.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeQuestion(idx)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
                       <Textarea
                         value={q}
                         onChange={(e) => updateQuestion(idx, e.target.value)}
-                        placeholder={`Question ${idx + 1}`}
+                        placeholder={`Enter question ${idx + 1}`}
                         rows={2}
-                        className="flex-1"
                       />
-                      {questions.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeQuestion(idx)}
-                          className="text-destructive hover:text-destructive mt-1"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      )}
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Model Answer</Label>
+                        <Textarea
+                          value={modelAnswers[idx] || ""}
+                          onChange={(e) => updateModelAnswer(idx, e.target.value)}
+                          placeholder="The correct/expected answer for AI evaluation"
+                          rows={2}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Key Concepts (semicolon-separated)</Label>
+                        <Input
+                          value={keyConcepts[idx] || ""}
+                          onChange={(e) => updateKeyConcept(idx, e.target.value)}
+                          placeholder="e.g. JOIN combines columns; UNION combines rows"
+                          className="mt-1"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
