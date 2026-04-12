@@ -527,11 +527,21 @@ const AssignmentManagement = () => {
                       return (
                         <div
                           key={qi}
-                          className="rounded-lg bg-secondary/50 p-3"
+                          className="rounded-lg bg-secondary/50 p-3 space-y-1"
                         >
                           <p className="text-sm text-foreground">
                             <span className="font-medium">Q{qi + 1}:</span> {questionText}
                           </p>
+                          {a.model_answers[qi] && (
+                            <p className="text-xs text-green-500">
+                              <span className="font-medium">Model:</span> {a.model_answers[qi]}
+                            </p>
+                          )}
+                          {a.key_concepts[qi] && (
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium">Concepts:</span> {a.key_concepts[qi]}
+                            </p>
+                          )}
                         </div>
                       );
                     })}
