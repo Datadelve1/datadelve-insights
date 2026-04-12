@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Award, Lock, CheckCircle2, Loader2, ExternalLink } from "lucide-react";
+import { Award, CheckCircle2, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
 
@@ -87,69 +87,7 @@ const CertificatePayment = () => {
     );
   }
 
-  // No record = not eligible yet
-  if (!cert || !cert.eligible) {
-    return (
-      <Card className="border-border bg-card relative overflow-hidden">
-        <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-10 flex items-center justify-center">
-          <div className="text-center space-y-2">
-            <Lock className="w-6 h-6 text-muted-foreground mx-auto" />
-            <p className="text-xs text-muted-foreground font-medium">
-              Complete the program to become eligible
-            </p>
-          </div>
-        </div>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="text-primary">
-              <Award className="w-6 h-6" />
-            </div>
-            <CardTitle className="font-display text-lg text-foreground">
-              Certificate of Completion
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Your certificate will be available after the admin marks you as eligible.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Paid
-  if (cert.payment_status === "paid") {
-    return (
-      <Card className="border-border bg-card border-green-500/30">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <CardTitle className="font-display text-lg text-foreground">
-                Certificate of Completion
-              </CardTitle>
-              <p className="text-xs text-green-600 font-medium">Payment Confirmed ✓</p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Your certificate payment of ₦{cert.amount.toLocaleString()} has been confirmed. Your certificate will be issued shortly.
-          </p>
-          {cert.paid_at && (
-            <p className="text-xs text-muted-foreground mt-2">
-              Paid on {new Date(cert.paid_at).toLocaleDateString()}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Eligible but not paid — verifying
+  // Verifying state
   if (verifying) {
     return (
       <Card className="border-border bg-card">
@@ -161,7 +99,71 @@ const CertificatePayment = () => {
     );
   }
 
-  // Eligible, not paid
+  // Paid AND eligible — certificate ready
+  if (cert?.payment_status === "paid" && cert?.eligible) {
+    return (
+      <Card className="border-border bg-card border-green-500/30">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <CardTitle className="font-display text-lg text-foreground">
+                Certificate of Completion
+              </CardTitle>
+              <p className="text-xs text-green-600 font-medium">Certificate Ready ✓</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Your payment of ₦{cert.amount.toLocaleString()} has been confirmed and you've completed the program. Your certificate will be issued shortly.
+          </p>
+          {cert.paid_at && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Paid on {new Date(cert.paid_at).toLocaleDateString()}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Paid but NOT yet eligible — waiting for program completion
+  if (cert?.payment_status === "paid") {
+    return (
+      <Card className="border-border bg-card border-amber-500/30">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-amber-600" />
+            </div>
+            <div>
+              <CardTitle className="font-display text-lg text-foreground">
+                Certificate of Completion
+              </CardTitle>
+              <p className="text-xs text-amber-600 font-medium">Payment Confirmed ✓</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Your payment of ₦{cert.amount.toLocaleString()} is confirmed! Your certificate will be issued once you complete the program.
+          </p>
+          {cert.paid_at && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Paid on {new Date(cert.paid_at).toLocaleDateString()}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Not yet paid — show pay button (available to all students)
+  const amount = cert?.amount ?? 10000;
+
   return (
     <Card className="border-border bg-card border-primary/30">
       <CardHeader className="pb-3">
@@ -173,14 +175,14 @@ const CertificatePayment = () => {
             <CardTitle className="font-display text-lg text-foreground">
               Certificate of Completion
             </CardTitle>
-            <p className="text-xs text-primary font-medium">You are eligible! 🎉</p>
+            <p className="text-xs text-muted-foreground font-medium">Secure your certificate early</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Congratulations! You've been marked as eligible for a certificate of completion. 
-          Pay ₦{cert.amount.toLocaleString()} to receive your official DelveTek certificate.
+          Pay ₦{amount.toLocaleString()} now to reserve your official DelveTek certificate. 
+          It will be issued once you complete the program.
         </p>
         <Button
           onClick={handlePay}
@@ -195,7 +197,7 @@ const CertificatePayment = () => {
             </>
           ) : (
             <>
-              <ExternalLink className="w-4 h-4 mr-2" /> Pay ₦{cert.amount.toLocaleString()}
+              <ExternalLink className="w-4 h-4 mr-2" /> Pay ₦{amount.toLocaleString()}
             </>
           )}
         </Button>

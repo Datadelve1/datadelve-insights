@@ -121,7 +121,7 @@ const CertificateManagement = () => {
             <Award className="w-6 h-6 text-primary" /> Certificate Management
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Mark students as eligible and track ₦10,000 certificate payments.
+            Students can pay anytime. Toggle eligibility to approve certificate issuance after program completion.
           </p>
         </div>
       </div>
@@ -186,7 +186,7 @@ const CertificateManagement = () => {
                 <div className="flex items-center gap-4 shrink-0">
                   {student.cert && statusBadge(student.cert.payment_status)}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Eligible</span>
+                    <span className="text-xs text-muted-foreground">Issue Cert</span>
                     <Switch
                       checked={student.cert?.eligible ?? false}
                       disabled={toggling === student.userId}

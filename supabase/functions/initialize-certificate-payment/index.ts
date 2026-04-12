@@ -37,25 +37,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check eligibility
-    const { data: cert, error: certError } = await supabase
+    const serviceClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // Get or create certificate payment record
+    let { data: cert } = await serviceClient
       .from("certificate_payments")
       .select("*")
       .eq("user_id", user.id)
       .single();
 
-    if (certError || !cert) {
-      return new Response(
-        JSON.stringify({ error: "No certificate record found. You may not be eligible yet." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!cert.eligible) {
-      return new Response(
-        JSON.stringify({ error: "You are not yet eligible for a certificate." }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!cert) {
+      // Auto-create record for this student
+      const { data: newCert, error: createErr } = await serviceClient
+        .from("certificate_payments")
+        .insert({ user_id: user.id, eligible: false })
+        .select()
+        .single();
+      if (createErr || !newCert) {
+        return new Response(
+          JSON.stringify({ error: "Failed to create payment record" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      cert = newCert;
     }
 
     if (cert.payment_status === "paid") {
@@ -76,7 +83,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         email: user.email,
-        amount: cert.amount * 100, // Paystack uses kobo
+        amount: cert.amount * 100,
         currency: "NGN",
         callback_url,
         metadata: {
@@ -100,11 +107,6 @@ Deno.serve(async (req) => {
     }
 
     // Save reference
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
     await serviceClient
       .from("certificate_payments")
       .update({
