@@ -155,25 +155,27 @@ const Assignments = ({
       // Only call AI evaluation if model answers are configured
       const hasModelAnswers = modelData.modelAnswers.length > 0 && modelData.modelAnswers.some(a => a.trim());
 
-      // Call AI evaluation
+      // Call AI evaluation only if model answers are configured
       let evaluations: Evaluation[] | null = null;
-      try {
-        const { data: evalData, error: evalError } = await supabase.functions.invoke(
-          "evaluate-assignment",
-          {
-            body: {
-              questions,
-              studentAnswers: answersData,
-              modelAnswers: modelData.modelAnswers,
-              keyConcepts: modelData.keyConcepts,
-            },
+      if (hasModelAnswers) {
+        try {
+          const { data: evalData, error: evalError } = await supabase.functions.invoke(
+            "evaluate-assignment",
+            {
+              body: {
+                questions,
+                studentAnswers: answersData,
+                modelAnswers: modelData.modelAnswers,
+                keyConcepts: modelData.keyConcepts,
+              },
+            }
+          );
+          if (!evalError && evalData?.evaluations) {
+            evaluations = evalData.evaluations;
           }
-        );
-        if (!evalError && evalData?.evaluations) {
-          evaluations = evalData.evaluations;
+        } catch (e) {
+          console.error("Evaluation error:", e);
         }
-      } catch (e) {
-        console.error("Evaluation error:", e);
       }
 
       const totalScore = evaluations
