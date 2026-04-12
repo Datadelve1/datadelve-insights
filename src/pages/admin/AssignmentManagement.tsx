@@ -49,6 +49,8 @@ interface Assignment {
   title: string;
   description: string | null;
   questions: string[];
+  model_answers: string[];
+  key_concepts: string[];
   created_at: string;
 }
 
@@ -77,6 +79,8 @@ const AssignmentManagement = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<string[]>(["", "", "", "", ""]);
+  const [modelAnswers, setModelAnswers] = useState<string[]>(["", "", "", "", ""]);
+  const [keyConcepts, setKeyConcepts] = useState<string[]>(["", "", "", "", ""]);
 
   // Submissions state
   const [submissionsDialogOpen, setSubmissionsDialogOpen] = useState(false);
@@ -101,6 +105,8 @@ const AssignmentManagement = () => {
         typeof a.questions === "string"
           ? JSON.parse(a.questions)
           : a.questions,
+      model_answers: Array.isArray(a.model_answers) ? a.model_answers : [],
+      key_concepts: Array.isArray(a.key_concepts) ? a.key_concepts : [],
     }));
     setAssignments(parsed);
     setLoading(false);
@@ -171,6 +177,8 @@ const AssignmentManagement = () => {
     setTitle("");
     setDescription("");
     setQuestions(["", "", "", "", ""]);
+    setModelAnswers(["", "", "", "", ""]);
+    setKeyConcepts(["", "", "", "", ""]);
     setEditingId(null);
   };
 
@@ -179,27 +187,50 @@ const AssignmentManagement = () => {
     setWeekNumber(a.week_number);
     setTitle(a.title);
     setDescription(a.description || "");
-    setQuestions(
-      a.questions.length > 0
-        ? a.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""))
-        : ["", "", "", "", ""]
-    );
+    const qList = a.questions.length > 0
+      ? a.questions.map((q: any) => (typeof q === "string" ? q : q.question || ""))
+      : ["", "", "", "", ""];
+    setQuestions(qList);
+    // Pad model answers/key concepts to match question count
+    const padded = (arr: string[], len: number) => {
+      const result = [...arr];
+      while (result.length < len) result.push("");
+      return result.slice(0, len);
+    };
+    setModelAnswers(padded(a.model_answers, qList.length));
+    setKeyConcepts(padded(a.key_concepts, qList.length));
     setDialogOpen(true);
   };
 
   const addQuestion = () => {
     setQuestions([...questions, ""]);
+    setModelAnswers([...modelAnswers, ""]);
+    setKeyConcepts([...keyConcepts, ""]);
   };
 
   const removeQuestion = (idx: number) => {
     if (questions.length <= 1) return;
     setQuestions(questions.filter((_, i) => i !== idx));
+    setModelAnswers(modelAnswers.filter((_, i) => i !== idx));
+    setKeyConcepts(keyConcepts.filter((_, i) => i !== idx));
   };
 
   const updateQuestion = (idx: number, value: string) => {
     const updated = [...questions];
     updated[idx] = value;
     setQuestions(updated);
+  };
+
+  const updateModelAnswer = (idx: number, value: string) => {
+    const updated = [...modelAnswers];
+    updated[idx] = value;
+    setModelAnswers(updated);
+  };
+
+  const updateKeyConcept = (idx: number, value: string) => {
+    const updated = [...keyConcepts];
+    updated[idx] = value;
+    setKeyConcepts(updated);
   };
 
   const handleSave = async () => {
@@ -220,6 +251,8 @@ const AssignmentManagement = () => {
         title: title.trim(),
         description: description.trim() || null,
         questions: questions as any,
+        model_answers: modelAnswers as any,
+        key_concepts: keyConcepts as any,
       };
 
       if (editingId) {
@@ -334,29 +367,49 @@ const AssignmentManagement = () => {
                     <Plus className="w-3 h-3" /> Add Question
                   </Button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {questions.map((q, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <span className="text-sm font-medium text-muted-foreground mt-2 w-6 shrink-0">
-                        {idx + 1}.
-                      </span>
+                    <div key={idx} className="rounded-lg border border-border p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-display font-semibold text-foreground">
+                          Question {idx + 1}
+                        </span>
+                        {questions.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeQuestion(idx)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
                       <Textarea
                         value={q}
                         onChange={(e) => updateQuestion(idx, e.target.value)}
-                        placeholder={`Question ${idx + 1}`}
+                        placeholder={`Enter question ${idx + 1}`}
                         rows={2}
-                        className="flex-1"
                       />
-                      {questions.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeQuestion(idx)}
-                          className="text-destructive hover:text-destructive mt-1"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      )}
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Model Answer</Label>
+                        <Textarea
+                          value={modelAnswers[idx] || ""}
+                          onChange={(e) => updateModelAnswer(idx, e.target.value)}
+                          placeholder="The correct/expected answer for AI evaluation"
+                          rows={2}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Key Concepts (semicolon-separated)</Label>
+                        <Input
+                          value={keyConcepts[idx] || ""}
+                          onChange={(e) => updateKeyConcept(idx, e.target.value)}
+                          placeholder="e.g. JOIN combines columns; UNION combines rows"
+                          className="mt-1"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -474,11 +527,21 @@ const AssignmentManagement = () => {
                       return (
                         <div
                           key={qi}
-                          className="rounded-lg bg-secondary/50 p-3"
+                          className="rounded-lg bg-secondary/50 p-3 space-y-1"
                         >
                           <p className="text-sm text-foreground">
                             <span className="font-medium">Q{qi + 1}:</span> {questionText}
                           </p>
+                          {a.model_answers[qi] && (
+                            <p className="text-xs text-green-500">
+                              <span className="font-medium">Model:</span> {a.model_answers[qi]}
+                            </p>
+                          )}
+                          {a.key_concepts[qi] && (
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium">Concepts:</span> {a.key_concepts[qi]}
+                            </p>
+                          )}
                         </div>
                       );
                     })}

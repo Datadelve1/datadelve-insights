@@ -28,6 +28,8 @@ interface Assignment {
   title: string;
   description: string;
   questions: string[];
+  model_answers: string[];
+  key_concepts: string[];
 }
 
 interface Evaluation {
@@ -47,26 +49,10 @@ interface Submission {
   created_at: string;
 }
 
-// Model answers and key concepts for AI evaluation
-const MODEL_DATA: Record<number, { modelAnswers: string[]; keyConcepts: string[] }> = {
-  // Week-based mapping; currently all assignments use same set
-};
-
-const DEFAULT_MODEL_DATA = {
-  modelAnswers: [
-    "A JOIN combines data from multiple tables horizontally by linking columns based on a relationship, while UNION combines the results of multiple queries vertically by stacking rows.",
-    "All SELECT queries must have the same number of columns, compatible data types, and the same column order.",
-    "UNION removes duplicate rows from the result set, while UNION ALL includes all rows, including duplicates.",
-    "Yes, ORDER BY can be used, and it must be placed at the end of the entire UNION query, not within individual SELECT statements.",
-    "JOINs can be used inside individual SELECT statements to combine related tables, and then UNION can be used to combine the results of those SELECT queries into a single result set.",
-  ],
-  keyConcepts: [
-    "JOIN combines columns; UNION combines rows; horizontal vs vertical",
-    "same number of columns; compatible data types; same column order",
-    "UNION removes duplicates; UNION ALL keeps duplicates",
-    "ORDER BY allowed; placed at end of query; not inside individual SELECTs",
-    "JOIN used inside SELECT; UNION combines SELECT results; both can be used together",
-  ],
+// Fallback model data used when assignments don't have model_answers configured
+const FALLBACK_MODEL_DATA = {
+  modelAnswers: [] as string[],
+  keyConcepts: [] as string[],
 };
 
 const getResultIcon = (result: string) => {
@@ -127,6 +113,8 @@ const Assignments = ({
       ...a,
       questions:
         typeof a.questions === "string" ? JSON.parse(a.questions) : a.questions,
+      model_answers: Array.isArray(a.model_answers) ? a.model_answers : [],
+      key_concepts: Array.isArray(a.key_concepts) ? a.key_concepts : [],
     }));
     setAssignments(parsedAssignments);
     const subMap: Record<string, Submission> = {};
@@ -159,27 +147,35 @@ const Assignments = ({
 
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
-      const modelData = MODEL_DATA[assignment.week_number] || DEFAULT_MODEL_DATA;
+      const modelData = {
+        modelAnswers: assignment.model_answers.length > 0 ? assignment.model_answers : FALLBACK_MODEL_DATA.modelAnswers,
+        keyConcepts: assignment.key_concepts.length > 0 ? assignment.key_concepts : FALLBACK_MODEL_DATA.keyConcepts,
+      };
 
-      // Call AI evaluation
+      // Only call AI evaluation if model answers are configured
+      const hasModelAnswers = modelData.modelAnswers.length > 0 && modelData.modelAnswers.some(a => a.trim());
+
+      // Call AI evaluation only if model answers are configured
       let evaluations: Evaluation[] | null = null;
-      try {
-        const { data: evalData, error: evalError } = await supabase.functions.invoke(
-          "evaluate-assignment",
-          {
-            body: {
-              questions,
-              studentAnswers: answersData,
-              modelAnswers: modelData.modelAnswers,
-              keyConcepts: modelData.keyConcepts,
-            },
+      if (hasModelAnswers) {
+        try {
+          const { data: evalData, error: evalError } = await supabase.functions.invoke(
+            "evaluate-assignment",
+            {
+              body: {
+                questions,
+                studentAnswers: answersData,
+                modelAnswers: modelData.modelAnswers,
+                keyConcepts: modelData.keyConcepts,
+              },
+            }
+          );
+          if (!evalError && evalData?.evaluations) {
+            evaluations = evalData.evaluations;
           }
-        );
-        if (!evalError && evalData?.evaluations) {
-          evaluations = evalData.evaluations;
+        } catch (e) {
+          console.error("Evaluation error:", e);
         }
-      } catch (e) {
-        console.error("Evaluation error:", e);
       }
 
       const totalScore = evaluations
