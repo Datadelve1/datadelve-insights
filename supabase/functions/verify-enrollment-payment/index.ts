@@ -5,15 +5,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function respond(ok: boolean, payload: Record<string, unknown>): Response {
+  return new Response(JSON.stringify({ ok, ...payload }), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const { reference } = await req.json();
     if (!reference) {
-      return new Response(JSON.stringify({ error: "Missing reference" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Missing reference" });
     }
 
     const paystackKey = Deno.env.get("PAYSTACK_SECRET_KEY");
@@ -23,16 +28,12 @@ Deno.serve(async (req) => {
     const verifyData = await verifyRes.json();
 
     if (!verifyData.status || verifyData.data.status !== "success") {
-      return new Response(JSON.stringify({ error: "Payment not successful" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Payment not successful" });
     }
 
     const metadata = verifyData.data.metadata || {};
     if (metadata.type !== "cohort2_enrollment") {
-      return new Response(JSON.stringify({ error: "Invalid payment type" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Invalid payment type" });
     }
 
     const email = verifyData.data.customer.email.toLowerCase();
@@ -55,9 +56,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (enrollment?.payment_status === "paid") {
-      return new Response(JSON.stringify({ success: true, already_processed: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(true, { success: true, already_processed: true });
     }
 
     // Generate random password
@@ -84,9 +83,7 @@ Deno.serve(async (req) => {
       );
       userId = existingUser?.id;
     } else if (userError) {
-      return new Response(JSON.stringify({ error: userError.message }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: userError.message });
     }
 
     // Update enrollment record
@@ -112,7 +109,7 @@ Deno.serve(async (req) => {
       }, { onConflict: "user_id" });
     }
 
-    // Send welcome email with login details via transactional email system
+    // Send welcome email with login details
     let emailSent = false;
     try {
       const { error: emailError } = await supabase.functions.invoke("send-transactional-email", {
@@ -156,13 +153,8 @@ Deno.serve(async (req) => {
       console.error("Email send failed:", emailErr);
     }
 
-    return new Response(
-      JSON.stringify({ success: true, password_sent: emailSent }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return respond(true, { success: true, password_sent: emailSent });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond(false, { error: err.message });
   }
 });
