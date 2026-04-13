@@ -64,7 +64,7 @@ const TermsOfService = () => {
 
             <section>
               <h2 className="font-display text-xl font-bold text-foreground mb-3">11. Contact Us</h2>
-              <p className="text-muted-foreground leading-relaxed">If you have any questions about these Terms of Service, please contact us at <a href="mailto:datadelve1@gmail.com" className="text-primary hover:underline">datadelve1@gmail.com</a>.</p>
+              <p className="text-muted-foreground leading-relaxed">If you have any questions about these Terms of Service, please contact us at <a href="mailto:info@delvetek.io" className="text-primary hover:underline">info@delvetek.io</a>.</p>
             </section>
           </div>
         </div>

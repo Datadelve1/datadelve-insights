@@ -49,7 +49,7 @@ const PrivacyPolicy = () => {
 
             <section>
               <h2 className="font-display text-xl font-bold text-foreground mb-3">8. Your Rights</h2>
-              <p className="text-muted-foreground leading-relaxed">You have the right to access, update, or delete your personal information at any time. You may also opt out of receiving promotional communications from us by following the unsubscribe instructions in those messages. To exercise any of these rights, please contact us at datadelve1@gmail.com.</p>
+              <p className="text-muted-foreground leading-relaxed">You have the right to access, update, or delete your personal information at any time. You may also opt out of receiving promotional communications from us by following the unsubscribe instructions in those messages. To exercise any of these rights, please contact us at info@delvetek.io.</p>
             </section>
 
             <section>
@@ -59,7 +59,7 @@ const PrivacyPolicy = () => {
 
             <section>
               <h2 className="font-display text-xl font-bold text-foreground mb-3">10. Contact Us</h2>
-              <p className="text-muted-foreground leading-relaxed">If you have any questions about this Privacy Policy, please contact us at <a href="mailto:datadelve1@gmail.com" className="text-primary hover:underline">datadelve1@gmail.com</a>.</p>
+              <p className="text-muted-foreground leading-relaxed">If you have any questions about this Privacy Policy, please contact us at <a href="mailto:info@delvetek.io" className="text-primary hover:underline">info@delvetek.io</a>.</p>
             </section>
           </div>
         </div>
