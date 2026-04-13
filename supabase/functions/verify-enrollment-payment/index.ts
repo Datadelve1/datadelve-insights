@@ -42,6 +42,8 @@ Deno.serve(async (req) => {
     const fullName = metadata.full_name || "";
     const track = metadata.track || "beginner";
     const certificateRequested = metadata.certificate_requested || false;
+    const classSchedule = metadata.class_schedule || "weekend";
+    const commitmentAccepted = metadata.commitment_accepted || false;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
