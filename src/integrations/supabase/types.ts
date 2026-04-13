@@ -235,6 +235,60 @@ export type Database = {
         }
         Relationships: []
       }
+      cohort2_enrollments: {
+        Row: {
+          amount_paid: number
+          certificate_requested: boolean
+          cohort: string
+          confirmed_by_admin: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          must_change_password: boolean
+          paid_at: string | null
+          payment_reference: string | null
+          payment_status: string
+          track: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          certificate_requested?: boolean
+          cohort?: string
+          confirmed_by_admin?: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          must_change_password?: boolean
+          paid_at?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          track?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          certificate_requested?: boolean
+          cohort?: string
+          confirmed_by_admin?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          must_change_password?: boolean
+          paid_at?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          track?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       google_review_confirmations: {
         Row: {
           confirmed_at: string
