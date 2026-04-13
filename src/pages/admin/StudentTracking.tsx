@@ -3,6 +3,7 @@ import { ALL_SESSIONS as PROGRAM_SESSIONS, getWeekSessions } from "@/lib/program
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +58,7 @@ const PAGE_SIZE = 20;
 const StudentTracking = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -70,6 +72,17 @@ const StudentTracking = () => {
 
   const fetchAll = async () => {
     setLoading(true);
+
+    // Get enrolled user_ids for selected cohort
+    const { data: enrollments } = await supabase
+      .from("cohort2_enrollments")
+      .select("user_id")
+      .eq("cohort", cohort)
+      .eq("payment_status", "paid");
+    const cohortUserIds = new Set(
+      (enrollments || []).map((e: any) => e.user_id).filter(Boolean) as string[]
+    );
+
     const [profilesRes, commitmentsRes, attendanceRes, reviewsRes, submissionsRes, notesRes] =
       await Promise.all([
         supabase.from("profiles").select("*").order("created_at", { ascending: false }),
@@ -82,7 +95,8 @@ const StudentTracking = () => {
         supabase.from("admin_notes").select("*").order("created_at", { ascending: false }),
       ]);
 
-    const profiles = profilesRes.data ?? [];
+    // Filter profiles to only cohort students
+    const profiles = (profilesRes.data ?? []).filter((p: any) => cohortUserIds.has(p.id));
     const commitments = commitmentsRes.data ?? [];
     const attendance = attendanceRes.data ?? [];
     const reviews = reviewsRes.data ?? [];
@@ -183,7 +197,7 @@ const StudentTracking = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [cohort]);
 
   const filtered = useMemo(
     () => students.filter(s => {
