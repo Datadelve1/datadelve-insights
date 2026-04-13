@@ -1,25 +1,22 @@
-import { Users } from "lucide-react";
+import teamCeo from "@/assets/team-ceo.jpeg";
+import teamOperations from "@/assets/team-operations.jpeg";
+import teamLead from "@/assets/team-lead.jpeg";
 
 const team = [
   {
-    name: "Co-Founder",
-    role: "Co-Founder & Lead Instructor",
-    placeholder: true,
+    name: "Co-Founder & CEO",
+    role: "Co-Founder & CEO",
+    image: teamCeo,
   },
   {
     name: "Co-Founder",
-    role: "Co-Founder & Operations Lead",
-    placeholder: true,
+    role: "Co-Founder & Operations",
+    image: teamOperations,
   },
   {
-    name: "Team Member",
-    role: "Coming Soon",
-    placeholder: true,
-  },
-  {
-    name: "Team Member",
-    role: "Coming Soon",
-    placeholder: true,
+    name: "Team Lead",
+    role: "Team Lead",
+    image: teamLead,
   },
 ];
 
@@ -39,14 +36,18 @@ const MeetTheTeam = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {team.map((member, index) => (
             <div
               key={index}
               className="group p-6 rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 text-center"
             >
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-10 h-10 text-primary" />
+              <div className="w-28 h-28 rounded-full overflow-hidden mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 border-2 border-primary/20">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
               <h3 className="font-display text-lg font-semibold text-foreground mb-1">
                 {member.name}
