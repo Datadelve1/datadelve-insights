@@ -7,7 +7,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -19,7 +18,6 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Verify caller is admin using their JWT
     const callerClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -30,7 +28,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check admin role
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
     const { data: roles } = await adminClient.from("user_roles").select("role").eq("user_id", caller.id);
     const isAdmin = roles?.some((r: any) => r.role === "admin");
@@ -62,7 +59,7 @@ Deno.serve(async (req) => {
 
     const { full_name, email } = profile;
 
-    // Delete all student data from related tables
+    // Delete all student data from ALL related tables
     await Promise.all([
       adminClient.from("training_commitments").delete().eq("user_id", studentId),
       adminClient.from("training_commitments").delete().eq("email", email),
@@ -73,73 +70,53 @@ Deno.serve(async (req) => {
       adminClient.from("google_review_confirmations").delete().eq("user_id", studentId),
       adminClient.from("admin_notes").delete().eq("user_id", studentId),
       adminClient.from("video_access_logs").delete().eq("accessed_by", studentId),
+      adminClient.from("certificate_payments").delete().eq("user_id", studentId),
+      adminClient.from("cohort2_enrollments").delete().eq("user_id", studentId),
+      adminClient.from("user_roles").delete().eq("user_id", studentId),
     ]);
 
-    // Mark student as withdrawn (keep auth user so they see a proper message on login)
-    const { error: updateError } = await adminClient
-      .from("profiles")
-      .update({ student_status: "withdrawn" })
-      .eq("id", studentId);
+    // Delete the profile
+    await adminClient.from("profiles").delete().eq("id", studentId);
 
-    if (updateError) {
-      console.error("Failed to update student status:", updateError);
-      return new Response(JSON.stringify({ error: "Failed to withdraw student" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Permanently delete the auth user
+    const { error: deleteAuthError } = await adminClient.auth.admin.deleteUser(studentId);
+    if (deleteAuthError) {
+      console.error("Failed to delete auth user:", deleteAuthError);
     }
 
     // Send withdrawal notification email
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (RESEND_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (RESEND_API_KEY && LOVABLE_API_KEY) {
       try {
-        await fetch("https://api.resend.com/emails", {
+        await fetch("https://connector-gateway.lovable.dev/resend/emails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "X-Connection-Api-Key": RESEND_API_KEY,
           },
           body: JSON.stringify({
-            from: "DELVETEK <info@datadelve.io>",
+            from: "DelveTek <onboarding@resend.dev>",
             to: [email],
             subject: "Notice of Withdrawal – Delvetek Data Analysis Training",
             html: `
               <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <img src="https://delve-insight-connect.lovable.app/delveschool-full-logo.png" alt="Delvetek" style="width: 120px; height: auto; margin-bottom: 12px;" />
-                </div>
                 <div style="background: #FFFFFF; border-radius: 12px; padding: 24px; border: 1px solid #E8E0D4;">
                   <h2 style="font-size: 22px; color: #1A1A1A; margin: 0 0 16px;">Hello ${full_name},</h2>
                   <p style="color: #5A5A5A; font-size: 15px; line-height: 1.8;">
-                    We regret to inform you that your enrollment in the <strong>Delvetek Free Data Analysis Training Program</strong> has been withdrawn.
+                    We regret to inform you that your enrollment in the <strong>Delvetek Data Analysis Training Program</strong> has been withdrawn.
                   </p>
                   <p style="color: #5A5A5A; font-size: 15px; line-height: 1.8;">
-                    As a result, your account and all associated data have been removed from the platform. You will no longer be able to access the student dashboard, recordings, assignments, or any course materials.
+                    Your account and all associated data have been permanently removed from the platform.
                   </p>
                   <p style="color: #5A5A5A; font-size: 15px; line-height: 1.8;">
-                    If you believe this was done in error, or if you have any questions, please reach out to us at <a href="mailto:info@datadelve.io" style="color: #D4A017;">info@datadelve.io</a>.
+                    If you believe this was done in error, please reach out at <a href="mailto:info@delvetek.io" style="color: #D4A017;">info@delvetek.io</a> or WhatsApp: +447775739225.
                   </p>
-                  <p style="color: #1A1A1A; font-size: 15px; margin-top: 20px;">– Delvetek Team</p>
-                </div>
-                <div style="text-align: center; border-top: 1px solid #E8E0D4; padding-top: 20px; margin-top: 20px;">
-                  <p style="color: #999; font-size: 12px;">DELVETEK — Data Analytics & Tech Education</p>
+                  <p style="color: #1A1A1A; font-size: 15px; margin-top: 20px;">– DelveTek Team</p>
                 </div>
               </div>
             `,
-          }),
-        });
-
-        // Notify admin
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "DELVETEK <info@datadelve.io>",
-            to: ["info@datadelve.io"],
-            subject: `🚫 Student Withdrawn: ${full_name}`,
-            html: `<div style="font-family: Arial; padding: 20px;"><h2>Student Withdrawn</h2><p><strong>Name:</strong> ${full_name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Withdrawn by:</strong> ${caller.email}</p><p><strong>Date:</strong> ${new Date().toISOString()}</p></div>`,
           }),
         });
       } catch (emailErr) {
@@ -147,7 +124,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ success: true, message: `${full_name} has been withdrawn and all data deleted.` }), {
+    return new Response(JSON.stringify({ success: true, message: `${full_name} has been permanently removed.` }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
