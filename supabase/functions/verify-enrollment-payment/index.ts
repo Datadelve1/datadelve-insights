@@ -141,12 +141,19 @@ Deno.serve(async (req) => {
                   <h3 style="margin-top: 0;">Your Login Details</h3>
                   <p><strong>Email:</strong> ${email}</p>
                   <p><strong>Temporary Password:</strong> ${password}</p>
-                  <p style="color: #ef4444; font-size: 14px;">⚠️ Please change your password on first login.</p>
+                  <p style="color: #ef4444; font-size: 14px;">⚠️ You MUST change your password on first login.</p>
                 </div>
-                <p>Access your dashboard here:</p>
-                <a href="https://delve-insight-connect.lovable.app/auth" style="display: inline-block; background: #0ea5e9; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Go to Dashboard</a>
-                <p style="margin-top: 20px; color: #666; font-size: 14px;">Classes start June 5. See you there!</p>
-                ${certificateRequested ? '<p style="color: #22c55e; font-size: 14px;">✅ Certificate payment included — it will be issued upon completion.</p>' : ''}
+                <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                  <h3 style="margin-top: 0;">Your Class Schedule</h3>
+                  <p>${classSchedule === "weekday" ? "📅 <strong>Weekday:</strong> Monday & Wednesday, 5:00 PM – 8:00 PM" : "📅 <strong>Weekend:</strong> Friday & Saturday, 6:00 PM – 9:00 PM"}</p>
+                </div>
+                <p><strong>Step 1:</strong> Click the button below to log in to your student dashboard.</p>
+                <p><strong>Step 2:</strong> Change your password immediately.</p>
+                <p><strong>Step 3:</strong> Explore your dashboard — classes start June 5!</p>
+                <a href="https://delve-insight-connect.lovable.app/auth" style="display: inline-block; background: #0ea5e9; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 16px 0;">Log In to Your Dashboard</a>
+                ${certificateRequested ? '<p style="color: #22c55e; font-size: 14px;">✅ Certificate payment included — it will be issued upon program completion.</p>' : ''}
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+                <p style="color: #666; font-size: 13px;">Need help? Contact us at <a href="mailto:info@delvetek.io">info@delvetek.io</a> or <a href="https://wa.me/447775739225">WhatsApp</a>.</p>
               </div>
             `,
           }),
