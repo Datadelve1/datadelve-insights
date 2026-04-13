@@ -105,8 +105,19 @@ const Assignments = ({
 
   const fetchData = async () => {
     if (!user) return;
+    // Determine student's cohort
+    const { data: enrollment } = await supabase
+      .from("cohort2_enrollments")
+      .select("cohort")
+      .eq("user_id", user.id)
+      .eq("payment_status", "paid")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const studentCohort = enrollment?.cohort ?? "Cohort 1";
+
     const [{ data: assignData }, { data: subData }] = await Promise.all([
-      supabase.from("assignments").select("*").order("week_number"),
+      supabase.from("assignments").select("*").eq("cohort", studentCohort).order("week_number"),
       supabase.from("assignment_submissions").select("*").eq("user_id", user.id),
     ]);
     const parsedAssignments = (assignData || []).map((a: any) => ({

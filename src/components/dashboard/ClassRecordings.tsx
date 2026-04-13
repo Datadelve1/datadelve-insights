@@ -35,9 +35,21 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
 
   useEffect(() => {
     const fetchRecordings = async () => {
+      // Determine student's cohort
+      const { data: enrollment } = await supabase
+        .from("cohort2_enrollments")
+        .select("cohort")
+        .eq("user_id", user!.id)
+        .eq("payment_status", "paid")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const studentCohort = enrollment?.cohort ?? "Cohort 1";
+
       const { data } = await supabase
         .from("class_recordings")
         .select("*")
+        .eq("cohort", studentCohort)
         .order("week_number")
         .order("session_day");
       setRecordings(data || []);
