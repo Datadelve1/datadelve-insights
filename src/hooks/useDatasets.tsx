@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface SqlDatasetRow {
   id: string;
@@ -11,14 +12,30 @@ export interface SqlDatasetRow {
 }
 
 export function useDatasets() {
+  const { user } = useAuth();
   const [datasets, setDatasets] = useState<SqlDatasetRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
+      // Determine student's cohort
+      let studentCohort = "Cohort 1";
+      if (user) {
+        const { data: enrollment } = await supabase
+          .from("cohort2_enrollments")
+          .select("cohort")
+          .eq("user_id", user.id)
+          .eq("payment_status", "paid")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        studentCohort = enrollment?.cohort ?? "Cohort 1";
+      }
+
       const { data } = await supabase
         .from("sql_datasets")
         .select("*")
+        .eq("cohort", studentCohort)
         .order("created_at");
       setDatasets(
         (data || []).map((d: any) => ({
@@ -36,7 +53,7 @@ export function useDatasets() {
       setLoading(false);
     };
     fetch();
-  }, []);
+  }, [user]);
 
   return { datasets, loading };
 }

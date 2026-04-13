@@ -92,15 +92,30 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
 
   useEffect(() => {
     const fetchQuestions = async () => {
+      // Determine student's cohort
+      let studentCohort = "Cohort 1";
+      if (user) {
+        const { data: enrollment } = await supabase
+          .from("cohort2_enrollments")
+          .select("cohort")
+          .eq("user_id", user.id)
+          .eq("payment_status", "paid")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        studentCohort = enrollment?.cohort ?? "Cohort 1";
+      }
+
       const { data } = await supabase
         .from("review_questions" as any)
         .select("*")
         .eq("is_active", true)
+        .eq("cohort", studentCohort)
         .order("question_number");
       setQuestions((data as any as ReviewQuestion[]) || []);
     };
     fetchQuestions();
-  }, []);
+  }, [user]);
 
   const triggerGoogleReview = (weekNum: number, day: string) => {
     setPendingWeek(weekNum);

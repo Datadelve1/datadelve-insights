@@ -138,6 +138,7 @@ export type Database = {
       }
       assignments: {
         Row: {
+          cohort: string
           created_at: string
           description: string | null
           id: string
@@ -148,6 +149,7 @@ export type Database = {
           week_number: number
         }
         Insert: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -158,6 +160,7 @@ export type Database = {
           week_number: number
         }
         Update: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -207,6 +210,7 @@ export type Database = {
       }
       class_recordings: {
         Row: {
+          cohort: string
           created_at: string
           description: string | null
           id: string
@@ -216,6 +220,7 @@ export type Database = {
           week_number: number
         }
         Insert: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -225,6 +230,7 @@ export type Database = {
           week_number: number
         }
         Update: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -432,6 +438,7 @@ export type Database = {
       }
       review_questions: {
         Row: {
+          cohort: string
           created_at: string
           id: string
           is_active: boolean
@@ -441,6 +448,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          cohort?: string
           created_at?: string
           id?: string
           is_active?: boolean
@@ -450,6 +458,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          cohort?: string
           created_at?: string
           id?: string
           is_active?: boolean
@@ -462,6 +471,7 @@ export type Database = {
       }
       sql_datasets: {
         Row: {
+          cohort: string
           created_at: string
           description: string | null
           id: string
@@ -471,6 +481,7 @@ export type Database = {
           seed_sql: string
         }
         Insert: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -480,6 +491,7 @@ export type Database = {
           seed_sql: string
         }
         Update: {
+          cohort?: string
           created_at?: string
           description?: string | null
           id?: string
