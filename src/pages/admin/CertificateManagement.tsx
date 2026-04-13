@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Award, Search, Loader2, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
 interface CertRecord {
   id: string;
@@ -20,6 +21,7 @@ interface CertRecord {
 }
 
 const CertificateManagement = () => {
+  const { cohort } = useAdminCohort();
   const [records, setRecords] = useState<CertRecord[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { full_name: string; email: string }>>({});
   const [loading, setLoading] = useState(true);
@@ -28,6 +30,18 @@ const CertificateManagement = () => {
 
   const fetchData = async () => {
     setLoading(true);
+
+    // Get cohort user ids
+    const { data: enrollments } = await supabase
+      .from("cohort2_enrollments")
+      .select("user_id")
+      .eq("cohort", cohort)
+      .eq("payment_status", "paid");
+    const cohortUserIds = new Set(
+      (enrollments || []).map((e: any) => e.user_id).filter(Boolean) as string[]
+    );
+    const cohortIdArr = [...cohortUserIds];
+
     const [{ data: certs }, { data: allProfiles }] = await Promise.all([
       supabase.from("certificate_payments").select("*"),
       supabase.from("profiles").select("id, full_name, email"),
@@ -35,22 +49,26 @@ const CertificateManagement = () => {
 
     const profileMap: Record<string, { full_name: string; email: string }> = {};
     (allProfiles || []).forEach((p: any) => {
-      profileMap[p.id] = { full_name: p.full_name, email: p.email };
+      if (cohortUserIds.has(p.id)) {
+        profileMap[p.id] = { full_name: p.full_name, email: p.email };
+      }
     });
     setProfiles(profileMap);
 
-    // Merge cert records with profile info
-    const merged = (certs || []).map((c: any) => ({
-      ...c,
-      profile: profileMap[c.user_id],
-    }));
+    // Only show cert records for cohort students
+    const merged = (certs || [])
+      .filter((c: any) => cohortUserIds.has(c.user_id))
+      .map((c: any) => ({
+        ...c,
+        profile: profileMap[c.user_id],
+      }));
     setRecords(merged);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [cohort]);
 
   const toggleEligibility = async (userId: string, currentEligible: boolean) => {
     setToggling(userId);

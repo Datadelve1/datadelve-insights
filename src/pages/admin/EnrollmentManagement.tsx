@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
 interface Enrollment {
   id: string;
@@ -23,20 +23,22 @@ interface Enrollment {
 }
 
 const EnrollmentManagement = () => {
+  const { cohort } = useAdminCohort();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cohortFilter, setCohortFilter] = useState("Cohort 2");
 
   const fetchEnrollments = async () => {
+    setLoading(true);
     const { data } = await supabase
       .from("cohort2_enrollments")
       .select("*")
+      .eq("cohort", cohort)
       .order("created_at", { ascending: false });
     setEnrollments((data as Enrollment[]) || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchEnrollments(); }, []);
+  useEffect(() => { fetchEnrollments(); }, [cohort]);
 
   const markConfirmed = async (id: string) => {
     const { error } = await supabase
@@ -51,10 +53,8 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const filteredByCohort = enrollments.filter((e) => (e.cohort || "Cohort 2") === cohortFilter);
-
   const renderTable = (trackFilter: string) => {
-    const filtered = filteredByCohort.filter((e) => e.track === trackFilter);
+    const filtered = enrollments.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
       return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments for this track yet.</p>;
     }
@@ -140,27 +140,16 @@ const EnrollmentManagement = () => {
   }
 
   const counts = {
-    beginner: filteredByCohort.filter((e) => e.track === "beginner").length,
-    professional: filteredByCohort.filter((e) => e.track === "professional").length,
-    advanced: filteredByCohort.filter((e) => e.track === "advanced").length,
+    beginner: enrollments.filter((e) => e.track === "beginner").length,
+    professional: enrollments.filter((e) => e.track === "professional").length,
+    advanced: enrollments.filter((e) => e.track === "advanced").length,
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
-          <p className="text-muted-foreground text-sm">Manage student enrollments by cohort and track</p>
-        </div>
-        <Select value={cohortFilter} onValueChange={setCohortFilter}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Cohort 1">Cohort 1</SelectItem>
-            <SelectItem value="Cohort 2">Cohort 2</SelectItem>
-          </SelectContent>
-        </Select>
+      <div>
+        <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
+        <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
       </div>
 
       <Tabs defaultValue="beginner">
