@@ -104,7 +104,8 @@ const WeeklyReports = () => {
     const { data: weekAssignments } = await supabase
       .from("assignments")
       .select("id")
-      .eq("week_number", week);
+      .eq("week_number", week)
+      .eq("cohort", cohort);
     const assignmentIds = (weekAssignments ?? []).map((a: any) => a.id);
 
     const [attendanceRes, reviewsRes, submissionsRes] = await Promise.all([
