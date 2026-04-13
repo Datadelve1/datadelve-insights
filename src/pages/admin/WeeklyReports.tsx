@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getCurrentWeek } from "@/lib/programDates";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,6 +66,7 @@ interface Review {
 const WeeklyReports = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [selectedWeek, setSelectedWeek] = useState(String(getCurrentWeek() || 1));
   const [loading, setLoading] = useState(true);
   const [totalStudents, setTotalStudents] = useState(0);
@@ -82,37 +84,55 @@ const WeeklyReports = () => {
   useEffect(() => {
     fetchReport(parseInt(selectedWeek));
     fetchReviews(parseInt(selectedWeek));
-  }, [selectedWeek]);
+  }, [selectedWeek, cohort]);
+
+  // Helper to get cohort user ids
+  const getCohortUserIds = async () => {
+    const { data } = await supabase
+      .from("cohort2_enrollments")
+      .select("user_id")
+      .eq("cohort", cohort)
+      .eq("payment_status", "paid");
+    return new Set((data || []).map((e: any) => e.user_id).filter(Boolean) as string[]);
+  };
 
   const fetchReport = async (week: number) => {
     setLoading(true);
+    const cohortIds = await getCohortUserIds();
+    const cohortIdArr = [...cohortIds];
+
     const { data: weekAssignments } = await supabase
       .from("assignments")
       .select("id")
       .eq("week_number", week);
     const assignmentIds = (weekAssignments ?? []).map((a: any) => a.id);
 
-    const [profilesRes, attendanceRes, reviewsRes, submissionsRes] = await Promise.all([
-      supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase
-        .from("student_attendance")
-        .select("id", { count: "exact", head: true })
-        .eq("week_number", week)
-        .eq("status", "present"),
-      supabase.from("weekly_reviews").select("id", { count: "exact", head: true }).eq("week_number", week),
-      assignmentIds.length > 0
+    const [attendanceRes, reviewsRes, submissionsRes] = await Promise.all([
+      cohortIdArr.length > 0
+        ? supabase
+            .from("student_attendance")
+            .select("id", { count: "exact", head: true })
+            .eq("week_number", week)
+            .eq("status", "present")
+            .in("user_id", cohortIdArr)
+        : Promise.resolve({ count: 0 }),
+      cohortIdArr.length > 0
+        ? supabase.from("weekly_reviews").select("id", { count: "exact", head: true }).eq("week_number", week).in("user_id", cohortIdArr)
+        : Promise.resolve({ count: 0 }),
+      assignmentIds.length > 0 && cohortIdArr.length > 0
         ? supabase
             .from("assignment_submissions")
             .select("id", { count: "exact", head: true })
             .in("assignment_id", assignmentIds)
+            .in("user_id", cohortIdArr)
         : Promise.resolve({ count: 0 }),
     ]);
 
-    setTotalStudents(profilesRes.count ?? 0);
+    setTotalStudents(cohortIdArr.length);
     setReport({
-      attended: attendanceRes.count ?? 0,
-      assignmentsSubmitted: submissionsRes.count ?? 0,
-      reflectionsSubmitted: reviewsRes.count ?? 0,
+      attended: (attendanceRes as any).count ?? 0,
+      assignmentsSubmitted: (submissionsRes as any).count ?? 0,
+      reflectionsSubmitted: (reviewsRes as any).count ?? 0,
     });
     setLoading(false);
   };
