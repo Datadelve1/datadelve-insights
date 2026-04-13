@@ -139,12 +139,26 @@ const WeeklyReports = () => {
 
   const fetchReviews = async (week: number) => {
     setReviewsLoading(true);
-    const { data } = await supabase
+    const cohortIds = await getCohortUserIds();
+    const cohortIdArr = [...cohortIds];
+    
+    let query = supabase
       .from("weekly_reviews")
       .select("*")
       .eq("week_number", week)
       .order("session_day" as any)
       .order("created_at", { ascending: false });
+    
+    if (cohortIdArr.length > 0) {
+      query = query.in("user_id", cohortIdArr);
+    } else {
+      // No students in cohort, return empty
+      setReviews([]);
+      setReviewsLoading(false);
+      return;
+    }
+    
+    const { data } = await query;
     setReviews((data as any as Review[]) || []);
     setReviewsLoading(false);
   };
