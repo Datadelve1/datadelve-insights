@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -51,6 +52,7 @@ const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
 const StudentVideos = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [videos, setVideos] = useState<ReviewVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterWeek, setFilterWeek] = useState<string>("all");
@@ -60,10 +62,25 @@ const StudentVideos = () => {
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const fetchVideos = async () => {
+    // Get cohort user ids
+    const { data: enrollments } = await supabase
+      .from("cohort2_enrollments")
+      .select("user_id")
+      .eq("cohort", cohort)
+      .eq("payment_status", "paid");
+    const cohortIdArr = (enrollments || []).map((e: any) => e.user_id).filter(Boolean) as string[];
+
+    if (cohortIdArr.length === 0) {
+      setVideos([]);
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("weekly_reviews")
       .select("*")
       .not("video_url", "is", null)
+      .in("user_id", cohortIdArr)
       .order("week_number")
       .order("created_at", { ascending: false });
 
@@ -76,7 +93,7 @@ const StudentVideos = () => {
 
   useEffect(() => {
     fetchVideos();
-  }, []);
+  }, [cohort]);
 
   const toggleApproval = async (video: ReviewVideo) => {
     if (!user) return;
