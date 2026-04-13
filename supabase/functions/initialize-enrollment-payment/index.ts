@@ -9,10 +9,17 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { full_name, email, track, certificate_requested, callback_url } = await req.json();
+    const { full_name, email, track, certificate_requested, callback_url, class_schedule, commitment_accepted } = await req.json();
 
-    if (!full_name || !email || !track || !callback_url) {
+    if (!full_name || !email || !track || !callback_url || !class_schedule) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!commitment_accepted) {
+      return new Response(JSON.stringify({ error: "Commitment form must be accepted" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -68,6 +75,8 @@ Deno.serve(async (req) => {
           full_name,
           track,
           certificate_requested,
+          class_schedule,
+          commitment_accepted,
           type: "cohort2_enrollment",
         },
       }),
@@ -94,6 +103,8 @@ Deno.serve(async (req) => {
           amount_paid: totalAmount,
           payment_reference: reference,
           payment_status: "pending",
+          class_schedule,
+          commitment_accepted: true,
         })
         .eq("id", existing.id);
     } else {
@@ -105,6 +116,8 @@ Deno.serve(async (req) => {
         amount_paid: totalAmount,
         payment_reference: reference,
         payment_status: "pending",
+        class_schedule,
+        commitment_accepted: true,
       });
     }
 
