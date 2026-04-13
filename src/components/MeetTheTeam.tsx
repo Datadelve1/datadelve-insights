@@ -4,18 +4,18 @@ import teamLead from "@/assets/team-lead.jpeg";
 
 const team = [
   {
-    name: "Co-Founder & CEO",
+    name: "Opeyemi Oloyede",
     role: "Co-Founder & CEO",
     image: teamCeo,
   },
   {
-    name: "Co-Founder",
-    role: "Co-Founder & Operations",
+    name: "Oshinubi Pipeloluwa",
+    role: "Co-Founder & Tutor",
     image: teamOperations,
   },
   {
-    name: "Team Lead",
-    role: "Team Lead",
+    name: "Goodness Oloyede",
+    role: "Operations & Team Lead",
     image: teamLead,
   },
 ];
