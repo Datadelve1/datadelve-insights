@@ -2,22 +2,39 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Video, FileText, BarChart3, Loader2 } from "lucide-react";
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
 const AdminOverview = () => {
+  const { cohort } = useAdminCohort();
   const [stats, setStats] = useState({ students: 0, recordings: 0, assignments: 0, completionRate: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [profiles, recordings, assignments, reviews] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
+      setLoading(true);
+
+      // Get enrolled student user_ids for this cohort
+      const { data: enrollments } = await supabase
+        .from("cohort2_enrollments")
+        .select("user_id")
+        .eq("cohort", cohort)
+        .eq("payment_status", "paid");
+
+      const enrolledUserIds = (enrollments || [])
+        .map((e: any) => e.user_id)
+        .filter(Boolean) as string[];
+
+      const studentCount = enrolledUserIds.length;
+
+      const [recordings, assignments, reviews] = await Promise.all([
         supabase.from("class_recordings").select("id", { count: "exact", head: true }),
         supabase.from("assignments").select("id", { count: "exact", head: true }),
-        supabase.from("weekly_reviews").select("user_id, week_number"),
+        enrolledUserIds.length > 0
+          ? supabase.from("weekly_reviews").select("user_id, week_number").in("user_id", enrolledUserIds)
+          : Promise.resolve({ data: [] }),
       ]);
 
-      const studentCount = profiles.count ?? 0;
-      const reviewData = reviews.data ?? [];
+      const reviewData = (reviews as any).data ?? [];
       const userWeeks = new Map<string, Set<number>>();
       reviewData.forEach((r: any) => {
         if (!userWeeks.has(r.user_id)) userWeeks.set(r.user_id, new Set());
@@ -36,7 +53,7 @@ const AdminOverview = () => {
       setLoading(false);
     };
     fetchStats();
-  }, []);
+  }, [cohort]);
 
   if (loading) {
     return (
