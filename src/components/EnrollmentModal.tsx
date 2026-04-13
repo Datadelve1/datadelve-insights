@@ -79,7 +79,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       });
 
       if (error) throw error;
-      if (data?.authorization_url) {
+      if (data?.ok && data?.authorization_url) {
         window.location.href = data.authorization_url;
       } else {
         toast.error(data?.error || "Failed to initialize payment");

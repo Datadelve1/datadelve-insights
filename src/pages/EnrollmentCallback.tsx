@@ -23,7 +23,7 @@ const EnrollmentCallback = () => {
           body: { reference },
         });
         if (error) throw error;
-        if (data?.success) {
+        if (data?.ok || data?.success) {
           setStatus("success");
         } else {
           setStatus("error");

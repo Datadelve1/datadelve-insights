@@ -5,6 +5,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function respond(ok: boolean, payload: Record<string, unknown>): Response {
+  return new Response(JSON.stringify({ ok, ...payload }), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -12,17 +19,11 @@ Deno.serve(async (req) => {
     const { full_name, email, track, certificate_requested, callback_url, class_schedule, commitment_accepted } = await req.json();
 
     if (!full_name || !email || !track || !callback_url || !class_schedule) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Missing required fields" });
     }
 
     if (!commitment_accepted) {
-      return new Response(JSON.stringify({ error: "Commitment form must be accepted" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Commitment form must be accepted" });
     }
 
     const trackPrices: Record<string, number> = {
@@ -34,10 +35,7 @@ Deno.serve(async (req) => {
     const totalAmount = (trackPrices[track] || 0) + certPrice;
 
     if (totalAmount === 0) {
-      return new Response(JSON.stringify({ error: "Invalid track" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "Invalid track" });
     }
 
     const supabase = createClient(
@@ -53,10 +51,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (existing?.payment_status === "paid") {
-      return new Response(JSON.stringify({ error: "This email is already enrolled and paid" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: "This email is already enrolled and paid" });
     }
 
     // Initialize Paystack payment
@@ -69,7 +64,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         email: email.toLowerCase(),
-        amount: totalAmount * 100, // kobo
+        amount: totalAmount * 100,
         callback_url,
         metadata: {
           full_name,
@@ -84,10 +79,7 @@ Deno.serve(async (req) => {
 
     const paystackData = await paystackRes.json();
     if (!paystackData.status) {
-      return new Response(JSON.stringify({ error: paystackData.message || "Paystack error" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respond(false, { error: paystackData.message || "Paystack error" });
     }
 
     const reference = paystackData.data.reference;
@@ -121,14 +113,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    return new Response(
-      JSON.stringify({ authorization_url: paystackData.data.authorization_url }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return respond(true, { authorization_url: paystackData.data.authorization_url });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond(false, { error: err.message });
   }
 });
