@@ -58,8 +58,8 @@ const Contact = () => {
     {
       icon: MessageCircle,
       title: "WhatsApp",
-      value: "+234 803 814 9647",
-      href: "https://wa.me/2348038149647?text=Hello%20I%20want%20to%20chat",
+      value: "+44 7775 739225",
+      href: "https://wa.me/447775739225?text=Hello%20I%20want%20to%20chat",
     },
     {
       icon: Clock,
@@ -120,7 +120,7 @@ const Contact = () => {
               </p>
               <div className="flex gap-3">
                 <Button variant="hero" size="sm" asChild>
-                  <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20book%20a%20clarity%20session" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/447775739225?text=Hello%20I%20want%20to%20book%20a%20clarity%20session" target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="w-4 h-4" /> WhatsApp
                   </a>
                 </Button>

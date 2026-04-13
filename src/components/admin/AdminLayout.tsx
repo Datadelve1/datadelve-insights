@@ -29,11 +29,13 @@ import {
   Database,
   FileVideo,
   MessageSquare,
+  ClipboardList,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
   { title: "Student Tracking", url: "/admin/students", icon: Users },
   { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Review Questions", url: "/admin/review-questions", icon: MessageSquare },

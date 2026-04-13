@@ -1,7 +1,17 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Check, AlertTriangle, Briefcase, Rocket, GraduationCap, FileText, Linkedin, Users } from "lucide-react";
+import EnrollmentModal from "@/components/EnrollmentModal";
 
 const DelveSchool = () => {
+  const [enrollOpen, setEnrollOpen] = useState(false);
+  const [defaultTrack, setDefaultTrack] = useState("");
+
+  const openEnroll = (track: string) => {
+    setDefaultTrack(track);
+    setEnrollOpen(true);
+  };
+
   return (
     <section id="delve-school" className="py-24 relative overflow-hidden">
       {/* Background Effects */}
@@ -35,14 +45,12 @@ const DelveSchool = () => {
             </h3>
             <p className="text-xs text-muted-foreground mb-4">Beginner Track</p>
 
-            {/* Pricing */}
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦150,000</span>
               <div className="text-xl font-bold text-primary">FREE <span className="text-xs font-normal text-muted-foreground">(This Cohort Only)</span></div>
               <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦10,000</span></p>
             </div>
 
-            {/* Content */}
             <ul className="space-y-2 mb-4 flex-1">
               {["SQL (Fundamentals)", "Excel (Fundamentals)", "Power BI (Fundamentals)", "Weekly assignments", "Collaborative projects", "Breakout sessions with tutors", "Live Q&A support", "Personal dashboard to track progress"].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -61,11 +69,9 @@ const DelveSchool = () => {
               Limited to 250 students
             </div>
 
-            <Button variant="hero" size="lg" className="w-full group/btn" asChild>
-              <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20enroll%20in%20the%20Beginner%20Track" target="_blank" rel="noopener noreferrer">
-                Enroll in Beginner Track
-                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-              </a>
+            <Button variant="hero" size="lg" className="w-full group/btn" onClick={() => openEnroll("beginner")}>
+              Enroll in Beginner Track
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </Button>
           </div>
 
@@ -82,14 +88,12 @@ const DelveSchool = () => {
             </h3>
             <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
 
-            {/* Pricing */}
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦275,000</span>
               <div className="text-xl font-bold text-primary">Discount Applied</div>
               <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦50,000</span></p>
             </div>
 
-            {/* Content */}
             <ul className="space-y-2 mb-4 flex-1">
               {["SQL (Beginner to Advanced)", "Excel (Beginner to Advanced)", "Power BI (Beginner to Advanced)", "Real-world projects", "Portfolio development", "Case studies", "Hands-on training"].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -112,11 +116,9 @@ const DelveSchool = () => {
               Limited to 250 students
             </div>
 
-            <Button variant="hero" size="lg" className="w-full group/btn" asChild>
-              <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20enroll%20in%20the%20Professional%20Track" target="_blank" rel="noopener noreferrer">
-                Enroll in Professional Track
-                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-              </a>
+            <Button variant="hero" size="lg" className="w-full group/btn" onClick={() => openEnroll("professional")}>
+              Enroll in Professional Track
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </Button>
           </div>
 
@@ -130,14 +132,12 @@ const DelveSchool = () => {
             </h3>
             <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
 
-            {/* Pricing */}
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦350,000</span>
               <div className="text-xl font-bold text-primary">Discount Applied</div>
               <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦100,000</span></p>
             </div>
 
-            {/* Full Learning Path */}
             <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Full Learning Path</p>
             <ul className="space-y-2 mb-4">
               {["SQL (Beginner to Advanced)", "Excel (Beginner to Advanced)", "Power BI (Beginner to Advanced)"].map((item) => (
@@ -148,7 +148,6 @@ const DelveSchool = () => {
               ))}
             </ul>
 
-            {/* Internship */}
             <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Internship</p>
             <ul className="space-y-2 mb-4">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -161,7 +160,6 @@ const DelveSchool = () => {
               </li>
             </ul>
 
-            {/* Career Acceleration */}
             <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Career Acceleration</p>
             <ul className="space-y-2 mb-4 flex-1">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -194,11 +192,9 @@ const DelveSchool = () => {
               Limited to 250 students
             </div>
 
-            <Button variant="hero" size="lg" className="w-full group/btn" asChild>
-              <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20enroll%20in%20the%20Advanced%20Track" target="_blank" rel="noopener noreferrer">
-                Enroll in Advanced Track
-                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-              </a>
+            <Button variant="hero" size="lg" className="w-full group/btn" onClick={() => openEnroll("advanced")}>
+              Enroll in Advanced Track
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
@@ -210,6 +206,8 @@ const DelveSchool = () => {
           </p>
         </div>
       </div>
+
+      <EnrollmentModal open={enrollOpen} onOpenChange={setEnrollOpen} defaultTrack={defaultTrack} />
     </section>
   );
 };

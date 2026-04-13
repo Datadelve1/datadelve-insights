@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.verify-certificate-payment]
 verify_jwt = false
+
+[functions.initialize-enrollment-payment]
+verify_jwt = false
+
+[functions.verify-enrollment-payment]
+verify_jwt = false
