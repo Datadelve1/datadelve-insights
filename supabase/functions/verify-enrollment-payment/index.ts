@@ -118,11 +118,14 @@ Deno.serve(async (req) => {
     }
 
     // Send welcome email with login details
+    let emailSent = false;
     try {
       const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      console.log("Email secrets available:", { hasResend: !!RESEND_API_KEY, hasLovable: !!LOVABLE_API_KEY });
+      
       if (RESEND_API_KEY && LOVABLE_API_KEY) {
-        await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+        const emailRes = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -158,6 +161,11 @@ Deno.serve(async (req) => {
             `,
           }),
         });
+        const emailResBody = await emailRes.text();
+        console.log("Email send response:", emailRes.status, emailResBody);
+        emailSent = emailRes.ok;
+      } else {
+        console.error("Missing email secrets - cannot send welcome email");
       }
     } catch (emailErr) {
       console.error("Email send failed:", emailErr);
