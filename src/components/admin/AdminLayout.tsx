@@ -2,6 +2,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   SidebarProvider,
   SidebarTrigger,
   Sidebar,
@@ -32,6 +39,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
+import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
 
 const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
@@ -91,6 +99,21 @@ function AdminSidebar() {
   );
 }
 
+function CohortSelector() {
+  const { cohort, setCohort } = useAdminCohort();
+  return (
+    <Select value={cohort} onValueChange={(v) => setCohort(v as any)}>
+      <SelectTrigger className="w-36 h-8 text-xs bg-secondary border-border">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="Cohort 1">Cohort 1</SelectItem>
+        <SelectItem value="Cohort 2">Cohort 2</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
+
 const AdminLayout = () => {
   const { user, profile, isAdmin, isLoading, signOut } = useAuth();
 
@@ -105,27 +128,32 @@ const AdminLayout = () => {
   if (!user || !isAdmin) return <Navigate to="/admin" replace />;
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4">
-            <SidebarTrigger className="text-foreground" />
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                {profile?.full_name || user.email}
-              </span>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="w-4 h-4 mr-2" /> Sign Out
-              </Button>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto">
-            <Outlet />
-          </main>
+    <AdminCohortProvider>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AdminSidebar />
+          <div className="flex-1 flex flex-col min-w-0">
+            <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger className="text-foreground" />
+                <CohortSelector />
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground hidden sm:block">
+                  {profile?.full_name || user.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                </Button>
+              </div>
+            </header>
+            <main className="flex-1 overflow-auto">
+              <Outlet />
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </AdminCohortProvider>
   );
 };
 
