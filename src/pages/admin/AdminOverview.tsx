@@ -27,8 +27,8 @@ const AdminOverview = () => {
       const studentCount = enrolledUserIds.length;
 
       const [recordings, assignments, reviews] = await Promise.all([
-        supabase.from("class_recordings").select("id", { count: "exact", head: true }),
-        supabase.from("assignments").select("id", { count: "exact", head: true }),
+        supabase.from("class_recordings").select("id", { count: "exact", head: true }).eq("cohort", cohort),
+        supabase.from("assignments").select("id", { count: "exact", head: true }).eq("cohort", cohort),
         enrolledUserIds.length > 0
           ? supabase.from("weekly_reviews").select("user_id, week_number").in("user_id", enrolledUserIds)
           : Promise.resolve({ data: [] }),
