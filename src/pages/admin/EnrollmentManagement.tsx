@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -16,11 +17,15 @@ interface Enrollment {
   amount_paid: number;
   paid_at: string | null;
   created_at: string;
+  class_schedule?: string;
+  commitment_accepted?: boolean;
+  cohort?: string;
 }
 
 const EnrollmentManagement = () => {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cohortFilter, setCohortFilter] = useState("Cohort 2");
 
   const fetchEnrollments = async () => {
     const { data } = await supabase
@@ -46,8 +51,10 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const filteredByCohort = enrollments.filter((e) => (e.cohort || "Cohort 2") === cohortFilter);
+
   const renderTable = (trackFilter: string) => {
-    const filtered = enrollments.filter((e) => e.track === trackFilter);
+    const filtered = filteredByCohort.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
       return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments for this track yet.</p>;
     }
@@ -59,8 +66,10 @@ const EnrollmentManagement = () => {
               <th className="text-left p-3 text-muted-foreground font-medium">Name</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Email</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Amount</th>
+              <th className="text-left p-3 text-muted-foreground font-medium">Schedule</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Payment</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Certificate</th>
+              <th className="text-left p-3 text-muted-foreground font-medium">Commitment</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Status</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Action</th>
             </tr>
@@ -71,6 +80,15 @@ const EnrollmentManagement = () => {
                 <td className="p-3 text-foreground">{e.full_name}</td>
                 <td className="p-3 text-muted-foreground">{e.email}</td>
                 <td className="p-3 text-foreground">₦{e.amount_paid.toLocaleString()}</td>
+                <td className="p-3">
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    e.class_schedule === "weekday" 
+                      ? "bg-blue-500/20 text-blue-600" 
+                      : "bg-purple-500/20 text-purple-600"
+                  }`}>
+                    {e.class_schedule === "weekday" ? "Weekday" : "Weekend"}
+                  </span>
+                </td>
                 <td className="p-3">
                   <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
                     e.payment_status === "paid" 
@@ -84,6 +102,11 @@ const EnrollmentManagement = () => {
                 <td className="p-3">
                   <span className={e.certificate_requested ? "text-green-600" : "text-muted-foreground"}>
                     {e.certificate_requested ? "Yes" : "No"}
+                  </span>
+                </td>
+                <td className="p-3">
+                  <span className={e.commitment_accepted ? "text-green-600 text-xs" : "text-muted-foreground text-xs"}>
+                    {e.commitment_accepted ? "✓ Agreed" : "—"}
                   </span>
                 </td>
                 <td className="p-3">
@@ -117,16 +140,27 @@ const EnrollmentManagement = () => {
   }
 
   const counts = {
-    beginner: enrollments.filter((e) => e.track === "beginner").length,
-    professional: enrollments.filter((e) => e.track === "professional").length,
-    advanced: enrollments.filter((e) => e.track === "advanced").length,
+    beginner: filteredByCohort.filter((e) => e.track === "beginner").length,
+    professional: filteredByCohort.filter((e) => e.track === "professional").length,
+    advanced: filteredByCohort.filter((e) => e.track === "advanced").length,
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">Cohort 2 Enrollments</h1>
-        <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
+          <p className="text-muted-foreground text-sm">Manage student enrollments by cohort and track</p>
+        </div>
+        <Select value={cohortFilter} onValueChange={setCohortFilter}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Cohort 1">Cohort 1</SelectItem>
+            <SelectItem value="Cohort 2">Cohort 2</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Tabs defaultValue="beginner">
