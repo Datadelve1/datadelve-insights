@@ -1,4 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -13,58 +14,29 @@ Deno.serve(async (req) => {
       });
     }
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${RESEND_API_KEY}` },
-      body: JSON.stringify({
-        from: "DELVETEK <info@datadelve.io>",
-        to: [email],
-        subject: "Thank You for Your Weekly Reflection – Delvetek Data Analysis Training",
-        html: `
-          <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #FAF8F5; padding: 40px 30px; border-radius: 16px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <img src="https://delve-insight-connect.lovable.app/delveschool-full-logo.png" alt="Delvetek" style="width: 120px; height: auto; margin-bottom: 12px;" />
-            </div>
-            <div style="background: #FFFFFF; border-radius: 12px; padding: 24px; border: 1px solid #E8E0D4;">
-              <h2 style="font-size: 22px; color: #1A1A1A; margin: 0 0 16px;">Hello ${full_name},</h2>
-              <p style="color: #5A5A5A; font-size: 15px; line-height: 1.8;">
-                Thank you for submitting your reflection for <strong>Week ${week_number}</strong>. Your submission has been successfully recorded.
-              </p>
-              <p style="color: #5A5A5A; font-size: 15px; line-height: 1.8;">
-                Your consistent participation helps you stay on track and ensures eligibility for certificates, references, and future programs. You will receive access to next week's class materials shortly.
-              </p>
-              <p style="color: #D4A017; font-size: 16px; font-weight: 600; margin-top: 20px;">Keep up the great work! 💪</p>
-              <p style="color: #1A1A1A; font-size: 15px; margin-top: 16px;">– Delvetek Team</p>
-            </div>
-            <div style="text-align: center; border-top: 1px solid #E8E0D4; padding-top: 20px; margin-top: 20px;">
-              <p style="color: #999; font-size: 12px;">DELVETEK — Data Analytics & Tech Education</p>
-            </div>
-          </div>
-        `,
-      }),
+    // Send confirmation to student
+    await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "weekly-review-confirmation",
+        recipientEmail: email,
+        idempotencyKey: `review-confirm-${email}-week${week_number}`,
+        templateData: { fullName: full_name, weekNumber: week_number },
+      },
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("Resend error:", data);
-      return new Response(JSON.stringify({ error: "Failed to send email", details: data }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     // Notify admin
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${RESEND_API_KEY}` },
-      body: JSON.stringify({
-        from: "DELVETEK <info@datadelve.io>",
-        to: ["info@datadelve.io"],
-        subject: `🔔 Weekly Review Submitted: ${full_name} - Week ${week_number}`,
-        html: `<div style="font-family: Arial; padding: 20px;"><h2>New Weekly Review</h2><p><strong>Name:</strong> ${full_name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Week:</strong> ${week_number}</p><p><strong>Date:</strong> ${new Date().toLocaleString()}</p></div>`,
-      }),
+    await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "admin-notification",
+        recipientEmail: "info@datadelve.io",
+        idempotencyKey: `review-admin-${email}-week${week_number}`,
+        templateData: { type: "Weekly Review Submitted", name: full_name, email, detail: `Week ${week_number}` },
+      },
     });
 
     return new Response(JSON.stringify({ success: true }), {
