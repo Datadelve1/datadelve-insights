@@ -130,7 +130,7 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrati
                     </a>
                   </Button>
                   <Button variant="hero-outline" asChild>
-                    <a href="mailto:datadelve1@gmail.com?subject=Advanced%20Package%20Enquiry">
+                    <a href="mailto:info@delvetek.io?subject=Advanced%20Package%20Enquiry">
                       <Mail className="w-4 h-4" /> Email Us
                     </a>
                   </Button>

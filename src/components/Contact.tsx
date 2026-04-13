@@ -36,12 +36,12 @@ const Contact = () => {
     setIsLoading(true);
 
     // Open mailto with the form data
-    const mailtoLink = `mailto:datadelve1@gmail.com?subject=${encodeURIComponent(formData.subject || "Contact from Website")}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+    const mailtoLink = `mailto:info@delvetek.io?subject=${encodeURIComponent(formData.subject || "Contact from Website")}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
     window.open(mailtoLink);
 
     toast({
       title: "Opening your email client...",
-      description: "Your message is ready to send to datadelve1@gmail.com",
+      description: "Your message is ready to send to info@delvetek.io",
     });
 
     setFormData({ name: "", email: "", subject: "", message: "" });
@@ -52,8 +52,8 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      value: "datadelve1@gmail.com",
-      href: "mailto:datadelve1@gmail.com",
+      value: "info@delvetek.io",
+      href: "mailto:info@delvetek.io",
     },
     {
       icon: MessageCircle,
@@ -125,7 +125,7 @@ const Contact = () => {
                   </a>
                 </Button>
                 <Button variant="hero-outline" size="sm" asChild>
-                  <a href="mailto:datadelve1@gmail.com?subject=Clarity%20Session%20Booking">
+                  <a href="mailto:info@delvetek.io?subject=Clarity%20Session%20Booking">
                     <Mail className="w-4 h-4" /> Email
                   </a>
                 </Button>

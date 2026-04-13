@@ -112,8 +112,8 @@ const Dashboard = () => {
           </p>
           <p className="text-sm text-muted-foreground">
             If you believe this is an error, please contact the admin team at{" "}
-            <a href="mailto:datadelve1@gmail.com" className="text-primary underline">
-              datadelve1@gmail.com
+            <a href="mailto:info@delvetek.io" className="text-primary underline">
+              info@delvetek.io
             </a>{" "}
             for assistance.
           </p>

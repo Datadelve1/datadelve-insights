@@ -26,7 +26,7 @@ const Footer = () => {
     { icon: Linkedin, href: "https://www.linkedin.com/company/datadelve.com/", label: "LinkedIn" },
     { icon: Facebook, href: "https://www.facebook.com/share/15hQHcG1G9L/?mibextid=wwXIfr", label: "Facebook" },
     { icon: Instagram, href: "https://www.instagram.com/delvetek_?igsh=MXB2Y2Myd2pibzc3Yg%3D%3D&utm_source=qr", label: "Instagram" },
-    { icon: Mail, href: "mailto:datadelve1@gmail.com", label: "Email" },
+    { icon: Mail, href: "mailto:info@delvetek.io", label: "Email" },
   ];
 
   return (
