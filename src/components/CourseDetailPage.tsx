@@ -125,7 +125,7 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrati
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button variant="hero" asChild>
-                    <a href="https://wa.me/2348038149647?text=Hello%20I%20want%20to%20enquire%20about%20the%20Advanced%20Package" target="_blank" rel="noopener noreferrer">
+                    <a href="https://wa.me/447775739225?text=Hello%20I%20want%20to%20enquire%20about%20the%20Advanced%20Package" target="_blank" rel="noopener noreferrer">
                       <MessageCircle className="w-4 h-4" /> WhatsApp Us
                     </a>
                   </Button>
