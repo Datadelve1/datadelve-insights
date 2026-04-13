@@ -54,8 +54,11 @@ interface SqlDataset {
   created_at: string;
 }
 
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
+
 const DatasetManagement = () => {
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [datasets, setDatasets] = useState<SqlDataset[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -81,7 +84,7 @@ const DatasetManagement = () => {
   useEffect(() => {
     fetchDatasets();
     initSql();
-  }, []);
+  }, [cohort]);
 
   const initSql = async () => {
     try {
@@ -97,6 +100,7 @@ const DatasetManagement = () => {
     const { data } = await supabase
       .from("sql_datasets")
       .select("*")
+      .eq("cohort", cohort)
       .order("created_at");
     setDatasets(
       (data || []).map((d: any) => ({
@@ -186,6 +190,7 @@ const DatasetManagement = () => {
         schema_sql: schemaSql.trim(),
         seed_sql: seedSql.trim(),
         sample_queries: validQueries as any,
+        cohort,
       };
 
       if (editingId) {

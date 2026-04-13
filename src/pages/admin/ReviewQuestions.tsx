@@ -16,9 +16,12 @@ interface ReviewQuestion {
   is_active: boolean;
 }
 
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
+
 const ReviewQuestions = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { cohort } = useAdminCohort();
   const [questions, setQuestions] = useState<ReviewQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<number | null>(null);
@@ -28,12 +31,13 @@ const ReviewQuestions = () => {
     const { data } = await supabase
       .from("review_questions" as any)
       .select("*")
+      .eq("cohort", cohort)
       .order("question_number");
     setQuestions((data as any as ReviewQuestion[]) || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchQuestions(); }, []);
+  useEffect(() => { fetchQuestions(); }, [cohort]);
 
   const updateQuestion = async (q: ReviewQuestion) => {
     setSaving(q.question_number);
@@ -64,6 +68,7 @@ const ReviewQuestions = () => {
         question_text: "",
         is_active: true,
         updated_by: user?.id || null,
+        cohort,
       } as any);
 
     if (error) {
