@@ -59,14 +59,12 @@ Deno.serve(async (req) => {
 
     const { full_name, email } = profile;
 
-    // Delete all student data from ALL related tables
+    // Delete student data but KEEP weekly_reviews and student_video_submissions
     await Promise.all([
       adminClient.from("training_commitments").delete().eq("user_id", studentId),
       adminClient.from("training_commitments").delete().eq("email", email),
-      adminClient.from("weekly_reviews").delete().eq("user_id", studentId),
       adminClient.from("assignment_submissions").delete().eq("user_id", studentId),
       adminClient.from("student_attendance").delete().eq("user_id", studentId),
-      adminClient.from("student_video_submissions").delete().eq("user_id", studentId),
       adminClient.from("google_review_confirmations").delete().eq("user_id", studentId),
       adminClient.from("admin_notes").delete().eq("user_id", studentId),
       adminClient.from("video_access_logs").delete().eq("accessed_by", studentId),
