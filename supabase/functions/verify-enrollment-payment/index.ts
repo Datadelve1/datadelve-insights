@@ -101,6 +101,8 @@ Deno.serve(async (req) => {
         payment_status: "paid",
         paid_at: new Date().toISOString(),
         user_id: userId,
+        class_schedule: classSchedule,
+        commitment_accepted: commitmentAccepted,
       })
       .eq("payment_reference", reference);
 
