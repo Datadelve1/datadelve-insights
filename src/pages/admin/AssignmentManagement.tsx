@@ -66,8 +66,11 @@ interface Submission {
   studentEmail?: string;
 }
 
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
+
 const AssignmentManagement = () => {
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -92,12 +95,13 @@ const AssignmentManagement = () => {
 
   useEffect(() => {
     fetchAssignments();
-  }, []);
+  }, [cohort]);
 
   const fetchAssignments = async () => {
     const { data } = await supabase
       .from("assignments")
       .select("*")
+      .eq("cohort", cohort)
       .order("week_number");
     const parsed = (data || []).map((a: any) => ({
       ...a,
@@ -253,6 +257,7 @@ const AssignmentManagement = () => {
         questions: questions as any,
         model_answers: modelAnswers as any,
         key_concepts: keyConcepts as any,
+        cohort,
       };
 
       if (editingId) {
