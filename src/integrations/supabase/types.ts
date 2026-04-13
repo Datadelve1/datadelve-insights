@@ -239,7 +239,9 @@ export type Database = {
         Row: {
           amount_paid: number
           certificate_requested: boolean
+          class_schedule: string
           cohort: string
+          commitment_accepted: boolean
           confirmed_by_admin: boolean
           created_at: string
           email: string
@@ -256,7 +258,9 @@ export type Database = {
         Insert: {
           amount_paid?: number
           certificate_requested?: boolean
+          class_schedule?: string
           cohort?: string
+          commitment_accepted?: boolean
           confirmed_by_admin?: boolean
           created_at?: string
           email: string
@@ -273,7 +277,9 @@ export type Database = {
         Update: {
           amount_paid?: number
           certificate_requested?: boolean
+          class_schedule?: string
           cohort?: string
+          commitment_accepted?: boolean
           confirmed_by_admin?: boolean
           created_at?: string
           email?: string
