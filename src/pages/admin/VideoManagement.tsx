@@ -60,9 +60,12 @@ const SESSIONS = WEEKS.flatMap(w => [
   { week: w, day: "Sat", label: `W${w} Sat` },
 ]);
 
+import { useAdminCohort } from "@/contexts/AdminCohortContext";
+
 const VideoManagement = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { cohort } = useAdminCohort();
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -83,6 +86,7 @@ const VideoManagement = () => {
     const { data } = await supabase
       .from("class_recordings")
       .select("*")
+      .eq("cohort", cohort)
       .order("week_number");
     setRecordings(data || []);
     setLoading(false);
@@ -90,7 +94,7 @@ const VideoManagement = () => {
 
   useEffect(() => {
     fetchRecordings();
-  }, []);
+  }, [cohort]);
 
   const resetForm = () => {
     setTitle("");
@@ -185,6 +189,7 @@ const VideoManagement = () => {
           week_number: parsedWeek,
           session_day: sessionDay,
           video_url: finalUrl,
+          cohort,
         } as any);
         if (error) throw error;
         toast({ title: "Recording added! 🎬" });
