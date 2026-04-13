@@ -53,7 +53,8 @@ const DelveSchool = () => {
             </ul>
 
             <p className="text-sm font-medium text-foreground mb-1">Build a strong foundation in data analysis</p>
-            <p className="text-xs text-muted-foreground mb-3">Perfect for absolute beginners</p>
+            <p className="text-xs text-muted-foreground mb-1">Perfect for absolute beginners</p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 8-week program • Virtual Graduation</p>
 
             <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -103,7 +104,8 @@ const DelveSchool = () => {
             </ul>
 
             <p className="text-sm font-medium text-foreground mb-1">Become job-ready with a strong portfolio</p>
-            <p className="text-xs text-muted-foreground mb-3">No prior experience needed — includes beginner to advanced training</p>
+            <p className="text-xs text-muted-foreground mb-1">No prior experience needed — includes beginner to advanced training</p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 12-week program • Virtual Graduation</p>
 
             <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -184,7 +186,8 @@ const DelveSchool = () => {
             </ul>
 
             <p className="text-sm font-medium text-foreground mb-1">Go from beginner to fully job-positioned</p>
-            <p className="text-xs text-muted-foreground italic mb-3">We don't guarantee jobs — but we position you strongly to get one</p>
+            <p className="text-xs text-muted-foreground italic mb-1">We don't guarantee jobs — but we position you strongly to get one</p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 12-week program • Virtual Graduation</p>
 
             <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -203,7 +206,7 @@ const DelveSchool = () => {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            All tracks start June 5 • Live online sessions • Certificate upon completion (paid)
+            All tracks start June 5 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
       </div>
