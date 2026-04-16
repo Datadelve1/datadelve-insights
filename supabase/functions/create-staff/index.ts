@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       // Create auth user
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: emailLower,
-        password: "1234_",
+        password: "1234_!",
         email_confirm: true,
         user_metadata: { full_name: staff.full_name },
       });
@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
           const existingUser = users?.find((u: any) => u.email === emailLower);
           if (existingUser) {
             await supabase.auth.admin.updateUserById(existingUser.id, {
-              password: "1234_",
+              password: "1234_!",
               user_metadata: { full_name: staff.full_name },
             });
             await supabase.from("staff_profiles").insert({
