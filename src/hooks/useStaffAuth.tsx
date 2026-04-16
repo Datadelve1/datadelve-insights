@@ -7,6 +7,7 @@ interface StaffProfile {
   id: string;
   user_id: string;
   email: string;
+  full_name: string;
   salary: number;
   has_onboarded: boolean;
   must_change_password: boolean;
