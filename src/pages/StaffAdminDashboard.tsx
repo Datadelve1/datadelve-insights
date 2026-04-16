@@ -86,6 +86,7 @@ const StaffAdminDashboard = () => {
       enriched.push({
         user_id: p.user_id,
         email: p.email,
+        full_name: p.full_name || p.email,
         salary: p.salary,
         status: currentStatus,
         sessionTime,
