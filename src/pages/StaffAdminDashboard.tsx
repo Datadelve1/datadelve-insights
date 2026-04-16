@@ -189,8 +189,7 @@ const StaffAdminDashboard = () => {
           <p className="text-muted-foreground text-sm">Monitor staff activity in real-time</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.location.href = "/staff/dashboard"}>My Dashboard</Button>
-          <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
+          <Button variant="outline" onClick={() => window.location.href = "/admin/dashboard"}>Admin Home</Button>
         </div>
       </div>
 
