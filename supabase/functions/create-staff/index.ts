@@ -125,32 +125,36 @@ Deno.serve(async (req) => {
   // --- Handle admin account ---
   try {
     const adminEmail = ADMIN_EMAIL.toLowerCase();
-    const { data: { users } } = await supabase.auth.admin.listUsers();
-    const adminUser = users?.find((u: any) => u.email === adminEmail);
     
-    if (adminUser) {
-      await supabase.auth.admin.updateUserById(adminUser.id, { password: ADMIN_PASSWORD });
-      // Ensure admin role exists
-      await supabase.from("user_roles").upsert(
-        { user_id: adminUser.id, role: "admin" },
-        { onConflict: "user_id,role" }
-      );
-      results.push({ email: adminEmail, status: "admin_updated" });
-    } else {
-      const { data: newAdmin, error: adminErr } = await supabase.auth.admin.createUser({
-        email: adminEmail,
-        password: ADMIN_PASSWORD,
-        email_confirm: true,
-      });
-      if (adminErr) {
-        results.push({ email: adminEmail, status: "error", error: adminErr.message });
-      } else {
+    // Try to create the admin user first
+    const { data: newAdmin, error: createErr } = await supabase.auth.admin.createUser({
+      email: adminEmail,
+      password: ADMIN_PASSWORD,
+      email_confirm: true,
+    });
+
+    if (createErr && createErr.message.includes("already been registered")) {
+      // User exists, find and update password
+      const { data: { users } } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+      const adminUser = users?.find((u: any) => u.email === adminEmail);
+      if (adminUser) {
+        await supabase.auth.admin.updateUserById(adminUser.id, { password: ADMIN_PASSWORD });
         await supabase.from("user_roles").upsert(
-          { user_id: newAdmin.user.id, role: "admin" },
+          { user_id: adminUser.id, role: "admin" },
           { onConflict: "user_id,role" }
         );
-        results.push({ email: adminEmail, status: "admin_created" });
+        results.push({ email: adminEmail, status: "admin_updated" });
+      } else {
+        results.push({ email: adminEmail, status: "error", error: "User exists but not found in list" });
       }
+    } else if (createErr) {
+      results.push({ email: adminEmail, status: "error", error: createErr.message });
+    } else {
+      await supabase.from("user_roles").upsert(
+        { user_id: newAdmin.user.id, role: "admin" },
+        { onConflict: "user_id,role" }
+      );
+      results.push({ email: adminEmail, status: "admin_created" });
     }
   } catch (e: any) {
     results.push({ email: ADMIN_EMAIL, status: "error", error: e.message });
