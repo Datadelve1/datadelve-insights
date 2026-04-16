@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       if (existing) {
         // Update password and full_name for existing user
         const { error: updateErr } = await supabase.auth.admin.updateUserById(existing.user_id, {
-          password: "1234_",
+          password: "1234_!",
           user_metadata: { full_name: staff.full_name },
         });
         if (updateErr) {
