@@ -76,6 +76,7 @@ const App = () => (
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/coming-soon" element={<ComingSoonPage />} />
             <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminOverview />} />
               <Route path="students" element={<StudentTracking />} />
@@ -89,6 +90,7 @@ const App = () => (
               <Route path="certificates" element={<CertificateManagement />} />
               <Route path="ambassadors" element={<ComingSoon />} />
               <Route path="notifications" element={<ComingSoon />} />
+              <Route path="staff" element={<StaffAdminDashboard />} />
             </Route>
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/enrollment-callback" element={<EnrollmentCallback />} />
@@ -97,7 +99,6 @@ const App = () => (
             <Route path="/staff/change-password" element={<StaffChangePassword />} />
             <Route path="/staff/onboarding" element={<StaffOnboarding />} />
             <Route path="/staff/dashboard" element={<StaffDashboard />} />
-            <Route path="/staff/admin" element={<StaffAdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

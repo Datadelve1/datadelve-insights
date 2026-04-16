@@ -339,7 +339,9 @@ const StaffDashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Staff Dashboard</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground">
+            Welcome, {staffProfile?.full_name || "Staff"}
+          </h1>
           <p className="text-muted-foreground text-sm">{staffProfile?.email}</p>
         </div>
         <div className="flex items-center gap-2">

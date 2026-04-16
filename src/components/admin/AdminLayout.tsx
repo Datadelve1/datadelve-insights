@@ -37,6 +37,7 @@ import {
   FileVideo,
   MessageSquare,
   ClipboardList,
+  Clock,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
@@ -54,6 +55,7 @@ const navItems = [
   { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
   { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
+  { title: "Staff Tracking", url: "/admin/staff", icon: Clock },
 ];
 
 function AdminSidebar() {

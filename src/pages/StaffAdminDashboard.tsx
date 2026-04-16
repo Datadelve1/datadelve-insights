@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useStaffAuth } from "@/hooks/useStaffAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import { Users, Eye, Check, X, LogOut, Clock, AlertTriangle } from "lucide-react
 interface StaffMember {
   user_id: string;
   email: string;
+  full_name: string;
   salary: number;
   status: string;
   sessionTime: number;
@@ -22,7 +23,7 @@ interface StaffMember {
 }
 
 const StaffAdminDashboard = () => {
-  const { user, isAdmin, loading: authLoading, signOut } = useStaffAuth();
+  const { user, isAdmin, isLoading: authLoading, signOut } = useAuth();
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStaff, setSelectedStaff] = useState<string | null>(null);
@@ -85,6 +86,7 @@ const StaffAdminDashboard = () => {
       enriched.push({
         user_id: p.user_id,
         email: p.email,
+        full_name: p.full_name || p.email,
         salary: p.salary,
         status: currentStatus,
         sessionTime,
@@ -187,8 +189,7 @@ const StaffAdminDashboard = () => {
           <p className="text-muted-foreground text-sm">Monitor staff activity in real-time</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.location.href = "/staff/dashboard"}>My Dashboard</Button>
-          <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="w-4 h-4" /></Button>
+          <Button variant="outline" onClick={() => window.location.href = "/admin/dashboard"}>Admin Home</Button>
         </div>
       </div>
 
@@ -210,7 +211,7 @@ const StaffAdminDashboard = () => {
                 return (
                   <div key={ip.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
                     <div>
-                      <span className="text-sm font-medium text-foreground">{staff?.email || ip.user_id}</span>
+                      <span className="text-sm font-medium text-foreground">{staff?.full_name || staff?.email || ip.user_id}</span>
                       <p className="text-xs text-muted-foreground">
                         {ip.reason} — {formatTime(duration)} {ip.flagged && <Badge variant="destructive" className="ml-1 text-xs">Flagged</Badge>}
                       </p>
@@ -254,7 +255,10 @@ const StaffAdminDashboard = () => {
             <TableBody>
               {staffList.map((s) => (
                 <TableRow key={s.user_id}>
-                  <TableCell className="text-sm">{s.email}</TableCell>
+                  <TableCell className="text-sm">
+                    <div>{s.full_name}</div>
+                    <div className="text-xs text-muted-foreground">{s.email}</div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={statusColor(s.status)} className="capitalize">{s.status}</Badge>
                   </TableCell>
