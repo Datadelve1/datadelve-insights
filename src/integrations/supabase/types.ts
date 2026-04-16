@@ -594,6 +594,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          full_name: string
           has_onboarded: boolean
           id: string
           must_change_password: boolean
@@ -603,6 +604,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          full_name?: string
           has_onboarded?: boolean
           id?: string
           must_change_password?: boolean
@@ -612,6 +614,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          full_name?: string
           has_onboarded?: boolean
           id?: string
           must_change_password?: boolean
