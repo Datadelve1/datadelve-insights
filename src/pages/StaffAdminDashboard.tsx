@@ -23,7 +23,7 @@ interface StaffMember {
 }
 
 const StaffAdminDashboard = () => {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isLoading: authLoading, signOut } = useAuth();
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStaff, setSelectedStaff] = useState<string | null>(null);
