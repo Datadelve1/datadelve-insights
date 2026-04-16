@@ -212,7 +212,7 @@ const StaffAdminDashboard = () => {
                 return (
                   <div key={ip.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
                     <div>
-                      <span className="text-sm font-medium text-foreground">{staff?.email || ip.user_id}</span>
+                      <span className="text-sm font-medium text-foreground">{staff?.full_name || staff?.email || ip.user_id}</span>
                       <p className="text-xs text-muted-foreground">
                         {ip.reason} — {formatTime(duration)} {ip.flagged && <Badge variant="destructive" className="ml-1 text-xs">Flagged</Badge>}
                       </p>
@@ -256,7 +256,10 @@ const StaffAdminDashboard = () => {
             <TableBody>
               {staffList.map((s) => (
                 <TableRow key={s.user_id}>
-                  <TableCell className="text-sm">{s.email}</TableCell>
+                  <TableCell className="text-sm">
+                    <div>{s.full_name}</div>
+                    <div className="text-xs text-muted-foreground">{s.email}</div>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={statusColor(s.status)} className="capitalize">{s.status}</Badge>
                   </TableCell>
