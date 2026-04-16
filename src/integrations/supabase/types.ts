@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          logged_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          logged_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          logged_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "time_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_notes: {
         Row: {
           admin_id: string
@@ -412,6 +447,59 @@ export type Database = {
         }
         Relationships: []
       }
+      idle_periods: {
+        Row: {
+          admin_approved: boolean | null
+          approved_by: string | null
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          flagged: boolean
+          id: string
+          idle_type: string
+          reason: string
+          session_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_approved?: boolean | null
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          flagged?: boolean
+          id?: string
+          idle_type?: string
+          reason?: string
+          session_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_approved?: boolean | null
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          flagged?: boolean
+          id?: string
+          idle_type?: string
+          reason?: string
+          session_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idle_periods_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "time_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -499,6 +587,36 @@ export type Database = {
           sample_queries?: Json
           schema_sql?: string
           seed_sql?: string
+        }
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          has_onboarded: boolean
+          id: string
+          must_change_password: boolean
+          salary: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          has_onboarded?: boolean
+          id?: string
+          must_change_password?: boolean
+          salary?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          has_onboarded?: boolean
+          id?: string
+          must_change_password?: boolean
+          salary?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -598,6 +716,33 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      time_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          started_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }
