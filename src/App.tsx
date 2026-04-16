@@ -40,6 +40,11 @@ import TermsOfService from "./pages/TermsOfService";
 import Blog from "./pages/Blog";
 import CaseStudies from "./pages/CaseStudies";
 import ComingSoonPage from "./pages/ComingSoon";
+import StaffLogin from "./pages/StaffLogin";
+import StaffChangePassword from "./pages/StaffChangePassword";
+import StaffOnboarding from "./pages/StaffOnboarding";
+import StaffDashboard from "./pages/StaffDashboard";
+import StaffAdminDashboard from "./pages/StaffAdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +93,11 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/enrollment-callback" element={<EnrollmentCallback />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/staff/login" element={<StaffLogin />} />
+            <Route path="/staff/change-password" element={<StaffChangePassword />} />
+            <Route path="/staff/onboarding" element={<StaffOnboarding />} />
+            <Route path="/staff/dashboard" element={<StaffDashboard />} />
+            <Route path="/staff/admin" element={<StaffAdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
