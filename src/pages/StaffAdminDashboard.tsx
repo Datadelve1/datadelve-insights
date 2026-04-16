@@ -14,6 +14,7 @@ import { Users, Eye, Check, X, LogOut, Clock, AlertTriangle } from "lucide-react
 interface StaffMember {
   user_id: string;
   email: string;
+  full_name: string;
   salary: number;
   status: string;
   sessionTime: number;
