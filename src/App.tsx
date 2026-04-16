@@ -93,6 +93,11 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/enrollment-callback" element={<EnrollmentCallback />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/staff/login" element={<StaffLogin />} />
+            <Route path="/staff/change-password" element={<StaffChangePassword />} />
+            <Route path="/staff/onboarding" element={<StaffOnboarding />} />
+            <Route path="/staff/dashboard" element={<StaffDashboard />} />
+            <Route path="/staff/admin" element={<StaffAdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
