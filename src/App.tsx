@@ -8,6 +8,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Webinar from "./pages/Webinar";
 import AmbassadorForm from "./pages/AmbassadorForm";
+import AmbassadorSignup from "./pages/AmbassadorSignup";
+import ReferrerTracking from "./pages/ReferrerTracking";
 import CommitmentForm from "./pages/CommitmentForm";
 import WeeklyReviewForm from "./pages/WeeklyReviewForm";
 import Auth from "./pages/Auth";
@@ -67,6 +69,8 @@ const App = () => (
             <Route path="/courses/data-engineering" element={<DataEngineering />} />
             <Route path="/webinar" element={<Webinar />} />
             <Route path="/ambassador" element={<AmbassadorForm />} />
+            <Route path="/become-ambassador" element={<AmbassadorSignup />} />
+            <Route path="/track/:code" element={<ReferrerTracking />} />
             <Route path="/commitment" element={<CommitmentForm />} />
             <Route path="/weekly-review" element={<WeeklyReviewForm />} />
             <Route path="/auth" element={<Auth />} />
