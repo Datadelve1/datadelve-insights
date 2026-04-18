@@ -138,6 +138,7 @@ export type Database = {
           id: string
           notes: string | null
           phone: string
+          photo_url: string | null
           referrer_id: string | null
           status: string
           updated_at: string
@@ -150,6 +151,7 @@ export type Database = {
           id?: string
           notes?: string | null
           phone: string
+          photo_url?: string | null
           referrer_id?: string | null
           status?: string
           updated_at?: string
@@ -162,6 +164,7 @@ export type Database = {
           id?: string
           notes?: string | null
           phone?: string
+          photo_url?: string | null
           referrer_id?: string | null
           status?: string
           updated_at?: string

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Sparkles, Upload, Mail } from "lucide-react";
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, "Name is required").max(100),
@@ -18,8 +18,12 @@ const signupSchema = z.object({
 
 const AmbassadorSignup = () => {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string>("");
+  const [photoPreview, setPhotoPreview] = useState<string>("");
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -28,6 +32,35 @@ const AmbassadorSignup = () => {
   });
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
+
+  const handlePhoto = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please upload an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image must be under 5MB", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `ambassadors/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("form-uploads").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type,
+      });
+      if (error) throw error;
+      const { data } = supabase.storage.from("form-uploads").getPublicUrl(path);
+      setPhotoUrl(data.publicUrl);
+      setPhotoPreview(URL.createObjectURL(file));
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +73,10 @@ const AmbassadorSignup = () => {
       });
       return;
     }
+    if (!photoUrl) {
+      toast({ title: "Please upload a professional headshot", variant: "destructive" });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -48,6 +85,7 @@ const AmbassadorSignup = () => {
         email: parsed.data.email.toLowerCase(),
         phone: parsed.data.phone,
         why_refer: parsed.data.why_refer,
+        photo_url: photoUrl,
       });
       if (error) throw error;
       setSubmitted(true);
@@ -72,7 +110,11 @@ const AmbassadorSignup = () => {
           <h1 className="font-display text-3xl font-bold">Application received 🎉</h1>
           <p className="text-muted-foreground leading-relaxed">
             Thanks for your interest in becoming a Delvetek Ambassador! Our team will review your
-            details and reach out via email with your unique referral code and tracking link.
+            details and <strong className="text-foreground">email you your unique referral code</strong> along
+            with a private link to track everyone who signs up with it.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Please check your inbox (and spam folder) within 24–48 hours.
           </p>
           <Link to="/">
             <Button variant="outline">Back to Home</Button>
@@ -99,13 +141,62 @@ const AmbassadorSignup = () => {
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-3">
             Become a Delvetek Ambassador
           </h1>
-          <p className="text-muted-foreground mb-10 leading-relaxed">
+          <p className="text-muted-foreground mb-6 leading-relaxed">
             Help us spread the word about Delvetek and earn rewards for every student you refer.
-            Fill in your details below — once approved, we'll email you a unique referral code and a
-            private link to track your referrals.
           </p>
 
+          <div className="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 mb-8">
+            <Mail className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-foreground">Your code arrives by email</p>
+              <p className="text-muted-foreground leading-relaxed">
+                Once approved, we'll email you a unique referral code and a private tracking link so
+                you can see exactly who signs up with your code.
+              </p>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Headshot upload */}
+            <div className="space-y-2">
+              <Label>Professional Headshot *</Label>
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 rounded-full bg-secondary border-2 border-dashed border-border flex items-center justify-center overflow-hidden shrink-0">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Upload className="w-6 h-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</>
+                    ) : photoUrl ? (
+                      "Change Photo"
+                    ) : (
+                      <><Upload className="w-4 h-4 mr-2" /> Upload Photo</>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Clear, professional headshot. JPG/PNG, max 5MB.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="full_name">Full Name *</Label>
               <Input
@@ -127,6 +218,7 @@ const AmbassadorSignup = () => {
                 placeholder="you@example.com"
                 required
               />
+              <p className="text-xs text-muted-foreground">We'll email your referral code here.</p>
             </div>
 
             <div className="space-y-1.5">
@@ -156,7 +248,7 @@ const AmbassadorSignup = () => {
 
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="w-full h-12 font-semibold text-base"
             >
               {loading ? (
@@ -169,7 +261,7 @@ const AmbassadorSignup = () => {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              No account needed. We'll email you a private tracking link once approved.
+              No account needed. We'll email your referral code and tracking link once approved.
             </p>
           </form>
         </div>

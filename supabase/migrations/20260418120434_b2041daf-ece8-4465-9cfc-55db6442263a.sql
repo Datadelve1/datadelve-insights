@@ -1,0 +1,1 @@
+ALTER TABLE public.ambassador_signups ADD COLUMN IF NOT EXISTS photo_url text;
