@@ -112,7 +112,7 @@ const StaffAdminDashboard = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!isAdmin) return;
+    if (!isSuperAdmin) return;
     loadStaffList();
     loadPendingIdle();
 
@@ -131,7 +131,7 @@ const StaffAdminDashboard = () => {
 
     const interval = setInterval(loadStaffList, 30000);
     return () => { supabase.removeChannel(channel); clearInterval(interval); };
-  }, [authLoading, isAdmin, loadStaffList, loadPendingIdle, selectedStaff]);
+  }, [authLoading, isSuperAdmin, loadStaffList, loadPendingIdle, selectedStaff]);
 
   const loadStaffDetail = async (userId: string) => {
     setSelectedStaff(userId);
@@ -180,7 +180,7 @@ const StaffAdminDashboard = () => {
 
   if (authLoading || loading) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Loading...</div>;
 
-  if (!isAdmin) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Access Denied</div>;
+  if (!isSuperAdmin) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Access Denied — Super admin only</div>;
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
