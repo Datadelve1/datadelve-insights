@@ -38,6 +38,7 @@ import {
   MessageSquare,
   ClipboardList,
   Clock,
+  HardDrive,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
@@ -56,6 +57,7 @@ const navItems = [
   { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
   { title: "Staff Tracking", url: "/admin/staff", icon: Clock },
+  { title: "Storage Manager", url: "/admin/storage", icon: HardDrive },
 ];
 
 function AdminSidebar() {
