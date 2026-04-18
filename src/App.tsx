@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Webinar from "./pages/Webinar";
-import AmbassadorForm from "./pages/AmbassadorForm";
 import AmbassadorSignup from "./pages/AmbassadorSignup";
 import ReferrerTracking from "./pages/ReferrerTracking";
 import CommitmentForm from "./pages/CommitmentForm";
@@ -28,7 +27,7 @@ import CertificateManagement from "./pages/admin/CertificateManagement";
 import AssignmentManagement from "./pages/admin/AssignmentManagement";
 import DatasetManagement from "./pages/admin/DatasetManagement";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
-import ReferrerManagement from "./pages/admin/ReferrerManagement";
+import AmbassadorManagement from "./pages/admin/AmbassadorManagement";
 import ReviewQuestions from "./pages/admin/ReviewQuestions";
 import ResetPassword from "./pages/ResetPassword";
 import EnrollmentCallback from "./pages/EnrollmentCallback";
@@ -68,7 +67,7 @@ const App = () => (
             <Route path="/courses/software-engineering" element={<SoftwareEngineering />} />
             <Route path="/courses/data-engineering" element={<DataEngineering />} />
             <Route path="/webinar" element={<Webinar />} />
-            <Route path="/ambassador" element={<AmbassadorForm />} />
+            <Route path="/ambassador" element={<AmbassadorSignup />} />
             <Route path="/become-ambassador" element={<AmbassadorSignup />} />
             <Route path="/track/:code" element={<ReferrerTracking />} />
             <Route path="/commitment" element={<CommitmentForm />} />
@@ -93,10 +92,10 @@ const App = () => (
               <Route path="assignments" element={<AssignmentManagement />} />
               <Route path="datasets" element={<DatasetManagement />} />
               <Route path="enrollments" element={<EnrollmentManagement />} />
-              <Route path="referrers" element={<ReferrerManagement />} />
+              <Route path="ambassadors" element={<AmbassadorManagement />} />
+              <Route path="referrers" element={<AmbassadorManagement />} />
               <Route path="review-questions" element={<ReviewQuestions />} />
               <Route path="certificates" element={<CertificateManagement />} />
-              <Route path="ambassadors" element={<ComingSoon />} />
               <Route path="notifications" element={<ComingSoon />} />
               <Route path="staff" element={<StaffAdminDashboard />} />
             </Route>

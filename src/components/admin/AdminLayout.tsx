@@ -49,7 +49,7 @@ const SUPER_ADMIN_EMAIL = "datadelve1@gmail.com";
 const baseNavItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
-  { title: "Referrers", url: "/admin/referrers", icon: Share2 },
+  { title: "Ambassadors", url: "/admin/ambassadors", icon: Share2 },
   { title: "Student Tracking", url: "/admin/students", icon: Users },
   { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Review Questions", url: "/admin/review-questions", icon: MessageSquare },
@@ -58,7 +58,6 @@ const baseNavItems = [
   { title: "Assignments", url: "/admin/assignments", icon: FileText },
   { title: "Datasets", url: "/admin/datasets", icon: Database },
   { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
-  { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
   { title: "Storage Manager", url: "/admin/storage", icon: HardDrive },
 ];

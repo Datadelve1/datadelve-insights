@@ -300,7 +300,7 @@ const ReferrerManagement = () => {
         <TabsContent value="signups" className="mt-4">
           {signups.length === 0 ? (
             <p className="text-muted-foreground text-sm py-8 text-center">
-              No signups yet. Share <code className="font-mono text-primary">/become-ambassador</code> to start collecting applications.
+              No signups yet. Share <code className="font-mono text-primary">/ambassador</code> to start collecting applications.
             </p>
           ) : (
             <div className="space-y-3">
