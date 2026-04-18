@@ -44,7 +44,9 @@ import {
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
 
-const navItems = [
+const SUPER_ADMIN_EMAIL = "datadelve1@gmail.com";
+
+const baseNavItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
   { title: "Referrers", url: "/admin/referrers", icon: Share2 },
@@ -58,14 +60,16 @@ const navItems = [
   { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
   { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
-  { title: "Staff Tracking", url: "/admin/staff", icon: Clock },
   { title: "Storage Manager", url: "/admin/storage", icon: HardDrive },
 ];
 
-function AdminSidebar() {
+const superAdminItem = { title: "Staff Tracking", url: "/admin/staff", icon: Clock };
+
+function AdminSidebar({ userEmail }: { userEmail?: string | null }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navItems = userEmail === SUPER_ADMIN_EMAIL ? [...baseNavItems, superAdminItem] : baseNavItems;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -137,7 +141,7 @@ const AdminLayout = () => {
     <AdminCohortProvider>
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          <AdminSidebar />
+          <AdminSidebar userEmail={user.email} />
           <div className="flex-1 flex flex-col min-w-0">
             <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4">
               <div className="flex items-center gap-3">
