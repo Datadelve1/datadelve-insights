@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "DelveTek"
@@ -13,6 +14,7 @@ const WebinarConfirmationEmail = ({ email }: WebinarConfirmationProps) => (
     <Preview>You're registered for the DelveTek Webinar! 🎉</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Heading style={h1}>You're In! 🎉</Heading>
         <Text style={subhead}>Your spot has been reserved</Text>
         <Section style={infoBox}>

@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { Body, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "DelveTek"
@@ -13,6 +14,7 @@ const CommitmentConfirmationEmail = ({ fullName }: CommitmentConfirmationProps) 
     <Preview>Thank You for Confirming Your Commitment – DelveTek</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Heading style={h1}>Hello {fullName || 'Student'},</Heading>
         <Section style={infoBox}>
           <Text style={text}>Thank you for submitting your Commitment Form. Your participation has been recorded successfully.</Text>

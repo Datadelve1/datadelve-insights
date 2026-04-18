@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "DelveTek"
@@ -20,6 +21,7 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
     <Preview>Welcome to DelveTek Cohort 2 — Your Login Details</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Heading style={h1}>Welcome to DelveTek, {fullName || 'Student'}! 🎉</Heading>
         <Text style={text}>Your enrollment in the <strong>{track ? track.charAt(0).toUpperCase() + track.slice(1) : 'Beginner'} Track</strong> (Cohort 2) has been confirmed.</Text>
         <Section style={infoBox}>
