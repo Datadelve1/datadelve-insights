@@ -20,16 +20,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify caller is an admin
+    // Verify caller is an admin OR using service role
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return respond(false, { error: "Unauthorized" });
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user: caller } } = await supabase.auth.getUser(token);
-    if (!caller) return respond(false, { error: "Unauthorized" });
-    const { data: callerRoles } = await supabase
-      .from("user_roles").select("role").eq("user_id", caller.id);
-    if (!callerRoles?.some((r: any) => r.role === "admin")) {
-      return respond(false, { error: "Admin only" });
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const isServiceRole = token === serviceKey;
+    if (!isServiceRole) {
+      const { data: { user: caller } } = await supabase.auth.getUser(token);
+      if (!caller) return respond(false, { error: "Unauthorized" });
+      const { data: callerRoles } = await supabase
+        .from("user_roles").select("role").eq("user_id", caller.id);
+      if (!callerRoles?.some((r: any) => r.role === "admin")) {
+        return respond(false, { error: "Admin only" });
+      }
     }
 
     const { email, full_name, password, login_url, send_email } = await req.json();
