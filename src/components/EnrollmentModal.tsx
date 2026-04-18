@@ -52,7 +52,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const allCommitmentsChecked = commitmentChecks.every(Boolean);
   const trackPrice = TRACK_PRICES[track] || 0;
   const totalAmount = trackPrice + (addCertificate ? CERTIFICATE_PRICE : 0);
-  const isCommitmentFeeTrack = track === "beginner";
 
   const handleCommitmentToggle = (index: number) => {
     const updated = [...commitmentChecks];
