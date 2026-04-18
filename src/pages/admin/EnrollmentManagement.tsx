@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, CheckCircle2, XCircle, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
@@ -21,6 +22,7 @@ interface Enrollment {
   class_schedule?: string;
   commitment_accepted?: boolean;
   cohort?: string;
+  referral_code?: string | null;
 }
 
 const EnrollmentManagement = () => {
@@ -28,6 +30,7 @@ const EnrollmentManagement = () => {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [referralFilter, setReferralFilter] = useState("");
 
   const fetchEnrollments = async () => {
     setLoading(true);
@@ -63,10 +66,16 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const filteredByReferral = useMemo(() => {
+    const q = referralFilter.trim().toUpperCase();
+    if (!q) return enrollments;
+    return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
+  }, [enrollments, referralFilter]);
+
   const renderTable = (trackFilter: string) => {
-    const filtered = enrollments.filter((e) => e.track === trackFilter);
+    const filtered = filteredByReferral.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
-      return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments for this track yet.</p>;
+      return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments match.</p>;
     }
     return (
       <div className="overflow-x-auto">
@@ -75,6 +84,7 @@ const EnrollmentManagement = () => {
             <tr className="border-b border-border">
               <th className="text-left p-3 text-muted-foreground font-medium">Name</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Email</th>
+              <th className="text-left p-3 text-muted-foreground font-medium">Referral</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Amount</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Schedule</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Payment</th>
