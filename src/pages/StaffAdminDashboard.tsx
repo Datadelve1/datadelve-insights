@@ -24,6 +24,7 @@ interface StaffMember {
 
 const StaffAdminDashboard = () => {
   const { user, isAdmin, isLoading: authLoading, signOut } = useAuth();
+  const isSuperAdmin = user?.email === "datadelve1@gmail.com";
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStaff, setSelectedStaff] = useState<string | null>(null);
