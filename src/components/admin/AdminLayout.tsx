@@ -28,7 +28,6 @@ import {
   BarChart3,
   Video,
   FileText,
-  Award,
   Bell,
   GraduationCap,
   Loader2,
