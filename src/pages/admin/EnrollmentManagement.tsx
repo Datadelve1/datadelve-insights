@@ -12,6 +12,7 @@ interface Enrollment {
   email: string;
   track: string;
   payment_status: string;
+  payment_reference: string | null;
   certificate_requested: boolean;
   confirmed_by_admin: boolean;
   amount_paid: number;
@@ -26,6 +27,7 @@ const EnrollmentManagement = () => {
   const { cohort } = useAdminCohort();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const fetchEnrollments = async () => {
     setLoading(true);
@@ -40,16 +42,24 @@ const EnrollmentManagement = () => {
 
   useEffect(() => { fetchEnrollments(); }, [cohort]);
 
-  const markConfirmed = async (id: string) => {
-    const { error } = await supabase
-      .from("cohort2_enrollments")
-      .update({ confirmed_by_admin: true })
-      .eq("id", id);
-    if (error) {
-      toast.error("Failed to confirm");
-    } else {
-      toast.success("Student confirmed");
-      fetchEnrollments();
+  const confirmPayment = async (id: string) => {
+    if (!confirm("Confirm payment received? This will create the student's account and email their login details.")) return;
+    setConfirmingId(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("confirm-manual-enrollment", {
+        body: { enrollment_id: id },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        toast.success(data.email_sent ? "Confirmed — login email sent" : "Confirmed (email send failed, check logs)");
+        fetchEnrollments();
+      } else {
+        toast.error(data?.error || "Failed to confirm");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to confirm");
+    } finally {
+      setConfirmingId(null);
     }
   };
 
