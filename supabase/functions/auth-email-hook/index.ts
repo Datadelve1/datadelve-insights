@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "delve-insight-connect"
+const SITE_NAME = "Delvetek"
 const SENDER_DOMAIN = "notify.www.datadelve.io"
 const ROOT_DOMAIN = "www.datadelve.io"
 const FROM_DOMAIN = "www.datadelve.io" // Domain shown in From address (may be root or sender subdomain)
