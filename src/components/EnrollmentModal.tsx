@@ -189,22 +189,20 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
         {/* Step 2: Commitment Form */}
         {step === 2 && (
           <div className="space-y-4">
-            {isCommitmentFeeTrack && (
-              <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-2 text-sm">
-                    <p className="font-semibold text-foreground">This is not a traditional course payment</p>
-                    <p className="text-muted-foreground">
-                      The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
-                    </p>
-                    <p className="text-muted-foreground">
-                      This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
-                    </p>
-                  </div>
+            <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="space-y-2 text-sm">
+                  <p className="font-semibold text-foreground">This is not a traditional course payment</p>
+                  <p className="text-muted-foreground">
+                    The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
+                  </p>
+                  <p className="text-muted-foreground">
+                    This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
 
             <p className="text-sm font-medium text-foreground">Please confirm you agree to the following:</p>
 
