@@ -43,6 +43,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const [email, setEmail] = useState("");
   const [track, setTrack] = useState(defaultTrack || "");
   const [addCertificate, setAddCertificate] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [commitmentChecks, setCommitmentChecks] = useState<boolean[]>(new Array(COMMITMENT_ITEMS.length).fill(false));
   const [classSchedule, setClassSchedule] = useState("");
   const [submitting, setSubmitting] = useState(false);
