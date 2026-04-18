@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, CheckCircle2, XCircle, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
@@ -21,6 +22,7 @@ interface Enrollment {
   class_schedule?: string;
   commitment_accepted?: boolean;
   cohort?: string;
+  referral_code?: string | null;
 }
 
 const EnrollmentManagement = () => {
@@ -28,6 +30,7 @@ const EnrollmentManagement = () => {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [referralFilter, setReferralFilter] = useState("");
 
   const fetchEnrollments = async () => {
     setLoading(true);
@@ -63,10 +66,16 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const filteredByReferral = useMemo(() => {
+    const q = referralFilter.trim().toUpperCase();
+    if (!q) return enrollments;
+    return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
+  }, [enrollments, referralFilter]);
+
   const renderTable = (trackFilter: string) => {
-    const filtered = enrollments.filter((e) => e.track === trackFilter);
+    const filtered = filteredByReferral.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
-      return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments for this track yet.</p>;
+      return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments match.</p>;
     }
     return (
       <div className="overflow-x-auto">
@@ -75,6 +84,7 @@ const EnrollmentManagement = () => {
             <tr className="border-b border-border">
               <th className="text-left p-3 text-muted-foreground font-medium">Name</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Email</th>
+              <th className="text-left p-3 text-muted-foreground font-medium">Referral</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Amount</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Schedule</th>
               <th className="text-left p-3 text-muted-foreground font-medium">Payment</th>
@@ -89,6 +99,13 @@ const EnrollmentManagement = () => {
               <tr key={e.id} className="border-b border-border/50 hover:bg-secondary/30">
                 <td className="p-3 text-foreground">{e.full_name}</td>
                 <td className="p-3 text-muted-foreground">{e.email}</td>
+                <td className="p-3">
+                  {e.referral_code ? (
+                    <code className="text-xs font-mono font-bold text-primary bg-primary/10 px-2 py-1 rounded">{e.referral_code}</code>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </td>
                 <td className="p-3 text-foreground">₦{e.amount_paid.toLocaleString()}</td>
                 <td className="p-3">
                   <span className={`text-xs px-2 py-1 rounded-full ${
@@ -177,6 +194,24 @@ const EnrollmentManagement = () => {
       <div>
         <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
         <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
+      </div>
+
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          value={referralFilter}
+          onChange={(e) => setReferralFilter(e.target.value)}
+          placeholder="Filter by referral code..."
+          className="pl-9 pr-9 font-mono uppercase"
+        />
+        {referralFilter && (
+          <button
+            onClick={() => setReferralFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <Tabs defaultValue="beginner">

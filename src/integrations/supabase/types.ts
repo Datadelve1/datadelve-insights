@@ -292,6 +292,7 @@ export type Database = {
           paid_at: string | null
           payment_reference: string | null
           payment_status: string
+          referral_code: string | null
           track: string
           updated_at: string
           user_id: string | null
@@ -311,6 +312,7 @@ export type Database = {
           paid_at?: string | null
           payment_reference?: string | null
           payment_status?: string
+          referral_code?: string | null
           track?: string
           updated_at?: string
           user_id?: string | null
@@ -330,6 +332,7 @@ export type Database = {
           paid_at?: string | null
           payment_reference?: string | null
           payment_status?: string
+          referral_code?: string | null
           track?: string
           updated_at?: string
           user_id?: string | null
@@ -521,6 +524,39 @@ export type Database = {
           full_name?: string
           id?: string
           student_status?: string
+        }
+        Relationships: []
+      }
+      referrers: {
+        Row: {
+          code: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

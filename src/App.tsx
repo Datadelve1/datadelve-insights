@@ -26,6 +26,7 @@ import CertificateManagement from "./pages/admin/CertificateManagement";
 import AssignmentManagement from "./pages/admin/AssignmentManagement";
 import DatasetManagement from "./pages/admin/DatasetManagement";
 import EnrollmentManagement from "./pages/admin/EnrollmentManagement";
+import ReferrerManagement from "./pages/admin/ReferrerManagement";
 import ReviewQuestions from "./pages/admin/ReviewQuestions";
 import ResetPassword from "./pages/ResetPassword";
 import EnrollmentCallback from "./pages/EnrollmentCallback";
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="assignments" element={<AssignmentManagement />} />
               <Route path="datasets" element={<DatasetManagement />} />
               <Route path="enrollments" element={<EnrollmentManagement />} />
+              <Route path="referrers" element={<ReferrerManagement />} />
               <Route path="review-questions" element={<ReviewQuestions />} />
               <Route path="certificates" element={<CertificateManagement />} />
               <Route path="ambassadors" element={<ComingSoon />} />

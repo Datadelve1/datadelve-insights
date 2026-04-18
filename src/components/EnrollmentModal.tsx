@@ -43,6 +43,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const [email, setEmail] = useState("");
   const [track, setTrack] = useState(defaultTrack || "");
   const [addCertificate, setAddCertificate] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [commitmentChecks, setCommitmentChecks] = useState<boolean[]>(new Array(COMMITMENT_ITEMS.length).fill(false));
   const [classSchedule, setClassSchedule] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -80,6 +81,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           certificate_requested: addCertificate,
           class_schedule: classSchedule,
           commitment_accepted: true,
+          referral_code: referralCode.trim() || null,
         },
       });
 
@@ -113,6 +115,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       setCommitmentChecks(new Array(COMMITMENT_ITEMS.length).fill(false));
       setClassSchedule("");
       setReference(null);
+      setReferralCode("");
     }
     onOpenChange(open);
   };
@@ -160,6 +163,17 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
             <div className="flex items-center gap-2">
               <Checkbox id="certificate" checked={addCertificate} onCheckedChange={(checked) => setAddCertificate(!!checked)} />
               <Label htmlFor="certificate" className="cursor-pointer">Add Certificate of Completion (₦10,000)</Label>
+            </div>
+            <div>
+              <Label>Referral Code <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Input
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                placeholder="Enter code if you were referred"
+                className="font-mono uppercase"
+                maxLength={32}
+              />
+              <p className="text-xs text-muted-foreground mt-1">If a Delvetek ambassador referred you, enter their code so they get credit.</p>
             </div>
             <Button
               variant="hero"
