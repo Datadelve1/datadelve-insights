@@ -127,10 +127,27 @@ const EnrollmentManagement = () => {
                   )}
                 </td>
                 <td className="p-3">
-                  {!e.confirmed_by_admin && e.payment_status === "paid" && (
-                    <Button size="sm" variant="outline" onClick={() => markConfirmed(e.id)}>
-                      Mark as Confirmed
-                    </Button>
+                  {!e.confirmed_by_admin && (
+                    <div className="space-y-1">
+                      {e.payment_reference && (
+                        <div className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</div>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="hero"
+                        disabled={confirmingId === e.id}
+                        onClick={() => confirmPayment(e.id)}
+                      >
+                        {confirmingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Confirming...</>
+                        ) : (
+                          "Confirm Payment & Send Login"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                  {e.confirmed_by_admin && e.payment_reference && (
+                    <span className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</span>
                   )}
                 </td>
               </tr>
