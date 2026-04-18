@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 interface Referrer {
@@ -120,6 +120,35 @@ const ReferrerManagement = () => {
     const url = `${window.location.origin}/track/${code}`;
     navigator.clipboard.writeText(url);
     toast.success("Tracking link copied");
+  };
+
+  const sendCodeEmail = async (r: Referrer) => {
+    if (!r.email) {
+      toast.error("This referrer has no email on file. Add one first.");
+      return;
+    }
+    if (!confirm(`Email referral code "${r.code}" and tracking link to ${r.email}?`)) return;
+
+    const trackingUrl = `${window.location.origin}/track/${r.code}`;
+    const t = toast.loading("Sending email...");
+    try {
+      const { error } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "ambassador-code-assigned",
+          recipientEmail: r.email,
+          idempotencyKey: `ambassador-code-${r.id}-${r.code}`,
+          templateData: {
+            fullName: r.full_name,
+            code: r.code,
+            trackingUrl,
+          },
+        },
+      });
+      if (error) throw error;
+      toast.success(`Email sent to ${r.email}`, { id: t });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send email", { id: t });
+    }
   };
 
   const openApprove = (s: AmbassadorSignup) => {
@@ -238,9 +267,19 @@ const ReferrerManagement = () => {
                         </span>
                       </td>
                       <td className="p-3">
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           <Button size="sm" variant="outline" className="h-7" title="Copy tracking link" onClick={() => copyTrackingLink(r.code)}>
                             <LinkIcon className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="hero"
+                            className="h-7"
+                            title={r.email ? `Email code & link to ${r.email}` : "No email on file"}
+                            onClick={() => sendCodeEmail(r)}
+                            disabled={!r.email}
+                          >
+                            <Mail className="w-3 h-3 mr-1" /> Send Code
                           </Button>
                           <Button size="sm" variant="outline" className="h-7" onClick={() => openEdit(r)}>
                             <Pencil className="w-3 h-3" />
