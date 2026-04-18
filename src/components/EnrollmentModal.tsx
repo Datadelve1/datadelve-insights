@@ -164,6 +164,17 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
               <Checkbox id="certificate" checked={addCertificate} onCheckedChange={(checked) => setAddCertificate(!!checked)} />
               <Label htmlFor="certificate" className="cursor-pointer">Add Certificate of Completion (₦10,000)</Label>
             </div>
+            <div>
+              <Label>Referral Code <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Input
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                placeholder="Enter code if you were referred"
+                className="font-mono uppercase"
+                maxLength={32}
+              />
+              <p className="text-xs text-muted-foreground mt-1">If a Delvetek ambassador referred you, enter their code so they get credit.</p>
+            </div>
             <Button
               variant="hero"
               size="lg"
