@@ -351,12 +351,12 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
               </div>
             </div>
 
-            <div className="rounded-lg bg-secondary/30 border border-border/50 p-3 space-y-1.5">
-              <p className="text-xs font-semibold text-foreground">📌 How it works:</p>
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 space-y-1.5">
+              <p className="text-xs font-semibold text-foreground">📌 Please pay first, then continue:</p>
               <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-                <li>Click <strong className="text-foreground">"I Have Paid"</strong> below to register your enrollment</li>
-                <li>Open your bank app and transfer the exact amount to the account above</li>
-                <li>You'll be given a reference code — send your proof of payment to us on WhatsApp</li>
+                <li>Open your bank app and transfer <strong className="text-foreground">₦{totalAmount.toLocaleString()}</strong> to the account above</li>
+                <li><strong className="text-foreground">Only after you have paid</strong>, click the button below to continue</li>
+                <li>You'll receive a reference code on the next screen — send your proof of payment to our WhatsApp line so we can confirm</li>
                 <li>Once we confirm your payment, we'll email your dashboard login details</li>
               </ol>
             </div>
@@ -369,7 +369,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 {submitting ? (
                   <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</>
                 ) : (
-                  "I Have Paid / Will Pay Now"
+                  <>Next — After Payment <ArrowRight className="w-4 h-4" /></>
                 )}
               </Button>
             </div>
