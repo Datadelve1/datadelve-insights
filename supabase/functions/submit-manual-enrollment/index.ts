@@ -93,6 +93,7 @@ Deno.serve(async (req) => {
           class_schedule,
           commitment_accepted: true,
           confirmed_by_admin: false,
+          referral_code: normalizedReferral,
         })
         .eq("id", existing.id);
     } else {
@@ -107,6 +108,7 @@ Deno.serve(async (req) => {
         class_schedule,
         commitment_accepted: true,
         confirmed_by_admin: false,
+        referral_code: normalizedReferral,
       });
     }
 
@@ -121,7 +123,7 @@ Deno.serve(async (req) => {
             type: "New Manual Enrollment (Awaiting Payment Confirmation)",
             name: full_name,
             email: lowerEmail,
-            detail: `${track} track · ${class_schedule} · ₦${totalAmount.toLocaleString()}${certificate_requested ? ' · certificate requested' : ''} · Ref: ${reference}`,
+            detail: `${track} track · ${class_schedule} · ₦${totalAmount.toLocaleString()}${certificate_requested ? ' · certificate requested' : ''}${normalizedReferral ? ` · Referral: ${normalizedReferral}` : ''} · Ref: ${reference}`,
           },
         },
       });
