@@ -3,6 +3,7 @@ import * as React from 'npm:react@18.3.1'
 import {
   Body, Container, Head, Heading, Html, Preview, Text, Button, Hr, Section,
 } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "Delvetek"
@@ -20,6 +21,7 @@ const AdminWelcomeEmail = ({ name, email, password, loginUrl }: AdminWelcomeProp
     <Preview>Your Delvetek Admin Portal login credentials</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Section style={headerSection}>
           <Heading style={h1}>Welcome to the Delvetek Admin Portal</Heading>
         </Section>

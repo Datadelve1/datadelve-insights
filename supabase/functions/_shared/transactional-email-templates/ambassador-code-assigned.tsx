@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "DelveTek"
@@ -17,6 +18,7 @@ const AmbassadorCodeAssignedEmail = ({ fullName, code, trackingUrl }: Ambassador
     <Preview>Your DelveTek Ambassador referral code is ready</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Heading style={h1}>Welcome aboard, {fullName || 'Ambassador'} 🎉</Heading>
         <Text style={text}>
           Congratulations! You're now an official {SITE_NAME} Ambassador. Below is your unique referral code — share it with anyone you refer to {SITE_NAME}.

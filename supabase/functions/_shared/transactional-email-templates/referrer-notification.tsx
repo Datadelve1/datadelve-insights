@@ -1,6 +1,7 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
 import { Body, Container, Head, Heading, Html, Preview, Text } from 'npm:@react-email/components@0.0.22'
+import { LogoHeader } from './_logo.tsx'
 import type { TemplateEntry } from './registry.ts'
 
 const SITE_NAME = "Delvetek"
@@ -18,6 +19,7 @@ const ReferrerNotificationEmail = ({ referrerName, referralCode, studentName, tr
     <Preview>🎉 Someone just enrolled using your referral code</Preview>
     <Body style={main}>
       <Container style={container}>
+        <LogoHeader />
         <Heading style={h1}>🎉 You earned a new referral!</Heading>
         <Text style={text}>Hi {referrerName || 'there'},</Text>
         <Text style={text}>
