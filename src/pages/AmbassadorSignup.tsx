@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, CheckCircle2, Sparkles, Upload, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, Sparkles, Upload, Mail } from "lucide-react";
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, "Name is required").max(100),
@@ -127,12 +127,6 @@ const AmbassadorSignup = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-6 py-12 max-w-2xl">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 mb-8 text-sm font-medium text-primary hover:underline"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
 
         <div className="rounded-3xl border border-border bg-card p-8 md:p-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
