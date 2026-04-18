@@ -6,9 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Shield, Heart, Clock } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Heart, Clock, Copy, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const BANK_NAME = "Wema Bank";
+const ACCOUNT_NUMBER = "0127561293";
+const ACCOUNT_NAME = "Delvetek Limited";
+const WHATSAPP_NUMBER = "447775739225";
 
 const TRACK_PRICES: Record<string, number> = {
   beginner: 10000,
@@ -40,11 +45,13 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const [addCertificate, setAddCertificate] = useState(false);
   const [commitmentChecks, setCommitmentChecks] = useState<boolean[]>(new Array(COMMITMENT_ITEMS.length).fill(false));
   const [classSchedule, setClassSchedule] = useState("");
-  const [paying, setPaying] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [reference, setReference] = useState<string | null>(null);
 
   const allCommitmentsChecked = commitmentChecks.every(Boolean);
   const trackPrice = TRACK_PRICES[track] || 0;
   const totalAmount = trackPrice + (addCertificate ? CERTIFICATE_PRICE : 0);
+  const isCommitmentFeeTrack = track === "beginner";
 
   const handleCommitmentToggle = (index: number) => {
     const updated = [...commitmentChecks];
@@ -52,7 +59,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
     setCommitmentChecks(updated);
   };
 
-  const handleEnroll = async () => {
+  const handleSubmitEnrollment = async () => {
     if (!fullName.trim() || !email.trim() || !track) {
       toast.error("Please fill in all required fields");
       return;
@@ -63,32 +70,41 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       return;
     }
 
-    setPaying(true);
+    setSubmitting(true);
     try {
-      const callbackUrl = `${window.location.origin}/enrollment-callback`;
-      const { data, error } = await supabase.functions.invoke("initialize-enrollment-payment", {
+      const { data, error } = await supabase.functions.invoke("submit-manual-enrollment", {
         body: {
           full_name: fullName.trim(),
           email: email.trim().toLowerCase(),
           track,
           certificate_requested: addCertificate,
-          callback_url: callbackUrl,
           class_schedule: classSchedule,
           commitment_accepted: true,
         },
       });
 
       if (error) throw error;
-      if (data?.ok && data?.authorization_url) {
-        window.location.href = data.authorization_url;
+      if (data?.ok && data?.reference) {
+        setReference(data.reference);
+        setStep(5);
       } else {
-        toast.error(data?.error || "Failed to initialize payment");
-        setPaying(false);
+        toast.error(data?.error || "Failed to submit enrollment");
       }
     } catch (err: any) {
-      toast.error(err.message || "Payment initialization failed");
-      setPaying(false);
+      toast.error(err.message || "Submission failed");
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied`);
+  };
+
+  const whatsappLink = () => {
+    const msg = `Hello Delvetek, I have just paid ₦${totalAmount.toLocaleString()} for my enrollment.%0A%0AName: ${fullName}%0AEmail: ${email}%0ATrack: ${track}%0AReference: ${reference}%0A%0AHere is my proof of payment:`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
   };
 
   const resetAndClose = (open: boolean) => {
@@ -96,6 +112,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       setStep(1);
       setCommitmentChecks(new Array(COMMITMENT_ITEMS.length).fill(false));
       setClassSchedule("");
+      setReference(null);
     }
     onOpenChange(open);
   };
@@ -108,11 +125,12 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
             {step === 1 && "Step 1: Your Details"}
             {step === 2 && "Step 2: Commitment Agreement"}
             {step === 3 && "Step 3: Choose Your Schedule"}
-            {step === 4 && "Step 4: Payment"}
+            {step === 4 && "Step 4: Payment Instructions"}
+            {step === 5 && "Enrollment Submitted"}
           </DialogTitle>
           <div className="flex gap-1.5 pt-2">
             {[1, 2, 3, 4].map((s) => (
-              <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? "bg-primary" : "bg-secondary"}`} />
+              <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= Math.min(step, 4) ? "bg-primary" : "bg-secondary"}`} />
             ))}
           </div>
         </DialogHeader>
@@ -158,21 +176,22 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
         {/* Step 2: Commitment Form */}
         {step === 2 && (
           <div className="space-y-4">
-            {/* Reassuring message */}
-            <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
-              <div className="flex items-start gap-3">
-                <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <div className="space-y-2 text-sm">
-                  <p className="font-semibold text-foreground">This is not a traditional course payment</p>
-                  <p className="text-muted-foreground">
-                    The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
-                  </p>
-                  <p className="text-muted-foreground">
-                    This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
-                  </p>
+            {isCommitmentFeeTrack && (
+              <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-sm">
+                    <p className="font-semibold text-foreground">This is not a traditional course payment</p>
+                    <p className="text-muted-foreground">
+                      The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
+                    </p>
+                    <p className="text-muted-foreground">
+                      This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <p className="text-sm font-medium text-foreground">Please confirm you agree to the following:</p>
 
@@ -251,7 +270,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           </div>
         )}
 
-        {/* Step 4: Payment */}
+        {/* Step 4: Bank Transfer Instructions */}
         {step === 4 && (
           <div className="space-y-4">
             <div className="rounded-xl bg-secondary/50 p-4 space-y-2">
@@ -283,33 +302,108 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 </div>
               )}
               <div className="flex justify-between text-sm font-bold border-t border-border pt-2 mt-1">
-                <span className="text-foreground">Total:</span>
+                <span className="text-foreground">Total to Pay:</span>
                 <span className="text-primary">₦{totalAmount.toLocaleString()}</span>
               </div>
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-              <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-              <p className="text-xs text-muted-foreground">
-                <strong className="text-foreground">Commitment confirmed</strong> — You've agreed to all program terms. After payment, you'll receive an email with a link to set up your student dashboard account.
-              </p>
+            <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 space-y-3">
+              <p className="text-sm font-semibold text-foreground">Make payment to this bank account:</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <p className="text-muted-foreground text-xs">Bank</p>
+                    <p className="text-foreground font-medium">{BANK_NAME}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <p className="text-muted-foreground text-xs">Account Number</p>
+                    <p className="text-foreground font-mono font-bold text-base">{ACCOUNT_NUMBER}</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => copyToClipboard(ACCOUNT_NUMBER, "Account number")}>
+                    <Copy className="w-3 h-3 mr-1" /> Copy
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <p className="text-muted-foreground text-xs">Account Name</p>
+                    <p className="text-foreground font-medium">{ACCOUNT_NAME}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <p className="text-muted-foreground text-xs">Amount</p>
+                    <p className="text-primary font-bold">₦{totalAmount.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-secondary/30 border border-border/50 p-3 space-y-1.5">
+              <p className="text-xs font-semibold text-foreground">📌 How it works:</p>
+              <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                <li>Click <strong className="text-foreground">"I Have Paid"</strong> below to register your enrollment</li>
+                <li>Open your bank app and transfer the exact amount to the account above</li>
+                <li>You'll be given a reference code — send your proof of payment to us on WhatsApp</li>
+                <li>Once we confirm your payment, we'll email your dashboard login details</li>
+              </ol>
             </div>
 
             <div className="flex gap-3">
               <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep(3)}>
                 <ArrowLeft className="w-4 h-4" /> Back
               </Button>
-              <Button onClick={handleEnroll} disabled={paying} variant="hero" size="lg" className="flex-1">
-                {paying ? (
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Redirecting...</>
+              <Button onClick={handleSubmitEnrollment} disabled={submitting} variant="hero" size="lg" className="flex-1">
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</>
                 ) : (
-                  `Pay ₦${totalAmount.toLocaleString()}`
+                  "I Have Paid / Will Pay Now"
                 )}
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Step 5: Success - Send Proof on WhatsApp */}
+        {step === 5 && reference && (
+          <div className="space-y-4">
+            <div className="rounded-xl bg-primary/10 border border-primary/30 p-4 text-center space-y-2">
+              <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
+              <p className="font-semibold text-foreground">Enrollment registered!</p>
+              <p className="text-xs text-muted-foreground">Your reference code:</p>
+              <div className="flex items-center justify-center gap-2">
+                <code className="font-mono text-base font-bold text-primary bg-background px-3 py-1.5 rounded border border-border">{reference}</code>
+                <Button variant="outline" size="sm" onClick={() => copyToClipboard(reference, "Reference")}>
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-secondary/30 border border-border/50 p-4 space-y-3">
+              <p className="text-sm font-semibold text-foreground">Next step: Send your proof of payment</p>
+              <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
+                <li>Pay <strong className="text-foreground">₦{totalAmount.toLocaleString()}</strong> to <strong className="text-foreground">{BANK_NAME} · {ACCOUNT_NUMBER}</strong> ({ACCOUNT_NAME})</li>
+                <li>Take a screenshot of your transfer receipt</li>
+                <li>Click the WhatsApp button below — it will open with a pre-filled message including your reference</li>
+                <li>Attach your screenshot and send</li>
+                <li>Once we confirm, your dashboard login will be emailed to <strong className="text-foreground">{email}</strong></li>
+              </ol>
+            </div>
+
+            <Button asChild variant="hero" size="lg" className="w-full">
+              <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="w-4 h-4 mr-2" /> Send Proof on WhatsApp
+              </a>
+            </Button>
+
             <p className="text-xs text-muted-foreground text-center">
-              Secure payment via Paystack. You'll receive login details after payment.
+              You can safely close this window. Your enrollment is saved with reference <strong className="text-foreground">{reference}</strong>.
             </p>
+
+            <Button variant="outline" size="lg" className="w-full" onClick={() => resetAndClose(false)}>
+              Close
+            </Button>
           </div>
         )}
       </DialogContent>
