@@ -81,6 +81,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           certificate_requested: addCertificate,
           class_schedule: classSchedule,
           commitment_accepted: true,
+          referral_code: referralCode.trim() || null,
         },
       });
 
@@ -114,6 +115,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       setCommitmentChecks(new Array(COMMITMENT_ITEMS.length).fill(false));
       setClassSchedule("");
       setReference(null);
+      setReferralCode("");
     }
     onOpenChange(open);
   };
