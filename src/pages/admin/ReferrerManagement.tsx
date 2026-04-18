@@ -402,7 +402,7 @@ const ReferrerManagement = () => {
                   maxLength={32}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  After approval, copy their tracking link from the Referrers tab and email it to them.
+                  After approval, click <strong>Send Code</strong> on the Referrers tab to email the code & tracking link.
                 </p>
               </div>
             </div>
