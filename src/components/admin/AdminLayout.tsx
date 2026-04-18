@@ -65,10 +65,11 @@ const baseNavItems = [
 
 const superAdminItem = { title: "Staff Tracking", url: "/admin/staff", icon: Clock };
 
-function AdminSidebar() {
+function AdminSidebar({ userEmail }: { userEmail?: string | null }) {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navItems = userEmail === SUPER_ADMIN_EMAIL ? [...baseNavItems, superAdminItem] : baseNavItems;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
