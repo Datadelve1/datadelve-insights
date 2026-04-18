@@ -108,7 +108,12 @@ const StudentVideoUpload = () => {
     setSubmitting(true);
     try {
       const ext = videoFile.name.split(".").pop();
-      const storagePath = `${user.id}/week-${selectedSession.week}/${Date.now()}.${ext}`;
+      const slug = (profile?.full_name || user.email || "student")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 40);
+      const storagePath = `${user.id}/week-${selectedSession.week}/${slug}-week${selectedSession.week}-${sessionDate}-${Date.now()}.${ext}`;
 
       const { uploadWithProgress } = await import("@/lib/uploadWithProgress");
       await uploadWithProgress({
