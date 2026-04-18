@@ -133,6 +133,27 @@ Deno.serve(async (req) => {
       console.error("Admin notify failed:", e);
     }
 
+    // Notify referrer if their code was used and we have their email
+    if (normalizedReferral && referrerInfo?.email) {
+      try {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "referrer-notification",
+            recipientEmail: referrerInfo.email,
+            idempotencyKey: `referrer-notify-${reference}`,
+            templateData: {
+              referrerName: referrerInfo.full_name,
+              referralCode: normalizedReferral,
+              studentName: full_name,
+              track,
+            },
+          },
+        });
+      } catch (e) {
+        console.error("Referrer notify failed:", e);
+      }
+    }
+
     return respond(true, { reference, total_amount: totalAmount });
   } catch (err) {
     return respond(false, { error: (err as Error).message });
