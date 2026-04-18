@@ -52,17 +52,19 @@ Deno.serve(async (req) => {
 
     // Validate referral code if provided
     let normalizedReferral: string | null = null;
+    let referrerInfo: { full_name: string; email: string | null } | null = null;
     if (referral_code && typeof referral_code === "string" && referral_code.trim()) {
       const code = referral_code.trim().toUpperCase();
       const { data: referrer } = await supabase
         .from("referrers")
-        .select("code, is_active")
+        .select("code, is_active, full_name, email")
         .ilike("code", code)
         .maybeSingle();
       if (!referrer || !referrer.is_active) {
         return respond(false, { error: "Invalid or inactive referral code. Leave blank if you weren't referred." });
       }
       normalizedReferral = referrer.code.toUpperCase();
+      referrerInfo = { full_name: referrer.full_name, email: referrer.email };
     }
 
     const lowerEmail = email.toLowerCase().trim();
@@ -129,6 +131,27 @@ Deno.serve(async (req) => {
       });
     } catch (e) {
       console.error("Admin notify failed:", e);
+    }
+
+    // Notify referrer if their code was used and we have their email
+    if (normalizedReferral && referrerInfo?.email) {
+      try {
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "referrer-notification",
+            recipientEmail: referrerInfo.email,
+            idempotencyKey: `referrer-notify-${reference}`,
+            templateData: {
+              referrerName: referrerInfo.full_name,
+              referralCode: normalizedReferral,
+              studentName: full_name,
+              track,
+            },
+          },
+        });
+      } catch (e) {
+        console.error("Referrer notify failed:", e);
+      }
     }
 
     return respond(true, { reference, total_amount: totalAmount });
