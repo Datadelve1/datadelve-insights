@@ -39,6 +39,7 @@ import {
   ClipboardList,
   Clock,
   HardDrive,
+  Share2,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
@@ -46,6 +47,7 @@ import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortConte
 const navItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
+  { title: "Referrers", url: "/admin/referrers", icon: Share2 },
   { title: "Student Tracking", url: "/admin/students", icon: Users },
   { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Review Questions", url: "/admin/review-questions", icon: MessageSquare },
