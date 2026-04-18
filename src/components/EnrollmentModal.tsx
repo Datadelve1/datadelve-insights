@@ -6,9 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Shield, Heart, Clock } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Heart, Clock, Copy, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const BANK_NAME = "Wema Bank";
+const ACCOUNT_NUMBER = "0127561293";
+const ACCOUNT_NAME = "Delvetek Limited";
+const WHATSAPP_NUMBER = "447775739225";
 
 const TRACK_PRICES: Record<string, number> = {
   beginner: 10000,
