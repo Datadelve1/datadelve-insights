@@ -12,6 +12,7 @@ export interface TemplateEntry {
 import { template as enrollmentWelcome } from './enrollment-welcome.tsx'
 import { template as webinarConfirmation } from './webinar-confirmation.tsx'
 import { template as ambassadorConfirmation } from './ambassador-confirmation.tsx'
+import { template as ambassadorCodeAssigned } from './ambassador-code-assigned.tsx'
 import { template as commitmentConfirmation } from './commitment-confirmation.tsx'
 import { template as weeklyReviewConfirmation } from './weekly-review-confirmation.tsx'
 import { template as adminNotification } from './admin-notification.tsx'
@@ -23,6 +24,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'enrollment-welcome': enrollmentWelcome,
   'webinar-confirmation': webinarConfirmation,
   'ambassador-confirmation': ambassadorConfirmation,
+  'ambassador-code-assigned': ambassadorCodeAssigned,
   'commitment-confirmation': commitmentConfirmation,
   'weekly-review-confirmation': weeklyReviewConfirmation,
   'admin-notification': adminNotification,
