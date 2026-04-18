@@ -44,7 +44,9 @@ import {
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
 
-const navItems = [
+const SUPER_ADMIN_EMAIL = "datadelve1@gmail.com";
+
+const baseNavItems = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
   { title: "Referrers", url: "/admin/referrers", icon: Share2 },
@@ -58,9 +60,10 @@ const navItems = [
   { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
   { title: "Ambassadors", url: "/admin/ambassadors", icon: Award },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
-  { title: "Staff Tracking", url: "/admin/staff", icon: Clock },
   { title: "Storage Manager", url: "/admin/storage", icon: HardDrive },
 ];
+
+const superAdminItem = { title: "Staff Tracking", url: "/admin/staff", icon: Clock };
 
 function AdminSidebar() {
   const { state } = useSidebar();
