@@ -99,6 +99,13 @@ const EnrollmentManagement = () => {
               <tr key={e.id} className="border-b border-border/50 hover:bg-secondary/30">
                 <td className="p-3 text-foreground">{e.full_name}</td>
                 <td className="p-3 text-muted-foreground">{e.email}</td>
+                <td className="p-3">
+                  {e.referral_code ? (
+                    <code className="text-xs font-mono font-bold text-primary bg-primary/10 px-2 py-1 rounded">{e.referral_code}</code>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </td>
                 <td className="p-3 text-foreground">₦{e.amount_paid.toLocaleString()}</td>
                 <td className="p-3">
                   <span className={`text-xs px-2 py-1 rounded-full ${
@@ -187,6 +194,24 @@ const EnrollmentManagement = () => {
       <div>
         <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
         <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
+      </div>
+
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          value={referralFilter}
+          onChange={(e) => setReferralFilter(e.target.value)}
+          placeholder="Filter by referral code..."
+          className="pl-9 pr-9 font-mono uppercase"
+        />
+        {referralFilter && (
+          <button
+            onClick={() => setReferralFilter("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <Tabs defaultValue="beginner">
