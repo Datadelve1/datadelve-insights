@@ -130,6 +130,53 @@ export type Database = {
         }
         Relationships: []
       }
+      ambassador_signups: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string
+          referrer_id: string | null
+          status: string
+          updated_at: string
+          why_refer: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone: string
+          referrer_id?: string | null
+          status?: string
+          updated_at?: string
+          why_refer: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string
+          referrer_id?: string | null
+          status?: string
+          updated_at?: string
+          why_refer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambassador_signups_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "referrers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignment_submissions: {
         Row: {
           answers: Json
@@ -977,6 +1024,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_referrer_tracking: { Args: { _code: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
