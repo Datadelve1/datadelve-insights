@@ -406,7 +406,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
             </Button>
           </div>
         )}
-        )}
       </DialogContent>
     </Dialog>
   );
