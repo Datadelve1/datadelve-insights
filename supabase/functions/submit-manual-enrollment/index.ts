@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { full_name, email, track, certificate_requested, class_schedule, commitment_accepted } = await req.json();
+    const { full_name, email, track, certificate_requested, class_schedule, commitment_accepted, referral_code } = await req.json();
 
     if (!full_name || !email || !track || !class_schedule) {
       return respond(false, { error: "Missing required fields" });
@@ -49,6 +49,21 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Validate referral code if provided
+    let normalizedReferral: string | null = null;
+    if (referral_code && typeof referral_code === "string" && referral_code.trim()) {
+      const code = referral_code.trim().toUpperCase();
+      const { data: referrer } = await supabase
+        .from("referrers")
+        .select("code, is_active")
+        .ilike("code", code)
+        .maybeSingle();
+      if (!referrer || !referrer.is_active) {
+        return respond(false, { error: "Invalid or inactive referral code. Leave blank if you weren't referred." });
+      }
+      normalizedReferral = referrer.code.toUpperCase();
+    }
 
     const lowerEmail = email.toLowerCase().trim();
 
