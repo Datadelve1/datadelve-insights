@@ -52,17 +52,19 @@ Deno.serve(async (req) => {
 
     // Validate referral code if provided
     let normalizedReferral: string | null = null;
+    let referrerInfo: { full_name: string; email: string | null } | null = null;
     if (referral_code && typeof referral_code === "string" && referral_code.trim()) {
       const code = referral_code.trim().toUpperCase();
       const { data: referrer } = await supabase
         .from("referrers")
-        .select("code, is_active")
+        .select("code, is_active, full_name, email")
         .ilike("code", code)
         .maybeSingle();
       if (!referrer || !referrer.is_active) {
         return respond(false, { error: "Invalid or inactive referral code. Leave blank if you weren't referred." });
       }
       normalizedReferral = referrer.code.toUpperCase();
+      referrerInfo = { full_name: referrer.full_name, email: referrer.email };
     }
 
     const lowerEmail = email.toLowerCase().trim();
