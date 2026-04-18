@@ -45,11 +45,13 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const [addCertificate, setAddCertificate] = useState(false);
   const [commitmentChecks, setCommitmentChecks] = useState<boolean[]>(new Array(COMMITMENT_ITEMS.length).fill(false));
   const [classSchedule, setClassSchedule] = useState("");
-  const [paying, setPaying] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [reference, setReference] = useState<string | null>(null);
 
   const allCommitmentsChecked = commitmentChecks.every(Boolean);
   const trackPrice = TRACK_PRICES[track] || 0;
   const totalAmount = trackPrice + (addCertificate ? CERTIFICATE_PRICE : 0);
+  const isCommitmentFeeTrack = track === "beginner";
 
   const handleCommitmentToggle = (index: number) => {
     const updated = [...commitmentChecks];
@@ -57,7 +59,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
     setCommitmentChecks(updated);
   };
 
-  const handleEnroll = async () => {
+  const handleSubmitEnrollment = async () => {
     if (!fullName.trim() || !email.trim() || !track) {
       toast.error("Please fill in all required fields");
       return;
@@ -68,32 +70,41 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       return;
     }
 
-    setPaying(true);
+    setSubmitting(true);
     try {
-      const callbackUrl = `${window.location.origin}/enrollment-callback`;
-      const { data, error } = await supabase.functions.invoke("initialize-enrollment-payment", {
+      const { data, error } = await supabase.functions.invoke("submit-manual-enrollment", {
         body: {
           full_name: fullName.trim(),
           email: email.trim().toLowerCase(),
           track,
           certificate_requested: addCertificate,
-          callback_url: callbackUrl,
           class_schedule: classSchedule,
           commitment_accepted: true,
         },
       });
 
       if (error) throw error;
-      if (data?.ok && data?.authorization_url) {
-        window.location.href = data.authorization_url;
+      if (data?.ok && data?.reference) {
+        setReference(data.reference);
+        setStep(5);
       } else {
-        toast.error(data?.error || "Failed to initialize payment");
-        setPaying(false);
+        toast.error(data?.error || "Failed to submit enrollment");
       }
     } catch (err: any) {
-      toast.error(err.message || "Payment initialization failed");
-      setPaying(false);
+      toast.error(err.message || "Submission failed");
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied`);
+  };
+
+  const whatsappLink = () => {
+    const msg = `Hello Delvetek, I have just paid ₦${totalAmount.toLocaleString()} for my enrollment.%0A%0AName: ${fullName}%0AEmail: ${email}%0ATrack: ${track}%0AReference: ${reference}%0A%0AHere is my proof of payment:`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
   };
 
   const resetAndClose = (open: boolean) => {
@@ -101,6 +112,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
       setStep(1);
       setCommitmentChecks(new Array(COMMITMENT_ITEMS.length).fill(false));
       setClassSchedule("");
+      setReference(null);
     }
     onOpenChange(open);
   };
