@@ -52,7 +52,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const allCommitmentsChecked = commitmentChecks.every(Boolean);
   const trackPrice = TRACK_PRICES[track] || 0;
   const totalAmount = trackPrice + (addCertificate ? CERTIFICATE_PRICE : 0);
-  const isCommitmentFeeTrack = track === "beginner";
 
   const handleCommitmentToggle = (index: number) => {
     const updated = [...commitmentChecks];
@@ -190,22 +189,20 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
         {/* Step 2: Commitment Form */}
         {step === 2 && (
           <div className="space-y-4">
-            {isCommitmentFeeTrack && (
-              <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-2 text-sm">
-                    <p className="font-semibold text-foreground">This is not a traditional course payment</p>
-                    <p className="text-muted-foreground">
-                      The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
-                    </p>
-                    <p className="text-muted-foreground">
-                      This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
-                    </p>
-                  </div>
+            <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <Heart className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="space-y-2 text-sm">
+                  <p className="font-semibold text-foreground">This is not a traditional course payment</p>
+                  <p className="text-muted-foreground">
+                    The fee you pay is a <strong className="text-foreground">commitment fee</strong>, not full payment for the program. We are equally committed to your growth and success — which is why these guidelines are in place.
+                  </p>
+                  <p className="text-muted-foreground">
+                    This structure is designed to <strong className="text-foreground">support discipline, accountability, and real results</strong>. We believe in you, and we want to make sure you get the most out of this experience.
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
 
             <p className="text-sm font-medium text-foreground">Please confirm you agree to the following:</p>
 
@@ -354,12 +351,12 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
               </div>
             </div>
 
-            <div className="rounded-lg bg-secondary/30 border border-border/50 p-3 space-y-1.5">
-              <p className="text-xs font-semibold text-foreground">📌 How it works:</p>
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 space-y-1.5">
+              <p className="text-xs font-semibold text-foreground">📌 Please pay first, then continue:</p>
               <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-                <li>Click <strong className="text-foreground">"I Have Paid"</strong> below to register your enrollment</li>
-                <li>Open your bank app and transfer the exact amount to the account above</li>
-                <li>You'll be given a reference code — send your proof of payment to us on WhatsApp</li>
+                <li>Open your bank app and transfer <strong className="text-foreground">₦{totalAmount.toLocaleString()}</strong> to the account above</li>
+                <li><strong className="text-foreground">Only after you have paid</strong>, click the button below to continue</li>
+                <li>You'll receive a reference code on the next screen — send your proof of payment to our WhatsApp line so we can confirm</li>
                 <li>Once we confirm your payment, we'll email your dashboard login details</li>
               </ol>
             </div>
@@ -372,7 +369,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 {submitting ? (
                   <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Submitting...</>
                 ) : (
-                  "I Have Paid / Will Pay Now"
+                  <>Next — After Payment <ArrowRight className="w-4 h-4" /></>
                 )}
               </Button>
             </div>
