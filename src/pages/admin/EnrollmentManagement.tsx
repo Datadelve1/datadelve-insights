@@ -246,6 +246,20 @@ const EnrollmentManagement = () => {
                           <><Mail className="w-3 h-3 mr-1" /> Resend Welcome Email</>
                         )}
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={deletingId === e.id}
+                        onClick={() => deleteEnrollment(e.id, e.full_name)}
+                        className="text-destructive hover:text-destructive"
+                        title="Delete this enrollment record (does not delete their auth account)"
+                      >
+                        {deletingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Deleting...</>
+                        ) : (
+                          <><Trash2 className="w-3 h-3 mr-1" /> Delete</>
+                        )}
+                      </Button>
                     </div>
                   )}
                 </td>
