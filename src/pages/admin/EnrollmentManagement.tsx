@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, CheckCircle2, XCircle, Search, X, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Search, X, Mail, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
@@ -31,6 +31,7 @@ const EnrollmentManagement = () => {
   const [loading, setLoading] = useState(true);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [referralFilter, setReferralFilter] = useState("");
 
   const fetchEnrollments = async () => {
@@ -101,7 +102,20 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const filteredByReferral = useMemo(() => {
+  const deleteEnrollment = async (id: string, name: string) => {
+    if (!confirm(`Delete enrollment for ${name}? This cannot be undone. Only use for unpaid/test entries.`)) return;
+    setDeletingId(id);
+    try {
+      const { error } = await supabase.from("cohort2_enrollments").delete().eq("id", id);
+      if (error) throw error;
+      toast.success(`Deleted enrollment for ${name}`);
+      setEnrollments((prev) => prev.filter((e) => e.id !== id));
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete");
+    } finally {
+      setDeletingId(null);
+    }
+  };
     const q = referralFilter.trim().toUpperCase();
     if (!q) return enrollments;
     return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
