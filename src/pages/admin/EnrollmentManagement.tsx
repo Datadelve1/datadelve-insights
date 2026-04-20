@@ -198,8 +198,25 @@ const EnrollmentManagement = () => {
                       </Button>
                     </div>
                   )}
-                  {e.confirmed_by_admin && e.payment_reference && (
-                    <span className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</span>
+                  {e.confirmed_by_admin && (
+                    <div className="space-y-1">
+                      {e.payment_reference && (
+                        <div className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</div>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={resendingId === e.id}
+                        onClick={() => resendWelcome(e.id, e.email)}
+                        title="Generate a new temp password and resend the welcome email"
+                      >
+                        {resendingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Sending...</>
+                        ) : (
+                          <><Mail className="w-3 h-3 mr-1" /> Resend Welcome Email</>
+                        )}
+                      </Button>
+                    </div>
                   )}
                 </td>
               </tr>
