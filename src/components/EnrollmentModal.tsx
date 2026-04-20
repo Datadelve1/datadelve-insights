@@ -103,29 +103,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
     toast.success(`${label} copied`);
   };
 
-  const openBankApp = () => {
-    // Copy account number first so the user can paste in their bank app
-    navigator.clipboard.writeText(ACCOUNT_NUMBER).catch(() => {});
-    toast.success("Account number copied — paste in your bank app");
-
-    const ua = navigator.userAgent || "";
-    const isAndroid = /Android/i.test(ua);
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-    if (isAndroid) {
-      // Try to open the Android banking app picker via intent
-      window.location.href =
-        "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_BANK;end";
-      return;
-    }
-    if (isIOS) {
-      // iOS has no universal banking scheme — fall back to a search so the user can pick
-      window.open("https://www.google.com/search?q=open+my+bank+app", "_blank", "noopener,noreferrer");
-      return;
-    }
-    toast.info("On mobile, this opens your bank app. On desktop, please use your bank's website.");
-  };
-
   const whatsappLink = () => {
     const msg = `Hello Delvetek, I have just paid ₦${totalAmount.toLocaleString()} for my enrollment.%0A%0AName: ${fullName}%0AEmail: ${email}%0ATrack: ${track}%0AReference: ${reference}%0A%0AHere is my proof of payment:`;
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
