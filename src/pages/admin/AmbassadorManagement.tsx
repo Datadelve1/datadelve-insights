@@ -154,6 +154,20 @@ const ReferrerManagement = () => {
     }
   };
 
+  const resendAckEmail = async (s: AmbassadorSignup) => {
+    if (!confirm(`Resend application confirmation email to ${s.email}?`)) return;
+    const t = toast.loading("Sending...");
+    try {
+      const { error } = await supabase.functions.invoke("send-ambassador-confirmation", {
+        body: { email: s.email, full_name: s.full_name },
+      });
+      if (error) throw error;
+      toast.success(`Confirmation email sent to ${s.email}`, { id: t });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send", { id: t });
+    }
+  };
+
   const openApprove = (s: AmbassadorSignup) => {
     setApprovalSignup(s);
     // Suggest a code from first name
@@ -370,12 +384,30 @@ const ReferrerManagement = () => {
                       </div>
                     </div>
                     {s.status === "pending" && (
-                      <div className="flex gap-2 shrink-0">
+                      <div className="flex gap-2 shrink-0 flex-wrap">
                         <Button size="sm" variant="hero" onClick={() => openApprove(s)}>
                           <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Approve
                         </Button>
+                        <Button size="sm" variant="outline" onClick={() => resendAckEmail(s)}>
+                          <Mail className="w-3.5 h-3.5 mr-1" /> Resend Confirmation
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => rejectSignup(s.id)}>
                           <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
+                        </Button>
+                      </div>
+                    )}
+                    {s.status === "approved" && s.referrer_id && (
+                      <div className="flex gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const ref = referrers.find((r) => r.id === s.referrer_id);
+                            if (ref) sendCodeEmail(ref);
+                            else toast.error("Referrer record not found");
+                          }}
+                        >
+                          <Mail className="w-3.5 h-3.5 mr-1" /> Resend Code Email
                         </Button>
                       </div>
                     )}
