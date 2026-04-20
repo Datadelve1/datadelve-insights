@@ -28,7 +28,9 @@ import {
   Search,
   FileVideo,
   ArrowUpDown,
+  Play,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type Bucket = "student-videos" | "class-videos" | "form-uploads";
 
@@ -66,6 +68,30 @@ const StorageManager = () => {
   const [sortBy, setSortBy] = useState<"size" | "date" | "name">("size");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmFile, setConfirmFile] = useState<StorageFile | null>(null);
+  const [previewFile, setPreviewFile] = useState<StorageFile | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const isVideoFile = (name: string) => /\.(mp4|webm|mov|m4v|ogg)$/i.test(name);
+
+  const openPreview = async (file: StorageFile) => {
+    setPreviewFile(file);
+    setPreviewUrl(null);
+    setPreviewLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-storage-manager", {
+        body: { action: "signed_url", bucket, path: file.path },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.error || "Failed to load preview");
+      setPreviewUrl(data.url);
+    } catch (e: any) {
+      toast({ title: "Preview failed", description: e.message, variant: "destructive" });
+      setPreviewFile(null);
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
 
   const fetchFiles = async (b: Bucket) => {
     setLoading(true);
