@@ -132,10 +132,12 @@ export type Database = {
       }
       ambassador_signups: {
         Row: {
+          allow_ig_tag: boolean
           created_at: string
           email: string
           full_name: string
           id: string
+          ig_handle: string | null
           notes: string | null
           phone: string
           photo_url: string | null
@@ -145,10 +147,12 @@ export type Database = {
           why_refer: string
         }
         Insert: {
+          allow_ig_tag?: boolean
           created_at?: string
           email: string
           full_name: string
           id?: string
+          ig_handle?: string | null
           notes?: string | null
           phone: string
           photo_url?: string | null
@@ -158,10 +162,12 @@ export type Database = {
           why_refer: string
         }
         Update: {
+          allow_ig_tag?: boolean
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          ig_handle?: string | null
           notes?: string | null
           phone?: string
           photo_url?: string | null
