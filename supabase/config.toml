@@ -23,3 +23,5 @@ project_id = "cszwkukwkcrecirbvvee"
     verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
+  [functions.send-ambassador-confirmation]
+    verify_jwt = false
