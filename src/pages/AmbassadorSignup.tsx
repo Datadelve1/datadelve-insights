@@ -94,6 +94,12 @@ const AmbassadorSignup = () => {
         allow_ig_tag: allowIgTag,
       });
       if (error) throw error;
+
+      // Fire-and-forget confirmation emails (don't block the success state)
+      supabase.functions.invoke("send-ambassador-confirmation", {
+        body: { email: parsed.data.email.toLowerCase(), full_name: parsed.data.full_name },
+      }).catch((e) => console.error("Confirmation email failed:", e));
+
       setSubmitted(true);
     } catch (err: any) {
       toast({
