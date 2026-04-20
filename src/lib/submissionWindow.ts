@@ -25,8 +25,8 @@ export interface SubmissionWindowInfo {
 // One-off deadline extensions per week (week number -> extra hours added to the close time).
 // Used for ad-hoc adjustments without changing the standard weekly cycle.
 const WEEK_DEADLINE_EXTENSIONS: Record<number, number> = {
-  // Week 3: extended from Wed 11:59 PM -> Thu 11:59 PM WAT (one-off)
-  3: 24,
+  // Week 4: extended from Wed 11:59 PM -> Thu 11:59 PM WAT (one-off for this week only)
+  4: 24,
 };
 
 function getWindowForWeek(week: number): { open: Date; close: Date } {
