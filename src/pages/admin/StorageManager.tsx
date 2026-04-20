@@ -263,19 +263,32 @@ const StorageManager = () => {
                             </div>
                           </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setConfirmFile(f)}
-                          disabled={deleting === f.path}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
-                        >
-                          {deleting === f.path ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
+                        <div className="flex gap-1 shrink-0">
+                          {isVideoFile(f.name) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openPreview(f)}
+                              className="text-primary hover:text-primary hover:bg-primary/10"
+                              title="Preview video"
+                            >
+                              <Play className="w-4 h-4" />
+                            </Button>
                           )}
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setConfirmFile(f)}
+                            disabled={deleting === f.path}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            {deleting === f.path ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -309,6 +322,60 @@ const StorageManager = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={!!previewFile}
+        onOpenChange={(o) => {
+          if (!o) {
+            setPreviewFile(null);
+            setPreviewUrl(null);
+          }
+        }}
+      >
+        <DialogContent className="bg-card border-border max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-foreground truncate pr-6">
+              {previewFile?.student_name || previewFile?.name}
+            </DialogTitle>
+            <p className="text-xs text-muted-foreground truncate">{previewFile?.path}</p>
+          </DialogHeader>
+          <div className="aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">
+            {previewLoading ? (
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            ) : previewUrl ? (
+              <video
+                src={previewUrl}
+                controls
+                autoPlay
+                controlsList="nodownload"
+                className="w-full h-full"
+              />
+            ) : (
+              <p className="text-muted-foreground text-sm">No preview available</p>
+            )}
+          </div>
+          {previewFile && (
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-xs text-muted-foreground">
+                {formatSize(previewFile.size)}
+                {previewFile.student_email && ` · ${previewFile.student_email}`}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setConfirmFile(previewFile);
+                  setPreviewFile(null);
+                  setPreviewUrl(null);
+                }}
+                className="text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+              >
+                <Trash2 className="w-3 h-3 mr-1" /> Delete this file
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
