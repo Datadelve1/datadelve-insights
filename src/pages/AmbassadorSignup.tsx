@@ -246,6 +246,31 @@ const AmbassadorSignup = () => {
               <p className="text-xs text-muted-foreground">Min 20 characters.</p>
             </div>
 
+            <div className="space-y-1.5">
+              <Label htmlFor="ig_handle" className="flex items-center gap-2">
+                <Instagram className="w-4 h-4" /> Instagram Handle <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+              </Label>
+              <Input
+                id="ig_handle"
+                value={form.ig_handle}
+                onChange={(e) => update("ig_handle", e.target.value)}
+                placeholder="@yourhandle"
+                maxLength={50}
+              />
+              <p className="text-xs text-muted-foreground">If you'd like us to feature you on our Instagram.</p>
+            </div>
+
+            <label className="flex items-start gap-3 p-3 rounded-lg border border-border bg-secondary/30 cursor-pointer">
+              <Checkbox
+                checked={allowIgTag}
+                onCheckedChange={(v) => setAllowIgTag(!!v)}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-foreground leading-relaxed">
+                Yes, I'd like Delvetek to <strong>tag me</strong> or <strong>collaborate with me</strong> when posting me as an ambassador on Instagram.
+              </span>
+            </label>
+
             <Button
               type="submit"
               disabled={loading || uploading}
