@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon, Mail } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon, Mail, Download, Instagram } from "lucide-react";
 import { toast } from "sonner";
 
 interface Referrer {
@@ -30,6 +30,9 @@ interface AmbassadorSignup {
   referrer_id: string | null;
   notes: string | null;
   created_at: string;
+  photo_url?: string | null;
+  ig_handle?: string | null;
+  allow_ig_tag?: boolean | null;
 }
 
 const ReferrerManagement = () => {
