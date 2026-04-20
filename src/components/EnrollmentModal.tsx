@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Heart, Clock, Copy, MessageCircle, Smartphone } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, CheckCircle2, Heart, Clock, Copy, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -101,29 +101,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied`);
-  };
-
-  const openBankApp = () => {
-    // Copy account number first so the user can paste in their bank app
-    navigator.clipboard.writeText(ACCOUNT_NUMBER).catch(() => {});
-    toast.success("Account number copied — paste in your bank app");
-
-    const ua = navigator.userAgent || "";
-    const isAndroid = /Android/i.test(ua);
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-    if (isAndroid) {
-      // Try to open the Android banking app picker via intent
-      window.location.href =
-        "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_BANK;end";
-      return;
-    }
-    if (isIOS) {
-      // iOS has no universal banking scheme — fall back to a search so the user can pick
-      window.open("https://www.google.com/search?q=open+my+bank+app", "_blank", "noopener,noreferrer");
-      return;
-    }
-    toast.info("On mobile, this opens your bank app. On desktop, please use your bank's website.");
   };
 
   const whatsappLink = () => {
@@ -376,17 +353,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 </div>
               </div>
 
-              <Button
-                variant="glow"
-                size="lg"
-                className="w-full mt-1"
-                onClick={openBankApp}
-              >
-                <Smartphone className="w-4 h-4 mr-2" /> Open my bank app
-              </Button>
-              <p className="text-[11px] text-muted-foreground text-center -mt-1">
-                Opens your installed banking app. If nothing opens, copy the details above and pay manually.
-              </p>
             </div>
 
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 space-y-1.5">

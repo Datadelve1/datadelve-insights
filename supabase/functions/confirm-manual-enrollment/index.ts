@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const isAdmin = roles?.some((r) => r.role === "admin");
     if (!isAdmin) return respond(false, { error: "Admin access required" });
 
-    const { enrollment_id } = await req.json();
+    const { enrollment_id, resend_email } = await req.json();
     if (!enrollment_id) return respond(false, { error: "Missing enrollment_id" });
 
     const { data: enrollment, error: fetchErr } = await supabase
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchErr || !enrollment) return respond(false, { error: "Enrollment not found" });
-    if (enrollment.payment_status === "paid" && enrollment.confirmed_by_admin) {
+    if (!resend_email && enrollment.payment_status === "paid" && enrollment.confirmed_by_admin) {
       return respond(false, { error: "Already confirmed" });
     }
 
@@ -110,14 +110,17 @@ Deno.serve(async (req) => {
       }, { onConflict: "user_id" });
     }
 
-    // Send welcome email with login details
+    // Send welcome email with login details (idempotency key includes timestamp on resend so it always sends)
     let emailSent = false;
+    const idempotencyKey = resend_email
+      ? `enrollment-welcome-${enrollment.payment_reference || enrollment_id}-resend-${Date.now()}`
+      : `enrollment-welcome-${enrollment.payment_reference || enrollment_id}`;
     try {
       const { error: emailError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
           templateName: "enrollment-welcome",
           recipientEmail: email,
-          idempotencyKey: `enrollment-welcome-${enrollment.payment_reference || enrollment_id}`,
+          idempotencyKey,
           templateData: {
             fullName,
             email,
@@ -134,7 +137,7 @@ Deno.serve(async (req) => {
       console.error("Welcome email failed:", e);
     }
 
-    return respond(true, { success: true, email_sent: emailSent });
+    return respond(true, { success: true, email_sent: emailSent, password: emailSent ? undefined : password });
   } catch (err) {
     return respond(false, { error: (err as Error).message });
   }

@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, CheckCircle2, Sparkles, Upload, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, CheckCircle2, Sparkles, Upload, Mail, Instagram } from "lucide-react";
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, "Name is required").max(100),
   email: z.string().trim().email("Invalid email").max(255),
   phone: z.string().trim().min(6, "Phone is required").max(30),
   why_refer: z.string().trim().min(20, "Tell us at least 20 characters").max(800),
+  ig_handle: z.string().trim().max(50).optional(),
 });
 
 const AmbassadorSignup = () => {
@@ -24,11 +26,13 @@ const AmbassadorSignup = () => {
   const [submitted, setSubmitted] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [allowIgTag, setAllowIgTag] = useState(false);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
     phone: "",
     why_refer: "",
+    ig_handle: "",
   });
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
@@ -86,6 +90,8 @@ const AmbassadorSignup = () => {
         phone: parsed.data.phone,
         why_refer: parsed.data.why_refer,
         photo_url: photoUrl,
+        ig_handle: parsed.data.ig_handle ? parsed.data.ig_handle.replace(/^@/, "").trim() || null : null,
+        allow_ig_tag: allowIgTag,
       });
       if (error) throw error;
       setSubmitted(true);
@@ -239,6 +245,31 @@ const AmbassadorSignup = () => {
               />
               <p className="text-xs text-muted-foreground">Min 20 characters.</p>
             </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="ig_handle" className="flex items-center gap-2">
+                <Instagram className="w-4 h-4" /> Instagram Handle <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+              </Label>
+              <Input
+                id="ig_handle"
+                value={form.ig_handle}
+                onChange={(e) => update("ig_handle", e.target.value)}
+                placeholder="@yourhandle"
+                maxLength={50}
+              />
+              <p className="text-xs text-muted-foreground">If you'd like us to feature you on our Instagram.</p>
+            </div>
+
+            <label className="flex items-start gap-3 p-3 rounded-lg border border-border bg-secondary/30 cursor-pointer">
+              <Checkbox
+                checked={allowIgTag}
+                onCheckedChange={(v) => setAllowIgTag(!!v)}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-foreground leading-relaxed">
+                Yes, I'd like Delvetek to <strong>tag me</strong> or <strong>collaborate with me</strong> when posting me as an ambassador on Instagram.
+              </span>
+            </label>
 
             <Button
               type="submit"

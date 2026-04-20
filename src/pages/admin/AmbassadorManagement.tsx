@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon, Mail } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Copy, CheckCircle2, XCircle, Link as LinkIcon, Mail, Download, Instagram } from "lucide-react";
 import { toast } from "sonner";
 
 interface Referrer {
@@ -30,6 +30,9 @@ interface AmbassadorSignup {
   referrer_id: string | null;
   notes: string | null;
   created_at: string;
+  photo_url?: string | null;
+  ig_handle?: string | null;
+  allow_ig_tag?: boolean | null;
 }
 
 const ReferrerManagement = () => {
@@ -307,20 +310,64 @@ const ReferrerManagement = () => {
               {signups.map((s) => (
                 <div key={s.id} className="rounded-lg border border-border p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-foreground">{s.full_name}</h3>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          s.status === "approved" ? "bg-green-500/20 text-green-600" :
-                          s.status === "rejected" ? "bg-destructive/20 text-destructive" :
-                          "bg-yellow-500/20 text-yellow-600"
-                        }`}>
-                          {s.status}
-                        </span>
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      {s.photo_url ? (
+                        <img
+                          src={s.photo_url}
+                          alt={`${s.full_name} headshot`}
+                          className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-secondary border border-border shrink-0 flex items-center justify-center text-xs text-muted-foreground">
+                          —
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-semibold text-foreground">{s.full_name}</h3>
+                          {s.photo_url && (
+                            <a
+                              href={s.photo_url}
+                              download={`${s.full_name.replace(/\s+/g, "_")}_headshot`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                              title="Download headshot"
+                            >
+                              <Download className="w-3 h-3" /> Headshot
+                            </a>
+                          )}
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            s.status === "approved" ? "bg-green-500/20 text-green-600" :
+                            s.status === "rejected" ? "bg-destructive/20 text-destructive" :
+                            "bg-yellow-500/20 text-yellow-600"
+                          }`}>
+                            {s.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {s.email} · {s.phone} · {new Date(s.created_at).toLocaleDateString()}
+                        </p>
+                        {(s.ig_handle || s.allow_ig_tag) && (
+                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+                            {s.ig_handle && (
+                              <a
+                                href={`https://instagram.com/${s.ig_handle.replace(/^@/, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-primary hover:underline"
+                              >
+                                <Instagram className="w-3 h-3" /> @{s.ig_handle.replace(/^@/, "")}
+                              </a>
+                            )}
+                            {s.allow_ig_tag && (
+                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-600">
+                                ✓ OK to tag/collab on IG
+                              </span>
+                            )}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {s.email} · {s.phone} · {new Date(s.created_at).toLocaleDateString()}
-                      </p>
                     </div>
                     {s.status === "pending" && (
                       <div className="flex gap-2 shrink-0">

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, CheckCircle2, XCircle, Search, X } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Search, X, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
@@ -30,6 +30,7 @@ const EnrollmentManagement = () => {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
   const [referralFilter, setReferralFilter] = useState("");
 
   const fetchEnrollments = async () => {
@@ -54,7 +55,14 @@ const EnrollmentManagement = () => {
       });
       if (error) throw error;
       if (data?.ok) {
-        toast.success(data.email_sent ? "Confirmed — login email sent" : "Confirmed (email send failed, check logs)");
+        if (data.email_sent) {
+          toast.success("Confirmed — login email sent");
+        } else if (data.password) {
+          await navigator.clipboard.writeText(data.password).catch(() => {});
+          toast.warning(`Confirmed but email failed. Temp password copied to clipboard: ${data.password}`, { duration: 20000 });
+        } else {
+          toast.success("Confirmed (email send failed, check logs)");
+        }
         fetchEnrollments();
       } else {
         toast.error(data?.error || "Failed to confirm");
@@ -63,6 +71,33 @@ const EnrollmentManagement = () => {
       toast.error(err.message || "Failed to confirm");
     } finally {
       setConfirmingId(null);
+    }
+  };
+
+  const resendWelcome = async (id: string, email: string) => {
+    if (!confirm(`Resend welcome email with NEW temporary password to ${email}? Their existing password will be reset.`)) return;
+    setResendingId(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("confirm-manual-enrollment", {
+        body: { enrollment_id: id, resend_email: true },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        if (data.email_sent) {
+          toast.success(`Welcome email resent to ${email}`);
+        } else if (data.password) {
+          await navigator.clipboard.writeText(data.password).catch(() => {});
+          toast.warning(`Email failed but password reset. Temp password copied: ${data.password}`, { duration: 20000 });
+        } else {
+          toast.error("Resend failed — check logs");
+        }
+      } else {
+        toast.error(data?.error || "Failed to resend");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to resend");
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -163,8 +198,25 @@ const EnrollmentManagement = () => {
                       </Button>
                     </div>
                   )}
-                  {e.confirmed_by_admin && e.payment_reference && (
-                    <span className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</span>
+                  {e.confirmed_by_admin && (
+                    <div className="space-y-1">
+                      {e.payment_reference && (
+                        <div className="text-[10px] font-mono text-muted-foreground">{e.payment_reference}</div>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={resendingId === e.id}
+                        onClick={() => resendWelcome(e.id, e.email)}
+                        title="Generate a new temp password and resend the welcome email"
+                      >
+                        {resendingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Sending...</>
+                        ) : (
+                          <><Mail className="w-3 h-3 mr-1" /> Resend Welcome Email</>
+                        )}
+                      </Button>
+                    </div>
                   )}
                 </td>
               </tr>
