@@ -376,17 +376,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 </div>
               </div>
 
-              <Button
-                variant="glow"
-                size="lg"
-                className="w-full mt-1"
-                onClick={openBankApp}
-              >
-                <Smartphone className="w-4 h-4 mr-2" /> Open my bank app
-              </Button>
-              <p className="text-[11px] text-muted-foreground text-center -mt-1">
-                Opens your installed banking app. If nothing opens, copy the details above and pay manually.
-              </p>
             </div>
 
             <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 space-y-1.5">
