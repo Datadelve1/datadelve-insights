@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, CheckCircle2, Sparkles, Upload, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, CheckCircle2, Sparkles, Upload, Mail, Instagram } from "lucide-react";
 
 const signupSchema = z.object({
   full_name: z.string().trim().min(2, "Name is required").max(100),
   email: z.string().trim().email("Invalid email").max(255),
   phone: z.string().trim().min(6, "Phone is required").max(30),
   why_refer: z.string().trim().min(20, "Tell us at least 20 characters").max(800),
+  ig_handle: z.string().trim().max(50).optional(),
 });
 
 const AmbassadorSignup = () => {
@@ -24,11 +26,13 @@ const AmbassadorSignup = () => {
   const [submitted, setSubmitted] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [allowIgTag, setAllowIgTag] = useState(false);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
     phone: "",
     why_refer: "",
+    ig_handle: "",
   });
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
@@ -86,6 +90,8 @@ const AmbassadorSignup = () => {
         phone: parsed.data.phone,
         why_refer: parsed.data.why_refer,
         photo_url: photoUrl,
+        ig_handle: parsed.data.ig_handle ? parsed.data.ig_handle.replace(/^@/, "").trim() || null : null,
+        allow_ig_tag: allowIgTag,
       });
       if (error) throw error;
       setSubmitted(true);
