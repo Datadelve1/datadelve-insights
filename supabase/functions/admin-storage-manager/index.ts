@@ -132,6 +132,14 @@ Deno.serve(async (req) => {
       return json({ ok: true });
     }
 
+    if (action === "signed_url") {
+      if (!path) return json({ ok: false, error: "Missing path" });
+      const expiresIn = 60 * 60; // 1 hour
+      const { data, error } = await admin.storage.from(bucket).createSignedUrl(path, expiresIn);
+      if (error) return json({ ok: false, error: error.message });
+      return json({ ok: true, url: data?.signedUrl });
+    }
+
     return json({ ok: false, error: "Unknown action" });
   } catch (e: any) {
     return json({ ok: false, error: e?.message || "Server error" });
