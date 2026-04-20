@@ -116,6 +116,8 @@ const EnrollmentManagement = () => {
       setDeletingId(null);
     }
   };
+
+  const filteredByReferral = useMemo(() => {
     const q = referralFilter.trim().toUpperCase();
     if (!q) return enrollments;
     return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
