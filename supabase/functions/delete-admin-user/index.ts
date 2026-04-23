@@ -30,26 +30,31 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    const callerClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const {
-      data: { user: caller },
-    } = await callerClient.auth.getUser();
-
-    if (!caller) {
-      return respond(false, { error: "Unauthorized" });
-    }
-
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
-    const { data: roles, error: rolesError } = await adminClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", caller.id);
+    const token = authHeader.replace("Bearer ", "").trim();
+    const isServiceRole = token === serviceRoleKey;
 
-    if (rolesError || !roles?.some((role: { role: string }) => role.role === "admin")) {
-      return respond(false, { error: "Forbidden" });
+    if (!isServiceRole) {
+      const callerClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+
+      const {
+        data: { user: caller },
+      } = await callerClient.auth.getUser();
+
+      if (!caller) {
+        return respond(false, { error: "Unauthorized" });
+      }
+
+      const { data: roles, error: rolesError } = await adminClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", caller.id);
+
+      if (rolesError || !roles?.some((role: { role: string }) => role.role === "admin")) {
+        return respond(false, { error: "Forbidden" });
+      }
     }
 
     const parsed = BodySchema.safeParse(await req.json());
