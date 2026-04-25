@@ -115,6 +115,6 @@ Deno.serve(async (req) => {
 
     return respond(true, { authorization_url: paystackData.data.authorization_url });
   } catch (err) {
-    return respond(false, { error: err.message });
+    return respond(false, { error: (err as Error).message });
   }
 });

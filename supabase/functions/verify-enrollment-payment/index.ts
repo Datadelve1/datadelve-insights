@@ -155,6 +155,6 @@ Deno.serve(async (req) => {
 
     return respond(true, { success: true, password_sent: emailSent });
   } catch (err) {
-    return respond(false, { error: err.message });
+    return respond(false, { error: (err as Error).message });
   }
 });
