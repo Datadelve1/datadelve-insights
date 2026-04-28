@@ -48,6 +48,8 @@ import StaffChangePassword from "./pages/StaffChangePassword";
 import StaffOnboarding from "./pages/StaffOnboarding";
 import StaffDashboard from "./pages/StaffDashboard";
 import StaffAdminDashboard from "./pages/StaffAdminDashboard";
+import EnrollHub from "./pages/EnrollHub";
+import EnrollTier from "./pages/EnrollTier";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +103,8 @@ const App = () => (
             </Route>
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/enrollment-callback" element={<EnrollmentCallback />} />
+            <Route path="/enroll" element={<EnrollHub />} />
+            <Route path="/enroll/:tier" element={<EnrollTier />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/staff/login" element={<StaffLogin />} />
             <Route path="/staff/change-password" element={<StaffChangePassword />} />
