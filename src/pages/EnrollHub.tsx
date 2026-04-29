@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   Check,
+  X,
   AlertTriangle,
   Briefcase,
   Rocket,
@@ -11,7 +12,27 @@ import {
   FileText,
   Linkedin,
   Users,
+  Quote,
+  TrendingUp,
+  Award,
+  Building2,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const EnrollHub = () => {
   return (
