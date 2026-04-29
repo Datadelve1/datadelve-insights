@@ -341,10 +341,68 @@ const EnrollmentManagement = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
-        <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground">Enrollments</h1>
+          <p className="text-muted-foreground text-sm">Manage student enrollments by track</p>
+        </div>
+        <Button variant="hero" onClick={() => setCreateOpen((v) => !v)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          {createOpen ? "Close" : "Create Student Account"}
+        </Button>
       </div>
+
+      {createOpen && (
+        <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-foreground">Create student account</h2>
+            <p className="text-xs text-muted-foreground">
+              Creates a paid enrollment, provisions a dashboard account, and emails login details immediately.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-name">Full name</Label>
+              <Input id="new-name" placeholder="Jane Doe" value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={100} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new-email">Email</Label>
+              <Input id="new-email" type="email" placeholder="student@example.com" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} maxLength={255} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Track</Label>
+              <Select value={newTrack} onValueChange={setNewTrack}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Class schedule</Label>
+              <Select value={newSchedule} onValueChange={setNewSchedule}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekend">Weekend (Fri/Sat)</SelectItem>
+                  <SelectItem value="weekday">Weekday (Mon/Wed)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+            <Checkbox checked={newCertificate} onCheckedChange={(v) => setNewCertificate(v === true)} />
+            Include certificate (₦10,000 — marks certificate as paid)
+          </label>
+          <div className="flex gap-2">
+            <Button variant="hero" disabled={creating} onClick={handleCreateStudent}>
+              {creating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating…</> : <><UserPlus className="w-4 h-4 mr-2" /> Create & Send Login</>}
+            </Button>
+            <Button variant="outline" disabled={creating} onClick={() => setCreateOpen(false)}>Cancel</Button>
+          </div>
+        </div>
+      )}
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
