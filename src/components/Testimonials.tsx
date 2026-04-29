@@ -24,18 +24,18 @@ interface StudentReview {
 
 const staticTestimonials = [
   {
-    name: "Sarah Mitchell",
-    role: "Data Analyst at TechCorp",
+    name: "Chiamaka Nwosu",
+    role: "Data Analyst, Lagos",
     content:
-      "DataDelve transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months. The personalised approach made all the difference.",
-    avatar: "SM",
+      "Delvetek transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months. The personalised approach made all the difference.",
+    avatar: "CN",
   },
   {
-    name: "James Chen",
+    name: "Tunde Adebayo",
     role: "Business Intelligence Developer",
     content:
-      "The Python for Data course was exactly what I needed. Real-world projects and patient guidance helped me land my dream job in BI.",
-    avatar: "JC",
+      "The Python for Data track was exactly what I needed. Real-world projects and patient guidance helped me land my dream BI role here in Lagos.",
+    avatar: "TA",
   },
   {
     name: "Amara Okonkwo",
@@ -45,25 +45,39 @@ const staticTestimonials = [
     avatar: "AO",
   },
   {
-    name: "Michael Torres",
-    role: "Marketing Analyst",
+    name: "Ibrahim Suleiman",
+    role: "Marketing Analyst, Abuja",
     content:
-      "The Data Visualisation course opened my eyes to storytelling with data. Now I create reports that actually drive decisions.",
-    avatar: "MT",
+      "The Data Visualisation sessions opened my eyes to storytelling with data. Now I create reports that actually drive decisions at work.",
+    avatar: "IS",
   },
   {
-    name: "Emily Watson",
+    name: "Ngozi Eze",
     role: "Financial Analyst",
     content:
       "Learning Git and GitHub for data work was a game-changer. I now collaborate seamlessly with my team and have a professional portfolio to show.",
-    avatar: "EW",
+    avatar: "NE",
   },
   {
-    name: "David Park",
-    role: "Operations Manager",
+    name: "Emeka Obi",
+    role: "Operations Manager, Port Harcourt",
     content:
-      "I never thought I could learn Python at my age, but the patient teaching style made it accessible. Now I automate hours of manual work.",
-    avatar: "DP",
+      "I never thought I could learn Python at my age, but the patient teaching style made it accessible. Now I automate hours of manual work weekly.",
+    avatar: "EO",
+  },
+  {
+    name: "Fatima Bello",
+    role: "Data Analyst, Kano",
+    content:
+      "The mentors at Delvetek genuinely care. The community, live sessions and assignments kept me accountable until I landed my first data role.",
+    avatar: "FB",
+  },
+  {
+    name: "Oluwaseun Adekunle",
+    role: "BI Developer, Ibadan",
+    content:
+      "Best decision I made this year. The curriculum is practical and tailored for the Nigerian job market. Highly recommend to anyone serious about data.",
+    avatar: "OA",
   },
 ];
 
