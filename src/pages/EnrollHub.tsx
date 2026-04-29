@@ -34,15 +34,36 @@ import {
 } from "@/components/ui/table";
 
 const EnrollHub = () => {
+  const scrollToTracks = () => {
+    document.getElementById("tracks")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
-    <section className="min-h-screen py-16 md:py-24 relative overflow-hidden bg-background">
+    <section className="min-h-screen relative overflow-hidden bg-background">
+      {/* Sticky Top CTA Bar */}
+      <div className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg border-b border-primary/30">
+        <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-center sm:text-left">
+            🔥 Cohort 2 enrolling now • Limited seats • Starts June 5
+          </p>
+          <Button
+            onClick={scrollToTracks}
+            size="sm"
+            variant="secondary"
+            className="font-bold whitespace-nowrap shadow-md hover:scale-105 transition-transform"
+          >
+            Enroll Now <ArrowRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 py-12 md:py-20">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <BookOpen className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">Cohort 2 Enrollment</span>
@@ -50,10 +71,26 @@ const EnrollHub = () => {
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-6">
             Choose Your <span className="gradient-text">Delvetek</span> Track
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg">
+          <p className="text-muted-foreground text-base md:text-lg mb-8">
             Pick the path that matches your goals. All tracks start June 5 • Live online • Virtual Graduation 🎓
           </p>
+
+          {/* Hero Enroll CTA */}
+          <Button
+            onClick={scrollToTracks}
+            variant="hero"
+            size="lg"
+            className="text-base md:text-lg px-8 py-6 font-bold shadow-xl shadow-primary/30 hover:scale-105 transition-transform animate-pulse"
+          >
+            Enroll Now <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+          <p className="text-xs text-muted-foreground mt-3">
+            Quick & easy · Pay → WhatsApp proof → You're in
+          </p>
         </div>
+
+        {/* Anchor for tracks */}
+        <div id="tracks" className="scroll-mt-24" />
 
         {/* Track Cards */}
         <div className="grid md:grid-cols-3 gap-6">
