@@ -138,6 +138,26 @@ Deno.serve(async (req) => {
       console.error("Welcome email failed:", e);
     }
 
+    // Send Meta Conversions API Purchase event (server-side, dedup via event_id)
+    if (!resend_email) {
+      try {
+        await sendMetaPurchase({
+          email,
+          fullName,
+          phone: enrollment.phone || undefined,
+          value: Number(enrollment.amount_paid) || 0,
+          currency: "NGN",
+          eventId: `enrollment-${enrollment_id}`,
+          contentName: `${enrollment.track} Track Enrollment`,
+          contentCategory: enrollment.track,
+          clientIp: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+          userAgent: req.headers.get("user-agent") || undefined,
+        });
+      } catch (e) {
+        console.error("Meta CAPI failed:", e);
+      }
+    }
+
     return respond(true, { success: true, email_sent: emailSent, password: emailSent ? undefined : password });
   } catch (err) {
     return respond(false, { error: (err as Error).message });
