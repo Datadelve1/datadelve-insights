@@ -17,7 +17,6 @@ import {
   Award,
   Building2,
   CreditCard,
-  ExternalLink,
 } from "lucide-react";
 import {
   Accordion,
@@ -424,34 +423,24 @@ const EnrollHub = () => {
           </div>
         </div>
 
-        {/* ===== PAYMENT OPTIONS / BURSAPAY ===== */}
+        {/* ===== HOW TO PAY ===== */}
         <div className="mt-24 max-w-3xl mx-auto">
-          <div className="p-8 rounded-2xl glass border border-primary/30 text-center">
-            <CreditCard className="w-10 h-10 text-primary mx-auto mb-4" />
-            <h2 className="font-display text-2xl font-bold mb-3">Flexible Payment Options</h2>
-            <p className="text-muted-foreground text-sm mb-6">
-              Pay your commitment fee securely via Paystack at checkout, or use BursaPay for alternative
-              payment methods. After paying with BursaPay, send your receipt via WhatsApp to{" "}
-              <span className="text-foreground font-medium">+44 7775 739225</span> for verification.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild variant="hero" size="lg">
-                <Link to="/enroll/professional">
-                  Pay with Paystack (Recommended)
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <a
-                  href="https://bursapay.com/pay/widget/b8HmgtGKOxxxn33l/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Pay with BursaPay
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </Button>
+          <div className="p-8 rounded-2xl glass border border-primary/30">
+            <div className="text-center mb-6">
+              <CreditCard className="w-10 h-10 text-primary mx-auto mb-4" />
+              <h2 className="font-display text-2xl font-bold mb-2">How to Pay</h2>
+              <p className="text-muted-foreground text-sm">
+                Click <span className="text-foreground font-medium">Enroll</span> on your chosen track. You'll see our bank details on the final step. Make a transfer, then send your proof of payment to us on WhatsApp for confirmation.
+              </p>
             </div>
+            <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-5 space-y-2 text-sm max-w-sm mx-auto">
+              <div className="flex justify-between"><span className="text-muted-foreground">Bank</span><span className="text-foreground font-medium">Wema Bank</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Account Number</span><span className="text-foreground font-mono font-bold">0127561293</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Account Name</span><span className="text-foreground font-medium">Delvetek Limited</span></div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              After payment, send proof to WhatsApp <span className="text-foreground font-medium">+44 7775 739225</span>. Your dashboard login is emailed once we confirm.
+            </p>
           </div>
         </div>
 
@@ -483,7 +472,7 @@ const EnrollHub = () => {
               },
               {
                 q: "How do I pay?",
-                a: "You can pay your commitment fee instantly via Paystack during enrollment, or use BursaPay and send your receipt via WhatsApp (+44 7775 739225) for manual verification.",
+                a: "Click Enroll on your chosen track. On the final step, you'll see our bank details (Wema Bank · 0127561293 · Delvetek Limited). Transfer the commitment fee, then send your proof of payment to WhatsApp +44 7775 739225 for confirmation.",
               },
               {
                 q: "Is the certificate included?",
