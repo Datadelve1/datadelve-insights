@@ -50,6 +50,7 @@ import StaffDashboard from "./pages/StaffDashboard";
 import StaffAdminDashboard from "./pages/StaffAdminDashboard";
 import EnrollHub from "./pages/EnrollHub";
 import EnrollTier from "./pages/EnrollTier";
+import RouteTracker from "./components/RouteTracker";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <RouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/courses/data-analysis" element={<DataAnalysis />} />
