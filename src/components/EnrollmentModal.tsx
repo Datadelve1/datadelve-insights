@@ -269,7 +269,7 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                <span>Your details are saved · Send proof anytime</span>
+                <span>Your details are saved · Please send proof immediately</span>
               </div>
             </>
           )}
