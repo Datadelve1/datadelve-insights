@@ -399,25 +399,67 @@ const EnrollHub = () => {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                name: "Sarah Mitchell",
-                role: "Data Analyst at TechCorp",
+                name: "Chiamaka Nwosu",
+                role: "Data Analyst, Lagos",
                 content:
                   "Delvetek transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months.",
-                avatar: "SM",
+                avatar: "CN",
               },
               {
-                name: "James Chen",
-                role: "BI Developer",
+                name: "Tunde Adebayo",
+                role: "BI Developer, Ibadan",
                 content:
-                  "The hands-on projects and patient guidance helped me land my dream job. Best investment I've made.",
-                avatar: "JC",
+                  "The hands-on projects and patient guidance helped me land my dream BI role. Best investment I've made.",
+                avatar: "TA",
               },
               {
                 name: "Amara Okonkwo",
-                role: "Junior Data Scientist",
+                role: "Junior Data Scientist, Enugu",
                 content:
                   "From zero SQL knowledge to confidently querying production databases. The capstone became my portfolio centerpiece.",
                 avatar: "AO",
+              },
+              {
+                name: "Ibrahim Suleiman",
+                role: "Marketing Analyst, Abuja",
+                content:
+                  "The Data Visualisation track helped me tell stories with data. My reports now drive real decisions at work.",
+                avatar: "IS",
+              },
+              {
+                name: "Ngozi Eze",
+                role: "Financial Analyst, Onitsha",
+                content:
+                  "Learning Python and Git changed how I work. I automate hours of reporting weekly and collaborate like a pro.",
+                avatar: "NE",
+              },
+              {
+                name: "Fatima Bello",
+                role: "Data Analyst, Kano",
+                content:
+                  "The mentors genuinely care. Live sessions and assignments kept me accountable till I landed my first data role.",
+                avatar: "FB",
+              },
+              {
+                name: "Emeka Obi",
+                role: "Operations Lead, Port Harcourt",
+                content:
+                  "I never thought I could learn Python at my age. The patient teaching made it accessible and practical.",
+                avatar: "EO",
+              },
+              {
+                name: "Halima Yakubu",
+                role: "Business Analyst, Kaduna",
+                content:
+                  "Practical, hands-on and tailored for the Nigerian job market. I recommend Delvetek to anyone serious about tech.",
+                avatar: "HY",
+              },
+              {
+                name: "Oluwaseun Adekunle",
+                role: "BI Developer, Lagos",
+                content:
+                  "Best decision I made this year. The curriculum is structured, the community is supportive, and the outcomes are real.",
+                avatar: "OA",
               },
             ].map((t, i) => (
               <div key={i} className="p-6 rounded-2xl glass border border-border/50 relative">
