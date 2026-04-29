@@ -37,6 +37,57 @@ const EnrollmentManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [referralFilter, setReferralFilter] = useState("");
 
+  // Create student form state
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newTrack, setNewTrack] = useState("beginner");
+  const [newSchedule, setNewSchedule] = useState("weekend");
+  const [newCertificate, setNewCertificate] = useState(false);
+
+  const handleCreateStudent = async () => {
+    const name = newName.trim();
+    const email = newEmail.trim().toLowerCase();
+    if (!name) return toast.error("Enter the student's full name");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast.error("Enter a valid email");
+    if (!confirm(`Create account for ${name} (${email}) on the ${newTrack} track and email login details?`)) return;
+
+    setCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-create-student", {
+        body: {
+          full_name: name,
+          email,
+          track: newTrack,
+          class_schedule: newSchedule,
+          cohort,
+          certificate_requested: newCertificate,
+        },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        if (data.email_sent) {
+          toast.success(`Account created — login email sent to ${email}`);
+        } else if (data.password) {
+          await navigator.clipboard.writeText(data.password).catch(() => {});
+          toast.warning(`Account created but email failed. Temp password copied: ${data.password}`, { duration: 20000 });
+        } else {
+          toast.success("Account created (email send failed, check logs)");
+        }
+        setNewName(""); setNewEmail(""); setNewCertificate(false);
+        setCreateOpen(false);
+        fetchEnrollments();
+      } else {
+        toast.error(data?.error || "Failed to create student account");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create student account");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const fetchEnrollments = async () => {
     setLoading(true);
     const { data } = await supabase
