@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Copy, MessageCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { trackLead, trackInitiateCheckout } from "@/lib/metaPixel";
 
 const BANK_NAME = "Wema Bank";
 const ACCOUNT_NUMBER = "0127561293";
@@ -24,6 +25,13 @@ interface EnrollmentModalProps {
 const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalProps) => {
   const [selected, setSelected] = useState(defaultTrack || "professional");
   const track = TRACKS.find((t) => t.id === selected) || TRACKS[1];
+
+  // Fire Lead event when modal opens
+  useEffect(() => {
+    if (open) {
+      trackLead({ content_name: "Enrollment Modal Opened", content_category: track.id, value: track.price, currency: "NGN" });
+    }
+  }, [open]);
 
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -123,7 +131,20 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           </div>
 
           {/* WhatsApp CTA */}
-          <Button asChild variant="hero" size="lg" className="w-full">
+          <Button
+            asChild
+            variant="hero"
+            size="lg"
+            className="w-full"
+            onClick={() =>
+              trackInitiateCheckout({
+                content_name: "WhatsApp Proof Click",
+                content_category: track.id,
+                value: track.price,
+                currency: "NGN",
+              })
+            }
+          >
             <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-4 h-4 mr-2" /> Send Proof & Details on WhatsApp
             </a>
