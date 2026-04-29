@@ -555,7 +555,7 @@ const EnrollHub = () => {
               },
               {
                 q: "Is the certificate included?",
-                a: "The certificate of completion costs ₦10,000 and is paid separately at the end of the program.",
+                a: "No — the certificate is completely optional. It is NOT included in any track and is only for students who want one. If you choose to claim it at the end of the program, it costs ₦10,000, paid separately. You can complete and benefit from the full training without ever paying for a certificate.",
               },
               {
                 q: "What happens if I miss a class?",
