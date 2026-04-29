@@ -1,69 +1,253 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Briefcase, Rocket } from "lucide-react";
-
-const TIERS = [
-  {
-    slug: "beginner",
-    title: "Beginner",
-    description: "Start your tech journey with foundational skills and guided learning.",
-    price: "₦10,000",
-    icon: GraduationCap,
-  },
-  {
-    slug: "professional",
-    title: "Professional",
-    description: "Level up with industry-relevant projects and mentorship.",
-    price: "₦50,000",
-    icon: Briefcase,
-  },
-  {
-    slug: "advanced",
-    title: "Advanced",
-    description: "Master advanced concepts and prepare for senior roles.",
-    price: "₦100,000",
-    icon: Rocket,
-  },
-];
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  AlertTriangle,
+  Briefcase,
+  Rocket,
+  GraduationCap,
+  FileText,
+  Linkedin,
+  Users,
+} from "lucide-react";
 
 const EnrollHub = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-5xl">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-3">
-            Choose Your Track
+    <section className="min-h-screen py-16 md:py-24 relative overflow-hidden bg-background">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
+            <BookOpen className="w-4 h-4 text-primary" />
+            <span className="text-sm text-muted-foreground">Cohort 2 Enrollment</span>
+          </div>
+          <h1 className="font-display text-3xl md:text-5xl font-bold mb-6">
+            Choose Your <span className="gradient-text">Delvetek</span> Track
           </h1>
           <p className="text-muted-foreground text-base md:text-lg">
-            Select an enrollment tier to continue
+            Pick the path that matches your goals. All tracks start June 5 • Live online • Virtual Graduation 🎓
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {TIERS.map(({ slug, title, description, price, icon: Icon }) => (
-            <Card
-              key={slug}
-              className="flex flex-col border-border bg-card hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
-            >
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                  <Icon className="w-6 h-6 text-primary" />
+        {/* Track Cards */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* BEGINNER */}
+          <div className="group p-6 rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 flex flex-col">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <GraduationCap className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="font-display text-lg font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
+              Start Your Data Career from Scratch
+            </h2>
+            <p className="text-xs text-muted-foreground mb-4">Beginner Track</p>
+
+            <div className="mb-4">
+              <span className="text-muted-foreground line-through text-sm">₦150,000</span>
+              <div className="text-xl font-bold text-primary">
+                FREE <span className="text-xs font-normal text-muted-foreground">(This Cohort Only)</span>
+              </div>
+              <p className="text-sm text-foreground mt-1">
+                Commitment Fee: <span className="font-semibold">₦10,000</span>
+              </p>
+            </div>
+
+            <ul className="space-y-2 mb-4 flex-1">
+              {[
+                "SQL (Fundamentals)",
+                "Excel (Fundamentals)",
+                "Power BI (Fundamentals)",
+                "Weekly assignments",
+                "Collaborative projects",
+                "Breakout sessions with tutors",
+                "Live Q&A support",
+                "Personal dashboard to track progress",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-sm font-medium text-foreground mb-1">Build a strong foundation in data analysis</p>
+            <p className="text-xs text-muted-foreground mb-1">Perfect for absolute beginners</p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 8-week program • Virtual Graduation</p>
+
+            <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Limited to 250 students
+            </div>
+
+            <Button asChild variant="hero" size="lg" className="w-full group/btn">
+              <Link to="/enroll/beginner">
+                Enroll in Beginner Track
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+          </div>
+
+          {/* PROFESSIONAL */}
+          <div className="group p-6 rounded-2xl glass border-2 border-primary/50 hover:border-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 flex flex-col relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+              Most Popular
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Briefcase className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="font-display text-lg font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
+              Become a Data Analyst in 12 Weeks — From Beginner to Advanced
+            </h2>
+            <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
+
+            <div className="mb-4">
+              <span className="text-muted-foreground line-through text-sm">₦275,000</span>
+              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              <p className="text-sm text-foreground mt-1">
+                Commitment Fee: <span className="font-semibold">₦50,000</span>
+              </p>
+            </div>
+
+            <ul className="space-y-2 mb-4 flex-1">
+              {[
+                "SQL (Beginner to Advanced)",
+                "Excel (Beginner to Advanced)",
+                "Power BI (Beginner to Advanced)",
+                "Real-world projects",
+                "Portfolio development",
+                "Case studies",
+                "Hands-on training",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                  {item}
+                </li>
+              ))}
+              <li className="flex items-start gap-2 text-sm font-medium text-foreground">
+                <Rocket className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                Bonus: UK Work Experience Exposure
+              </li>
+            </ul>
+
+            <p className="text-sm font-medium text-foreground mb-1">Become job-ready with a strong portfolio</p>
+            <p className="text-xs text-muted-foreground mb-1">
+              No prior experience needed — includes beginner to advanced training
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 12-week program • Virtual Graduation</p>
+
+            <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Limited to 250 students
+            </div>
+
+            <Button asChild variant="hero" size="lg" className="w-full group/btn">
+              <Link to="/enroll/professional">
+                Enroll in Professional Track
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+          </div>
+
+          {/* ADVANCED */}
+          <div className="group p-6 rounded-2xl glass border border-border/50 hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 flex flex-col">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Rocket className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="font-display text-lg font-semibold mb-1 text-foreground group-hover:text-primary transition-colors">
+              The Fastest Path to Becoming Job-Ready in Tech
+            </h2>
+            <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
+
+            <div className="mb-4">
+              <span className="text-muted-foreground line-through text-sm">₦350,000</span>
+              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              <p className="text-sm text-foreground mt-1">
+                Commitment Fee: <span className="font-semibold">₦100,000</span>
+              </p>
+            </div>
+
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Full Learning Path</p>
+            <ul className="space-y-2 mb-4">
+              {["SQL (Beginner to Advanced)", "Excel (Beginner to Advanced)", "Power BI (Beginner to Advanced)"].map(
+                (item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ),
+              )}
+            </ul>
+
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Internship</p>
+            <ul className="space-y-2 mb-4">
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                3-Month Internship with DelveTek (Non-paid)
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                Work with real company data
+              </li>
+            </ul>
+
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Career Acceleration</p>
+            <ul className="space-y-2 mb-4 flex-1">
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <FileText className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <span className="font-medium text-foreground">DelveTek Smart CV Engine</span>
+                  <span className="block text-xs mt-0.5">
+                    Upload CV → Paste job description → Auto-optimized CV → Admin review → Delivered via Email/WhatsApp
+                  </span>
                 </div>
-                <CardTitle className="text-2xl">{title}</CardTitle>
-                <CardDescription className="text-base">{description}</CardDescription>
-              </CardHeader>
-              <CardContent className="mt-auto flex flex-col gap-4">
-                <div className="text-2xl font-display font-bold text-primary">{price}</div>
-                <Button asChild variant="hero" size="lg" className="w-full">
-                  <Link to={`/enroll/${slug}`}>Enroll Now</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Linkedin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                LinkedIn Optimization
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                Interview Preparation
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                Job Referrals to partner companies
+              </li>
+            </ul>
+
+            <p className="text-sm font-medium text-foreground mb-1">Go from beginner to fully job-positioned</p>
+            <p className="text-xs text-muted-foreground italic mb-1">
+              We don't guarantee jobs — but we position you strongly to get one
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">🎓 12-week program • Virtual Graduation</p>
+
+            <div className="flex items-center gap-1.5 text-xs text-yellow-500 mb-4">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Limited to 250 students
+            </div>
+
+            <Button asChild variant="hero" size="lg" className="w-full group/btn">
+              <Link to="/enroll/advanced">
+                Enroll in Advanced Track
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Bottom note */}
+        <div className="mt-12 text-center">
+          <p className="text-muted-foreground text-sm">
+            All tracks start June 5 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
+          </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
