@@ -267,6 +267,268 @@ const EnrollHub = () => {
             All tracks start June 5 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
+
+        {/* ===== TIER COMPARISON TABLE ===== */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-primary font-medium mb-3 block text-sm">Compare Tracks</span>
+            <h2 className="font-display text-2xl md:text-4xl font-bold">
+              Find the <span className="gradient-text">Right Fit</span>
+            </h2>
+          </div>
+          <div className="rounded-2xl glass border border-border/50 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-card/50">
+                  <TableHead className="text-foreground font-semibold">Feature</TableHead>
+                  <TableHead className="text-center text-foreground font-semibold">Beginner</TableHead>
+                  <TableHead className="text-center text-primary font-semibold">Professional</TableHead>
+                  <TableHead className="text-center text-foreground font-semibold">Advanced</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[
+                  ["Commitment Fee", "₦10,000", "₦50,000", "₦100,000"],
+                  ["Program Duration", "8 weeks", "12 weeks", "12 weeks + 3mo internship"],
+                  ["SQL Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
+                  ["Excel Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
+                  ["Power BI Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
+                  ["Real-world Projects", false, true, true],
+                  ["Portfolio Development", false, true, true],
+                  ["UK Work Experience Exposure", false, true, true],
+                  ["3-Month DelveTek Internship", false, false, true],
+                  ["Smart CV Engine", false, false, true],
+                  ["LinkedIn Optimization", false, false, true],
+                  ["Interview Preparation", false, false, true],
+                  ["Job Referrals", false, false, true],
+                  ["Virtual Graduation", true, true, true],
+                ].map((row, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="font-medium text-foreground">{row[0]}</TableCell>
+                    {row.slice(1).map((cell, j) => (
+                      <TableCell key={j} className="text-center">
+                        {typeof cell === "boolean" ? (
+                          cell ? (
+                            <Check className="w-5 h-5 text-primary mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-muted-foreground/40 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-sm text-muted-foreground">{cell}</span>
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* ===== STUDENT OUTCOMES ===== */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-primary font-medium mb-3 block text-sm">Real Results</span>
+            <h2 className="font-display text-2xl md:text-4xl font-bold">
+              Student <span className="gradient-text">Outcomes</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: Users, value: "500+", label: "Students Trained" },
+              { icon: TrendingUp, value: "87%", label: "Completion Rate" },
+              { icon: Briefcase, value: "120+", label: "Job-Ready Graduates" },
+              { icon: Award, value: "4.9/5", label: "Student Rating" },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-2xl glass border border-border/50 text-center hover:border-primary/30 transition-all"
+              >
+                <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
+                <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
+                <div className="text-xs text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== TESTIMONIALS ===== */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-primary font-medium mb-3 block text-sm">Testimonials</span>
+            <h2 className="font-display text-2xl md:text-4xl font-bold">
+              What Our <span className="gradient-text">Students Say</span>
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Sarah Mitchell",
+                role: "Data Analyst at TechCorp",
+                content:
+                  "Delvetek transformed my career. I went from spreadsheet basics to building automated dashboards in just 3 months.",
+                avatar: "SM",
+              },
+              {
+                name: "James Chen",
+                role: "BI Developer",
+                content:
+                  "The hands-on projects and patient guidance helped me land my dream job. Best investment I've made.",
+                avatar: "JC",
+              },
+              {
+                name: "Amara Okonkwo",
+                role: "Junior Data Scientist",
+                content:
+                  "From zero SQL knowledge to confidently querying production databases. The capstone became my portfolio centerpiece.",
+                avatar: "AO",
+              },
+            ].map((t, i) => (
+              <div key={i} className="p-6 rounded-2xl glass border border-border/50 relative">
+                <Quote className="w-8 h-8 text-primary/20 absolute top-4 right-4" />
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5">"{t.content}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-semibold text-sm">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground text-sm">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== PARTNER LOGOS ===== */}
+        <div className="mt-24 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <span className="text-primary font-medium mb-3 block text-sm">Trusted By</span>
+            <h2 className="font-display text-xl md:text-2xl font-semibold text-muted-foreground">
+              Our graduates work at leading companies
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {["Microsoft", "Andela", "Flutterwave", "Interswitch", "PwC"].map((partner) => (
+              <div
+                key={partner}
+                className="p-6 rounded-xl glass border border-border/50 flex items-center justify-center hover:border-primary/30 transition-all"
+              >
+                <Building2 className="w-5 h-5 text-primary mr-2" />
+                <span className="font-display font-semibold text-foreground text-sm md:text-base">
+                  {partner}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== PAYMENT OPTIONS / BURSAPAY ===== */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <div className="p-8 rounded-2xl glass border border-primary/30 text-center">
+            <CreditCard className="w-10 h-10 text-primary mx-auto mb-4" />
+            <h2 className="font-display text-2xl font-bold mb-3">Flexible Payment Options</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              Pay your commitment fee securely via Paystack at checkout, or use BursaPay for alternative
+              payment methods. After paying with BursaPay, send your receipt via WhatsApp to{" "}
+              <span className="text-foreground font-medium">+44 7775 739225</span> for verification.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild variant="hero" size="lg">
+                <Link to="/enroll/professional">
+                  Pay with Paystack (Recommended)
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a
+                  href="https://bursapay.com/pay/widget/b8HmgtGKOxxxn33l/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Pay with BursaPay
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== ENROLLMENT FAQ ===== */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-primary font-medium mb-3 block text-sm">Enrollment FAQ</span>
+            <h2 className="font-display text-2xl md:text-4xl font-bold">
+              Got <span className="gradient-text">Questions?</span>
+            </h2>
+          </div>
+          <Accordion type="single" collapsible className="space-y-3">
+            {[
+              {
+                q: "What is the commitment fee for?",
+                a: "The commitment fee secures your seat in the cohort and demonstrates your dedication. It's non-refundable and counts toward unlocking your full learning experience.",
+              },
+              {
+                q: "When does Cohort 2 start?",
+                a: "All tracks officially begin on June 5. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
+              },
+              {
+                q: "What's the difference between the tracks?",
+                a: "Beginner covers fundamentals only. Professional takes you from beginner to advanced with real projects. Advanced adds a 3-month internship, Smart CV Engine, LinkedIn optimization, interview prep, and job referrals.",
+              },
+              {
+                q: "Do I need any prior experience?",
+                a: "No prior experience is required for any track. We meet you where you are and build from the ground up.",
+              },
+              {
+                q: "How do I pay?",
+                a: "You can pay your commitment fee instantly via Paystack during enrollment, or use BursaPay and send your receipt via WhatsApp (+44 7775 739225) for manual verification.",
+              },
+              {
+                q: "Is the certificate included?",
+                a: "The certificate of completion costs ₦10,000 and is paid separately at the end of the program.",
+              },
+              {
+                q: "What happens if I miss a class?",
+                a: "All sessions are recorded and accessible through your dashboard after you submit your weekly review.",
+              },
+              {
+                q: "Do you guarantee jobs?",
+                a: "We don't guarantee jobs, but our Advanced track positions you strongly with portfolio projects, interview prep, LinkedIn optimization, and direct job referrals to partner companies.",
+              },
+            ].map((faq, i) => (
+              <AccordionItem
+                key={i}
+                value={`item-${i}`}
+                className="rounded-xl glass border border-border/50 px-5"
+              >
+                <AccordionTrigger className="text-left text-foreground font-medium hover:text-primary">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-sm">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* ===== FINAL CTA ===== */}
+        <div className="mt-24 max-w-3xl mx-auto text-center p-10 rounded-2xl glass border border-primary/30">
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
+            Ready to <span className="gradient-text">Transform</span> Your Career?
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Seats fill fast. Lock in your spot today and start your data journey June 5.
+          </p>
+          <Button asChild variant="hero" size="lg">
+            <Link to="/enroll/professional">
+              Enroll Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
     </section>
   );
