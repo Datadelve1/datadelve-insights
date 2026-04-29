@@ -154,6 +154,24 @@ Deno.serve(async (req) => {
       console.error("Email send failed:", emailErr);
     }
 
+    // Send Meta Conversions API Purchase event (server-side)
+    try {
+      await sendMetaPurchase({
+        email,
+        fullName,
+        phone: verifyData.data.customer?.phone || metadata.phone || undefined,
+        value: Number(verifyData.data.amount) / 100,
+        currency: verifyData.data.currency || "NGN",
+        eventId: `enrollment-paystack-${reference}`,
+        contentName: `${track} Track Enrollment`,
+        contentCategory: track,
+        clientIp: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+        userAgent: req.headers.get("user-agent") || undefined,
+      });
+    } catch (e) {
+      console.error("Meta CAPI failed:", e);
+    }
+
     return respond(true, { success: true, password_sent: emailSent });
   } catch (err) {
     return respond(false, { error: (err as Error).message });
