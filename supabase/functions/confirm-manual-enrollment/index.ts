@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendMetaPurchase } from "../_shared/metaCapi.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -135,6 +136,26 @@ Deno.serve(async (req) => {
       else console.error("Welcome email error:", emailError);
     } catch (e) {
       console.error("Welcome email failed:", e);
+    }
+
+    // Send Meta Conversions API Purchase event (server-side, dedup via event_id)
+    if (!resend_email) {
+      try {
+        await sendMetaPurchase({
+          email,
+          fullName,
+          phone: enrollment.phone || undefined,
+          value: Number(enrollment.amount_paid) || 0,
+          currency: "NGN",
+          eventId: `enrollment-${enrollment_id}`,
+          contentName: `${enrollment.track} Track Enrollment`,
+          contentCategory: enrollment.track,
+          clientIp: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+          userAgent: req.headers.get("user-agent") || undefined,
+        });
+      } catch (e) {
+        console.error("Meta CAPI failed:", e);
+      }
     }
 
     return respond(true, { success: true, email_sent: emailSent, password: emailSent ? undefined : password });
