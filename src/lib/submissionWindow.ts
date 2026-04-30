@@ -27,6 +27,8 @@ export interface SubmissionWindowInfo {
 const WEEK_DEADLINE_EXTENSIONS: Record<number, number> = {
   // Week 4: extended from Wed 11:59 PM -> Thu 11:59 PM WAT (one-off for this week only)
   4: 24,
+  // Week 5: shortened from Wed 11:59 PM -> Sat 11:59 PM WAT (one-off, closes Saturday midnight)
+  5: -72,
 };
 
 function getWindowForWeek(week: number): { open: Date; close: Date } {
