@@ -485,6 +485,48 @@ const EnrollmentManagement = () => {
         <TabsContent value="professional">{renderTable("professional")}</TabsContent>
         <TabsContent value="advanced">{renderTable("advanced")}</TabsContent>
       </Tabs>
+
+      <Dialog open={!!moveTarget} onOpenChange={(o) => !o && setMoveTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Move {moveTarget?.full_name} to {moveTarget?.cohort === "Cohort 2" ? "Cohort 1" : "Cohort 2"}
+            </DialogTitle>
+            <DialogDescription>
+              Pick the track and schedule for the student in their new cohort. Their existing login is preserved — no new email is sent.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Track</Label>
+              <Select value={moveTrack} onValueChange={setMoveTrack}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Class schedule</Label>
+              <Select value={moveSchedule} onValueChange={setMoveSchedule}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekend">Weekend (Fri/Sat)</SelectItem>
+                  <SelectItem value="weekday">Weekday (Mon/Wed)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMoveTarget(null)} disabled={!!movingId}>Cancel</Button>
+            <Button variant="hero" onClick={confirmMove} disabled={!!movingId}>
+              {movingId ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Moving…</> : <><ArrowRightLeft className="w-4 h-4 mr-2" /> Confirm move</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
