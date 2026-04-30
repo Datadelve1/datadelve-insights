@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CheckCircle2, XCircle, Search, X, Mail, Trash2, UserPlus } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Search, X, Mail, Trash2, UserPlus, ArrowRightLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
@@ -35,6 +35,7 @@ const EnrollmentManagement = () => {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [movingId, setMovingId] = useState<string | null>(null);
   const [referralFilter, setReferralFilter] = useState("");
 
   // Create student form state
@@ -171,6 +172,28 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const moveStudentCohort = async (id: string, name: string, currentCohort: string | undefined) => {
+    const targetCohort = currentCohort === "Cohort 2" ? "Cohort 1" : "Cohort 2";
+    if (!confirm(`Move ${name} from ${currentCohort || "Cohort 1"} to ${targetCohort}? This keeps their existing login — no new email is sent.`)) return;
+    setMovingId(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-upgrade-student-cohort", {
+        body: { enrollment_id: id, target_cohort: targetCohort },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        toast.success(`${name} moved to ${targetCohort}`);
+        fetchEnrollments();
+      } else {
+        toast.error(data?.error || "Failed to move student");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to move student");
+    } finally {
+      setMovingId(null);
+    }
+  };
+
   const filteredByReferral = useMemo(() => {
     const q = referralFilter.trim().toUpperCase();
     if (!q) return enrollments;
@@ -298,6 +321,19 @@ const EnrollmentManagement = () => {
                           <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Sending...</>
                         ) : (
                           <><Mail className="w-3 h-3 mr-1" /> Resend Welcome Email</>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={movingId === e.id}
+                        onClick={() => moveStudentCohort(e.id, e.full_name, e.cohort)}
+                        title="Move this student to the other cohort. Keeps their existing login — no new email is sent."
+                      >
+                        {movingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Moving...</>
+                        ) : (
+                          <><ArrowRightLeft className="w-3 h-3 mr-1" /> Move to {e.cohort === "Cohort 2" ? "Cohort 1" : "Cohort 2"}</>
                         )}
                       </Button>
                       <Button
