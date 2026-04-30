@@ -326,6 +326,19 @@ const EnrollmentManagement = () => {
                       <Button
                         size="sm"
                         variant="outline"
+                        disabled={movingId === e.id}
+                        onClick={() => moveStudentCohort(e.id, e.full_name, e.cohort)}
+                        title="Move this student to the other cohort. Keeps their existing login — no new email is sent."
+                      >
+                        {movingId === e.id ? (
+                          <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Moving...</>
+                        ) : (
+                          <><ArrowRightLeft className="w-3 h-3 mr-1" /> Move to {e.cohort === "Cohort 2" ? "Cohort 1" : "Cohort 2"}</>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         disabled={deletingId === e.id}
                         onClick={() => deleteEnrollment(e.id, e.full_name)}
                         className="text-destructive hover:text-destructive"
