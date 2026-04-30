@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CheckCircle2, XCircle, Search, X, Mail, Trash2, UserPlus } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Search, X, Mail, Trash2, UserPlus, ArrowRightLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminCohort } from "@/contexts/AdminCohortContext";
 
