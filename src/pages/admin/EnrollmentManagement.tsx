@@ -172,6 +172,28 @@ const EnrollmentManagement = () => {
     }
   };
 
+  const moveStudentCohort = async (id: string, name: string, currentCohort: string | undefined) => {
+    const targetCohort = currentCohort === "Cohort 2" ? "Cohort 1" : "Cohort 2";
+    if (!confirm(`Move ${name} from ${currentCohort || "Cohort 1"} to ${targetCohort}? This keeps their existing login — no new email is sent.`)) return;
+    setMovingId(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-upgrade-student-cohort", {
+        body: { enrollment_id: id, target_cohort: targetCohort },
+      });
+      if (error) throw error;
+      if (data?.ok) {
+        toast.success(`${name} moved to ${targetCohort}`);
+        fetchEnrollments();
+      } else {
+        toast.error(data?.error || "Failed to move student");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to move student");
+    } finally {
+      setMovingId(null);
+    }
+  };
+
   const filteredByReferral = useMemo(() => {
     const q = referralFilter.trim().toUpperCase();
     if (!q) return enrollments;
