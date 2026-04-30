@@ -77,11 +77,35 @@ Deno.serve(async (req) => {
 
     if (updErr) return respond(false, { error: updErr.message });
 
+    // Notify the student about their cohort move
+    let emailSent = false;
+    try {
+      const { error: emailError } = await supabase.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "cohort-move-notification",
+          recipientEmail: existing.email,
+          idempotencyKey: `cohort-move-${existing.id}-${targetCohort}-${Date.now()}`,
+          templateData: {
+            fullName: existing.full_name,
+            newCohort: targetCohort,
+            previousCohort: existing.cohort,
+            track: newTrack || existing.track,
+            classSchedule: newSchedule || existing.class_schedule,
+          },
+        },
+      });
+      if (!emailError) emailSent = true;
+      else console.error("Cohort-move email error:", emailError);
+    } catch (e) {
+      console.error("Cohort-move email failed:", e);
+    }
+
     return respond(true, {
       success: true,
       enrollment_id: existing.id,
       previous_cohort: existing.cohort,
       new_cohort: targetCohort,
+      email_sent: emailSent,
     });
   } catch (err) {
     return respond(false, { error: (err as Error).message });
