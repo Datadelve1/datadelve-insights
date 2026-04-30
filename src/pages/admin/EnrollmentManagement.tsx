@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +37,9 @@ const EnrollmentManagement = () => {
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
+  const [moveTarget, setMoveTarget] = useState<Enrollment | null>(null);
+  const [moveTrack, setMoveTrack] = useState("beginner");
+  const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
 
   // Create student form state
@@ -172,17 +176,30 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const moveStudentCohort = async (id: string, name: string, currentCohort: string | undefined) => {
+  const openMoveDialog = (e: Enrollment) => {
+    setMoveTarget(e);
+    setMoveTrack(e.track || "beginner");
+    setMoveSchedule(e.class_schedule || "weekend");
+  };
+
+  const confirmMove = async () => {
+    if (!moveTarget) return;
+    const currentCohort = moveTarget.cohort;
     const targetCohort = currentCohort === "Cohort 2" ? "Cohort 1" : "Cohort 2";
-    if (!confirm(`Move ${name} from ${currentCohort || "Cohort 1"} to ${targetCohort}? This keeps their existing login — no new email is sent.`)) return;
-    setMovingId(id);
+    setMovingId(moveTarget.id);
     try {
       const { data, error } = await supabase.functions.invoke("admin-upgrade-student-cohort", {
-        body: { enrollment_id: id, target_cohort: targetCohort },
+        body: {
+          enrollment_id: moveTarget.id,
+          target_cohort: targetCohort,
+          track: moveTrack,
+          class_schedule: moveSchedule,
+        },
       });
       if (error) throw error;
       if (data?.ok) {
-        toast.success(`${name} moved to ${targetCohort}`);
+        toast.success(`${moveTarget.full_name} moved to ${targetCohort} (${moveTrack})`);
+        setMoveTarget(null);
         fetchEnrollments();
       } else {
         toast.error(data?.error || "Failed to move student");
@@ -327,7 +344,7 @@ const EnrollmentManagement = () => {
                         size="sm"
                         variant="outline"
                         disabled={movingId === e.id}
-                        onClick={() => moveStudentCohort(e.id, e.full_name, e.cohort)}
+                        onClick={() => openMoveDialog(e)}
                         title="Move this student to the other cohort. Keeps their existing login — no new email is sent."
                       >
                         {movingId === e.id ? (
@@ -468,6 +485,48 @@ const EnrollmentManagement = () => {
         <TabsContent value="professional">{renderTable("professional")}</TabsContent>
         <TabsContent value="advanced">{renderTable("advanced")}</TabsContent>
       </Tabs>
+
+      <Dialog open={!!moveTarget} onOpenChange={(o) => !o && setMoveTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Move {moveTarget?.full_name} to {moveTarget?.cohort === "Cohort 2" ? "Cohort 1" : "Cohort 2"}
+            </DialogTitle>
+            <DialogDescription>
+              Pick the track and schedule for the student in their new cohort. Their existing login is preserved — no new email is sent.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label>Track</Label>
+              <Select value={moveTrack} onValueChange={setMoveTrack}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Class schedule</Label>
+              <Select value={moveSchedule} onValueChange={setMoveSchedule}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekend">Weekend (Fri/Sat)</SelectItem>
+                  <SelectItem value="weekday">Weekday (Mon/Wed)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMoveTarget(null)} disabled={!!movingId}>Cancel</Button>
+            <Button variant="hero" onClick={confirmMove} disabled={!!movingId}>
+              {movingId ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Moving…</> : <><ArrowRightLeft className="w-4 h-4 mr-2" /> Confirm move</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
