@@ -198,7 +198,11 @@ const EnrollmentManagement = () => {
       });
       if (error) throw error;
       if (data?.ok) {
-        toast.success(`${moveTarget.full_name} moved to ${targetCohort} (${moveTrack})`);
+        if (data.email_sent) {
+          toast.success(`${moveTarget.full_name} moved to ${targetCohort} (${moveTrack}) — notification email sent`);
+        } else {
+          toast.warning(`${moveTarget.full_name} moved to ${targetCohort} (${moveTrack}) — email send failed, please notify them manually`);
+        }
         setMoveTarget(null);
         fetchEnrollments();
       } else {
