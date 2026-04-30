@@ -37,6 +37,9 @@ const EnrollmentManagement = () => {
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
+  const [moveTarget, setMoveTarget] = useState<Enrollment | null>(null);
+  const [moveTrack, setMoveTrack] = useState("beginner");
+  const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
 
   // Create student form state
