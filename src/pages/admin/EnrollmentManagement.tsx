@@ -344,7 +344,7 @@ const EnrollmentManagement = () => {
                         size="sm"
                         variant="outline"
                         disabled={movingId === e.id}
-                        onClick={() => moveStudentCohort(e.id, e.full_name, e.cohort)}
+                        onClick={() => openMoveDialog(e)}
                         title="Move this student to the other cohort. Keeps their existing login — no new email is sent."
                       >
                         {movingId === e.id ? (
