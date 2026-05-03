@@ -59,6 +59,32 @@ const SESSIONS = PROGRAM_SESSIONS;
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
 
+const WEEK_6_VIDEO_QUESTIONS = [
+  "What were you doing before Delvetek?",
+  "What did you achieve during/after the program?",
+  "What measurable change happened? (job, income, skills, project)",
+];
+
+const WEEK_6_VIDEO_SCRIPT = `Hi, my name is [Full Name], and I'm a participant of Delvetek's [Cohort Name/Number].
+
+Before joining Delvetek, I was [your situation before — e.g. struggling to learn on my own / unemployed / switching careers / lacking structure].
+
+One of the biggest challenges I faced was [specific problem — e.g. expensive courses, no clear roadmap, inconsistency].
+
+During the program, I was able to:
+• [Skill or tool learned]
+• [Project built or milestone achieved]
+• [Any measurable progress]
+
+After completing (or during) the program:
+I have [clear outcome — e.g. built X project / started freelancing / got a job / improved my income / gained confidence to apply for roles].
+
+What made Delvetek different was [structure / affordability / mentorship / community — be specific].
+
+If you're someone who is [target audience], I would recommend Delvetek because [reason based on real experience].
+
+Thank you.`;
+
 const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: WeeklyReviewsProps) => {
   const { user, profile, isAdmin } = useAuth();
   const isUnrestricted =
@@ -563,9 +589,40 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
             }
 
             // Saturday - Video Review
+            const showWeek6VideoGuidance = weekNum === 6;
+
             return (
               <form onSubmit={handleSaturdaySubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
                 {commonFields}
+
+                {showWeek6VideoGuidance && (
+                  <div className="space-y-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                    <div className="space-y-1">
+                      <h4 className="font-display font-semibold text-foreground text-sm">
+                        Week 6 video review instructions
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        Answer these prompts in your video and use the script below as your guide.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 rounded-lg border border-border bg-card p-4">
+                      <p className="text-sm font-semibold text-foreground">Questions to cover</p>
+                      <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                        {WEEK_6_VIDEO_QUESTIONS.map((question) => (
+                          <li key={question}>{question}</li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    <div className="space-y-2 rounded-lg border border-border bg-card p-4">
+                      <p className="text-sm font-semibold text-foreground">Suggested script</p>
+                      <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed text-muted-foreground">
+                        {WEEK_6_VIDEO_SCRIPT}
+                      </pre>
+                    </div>
+                  </div>
+                )}
 
                 {/* Video Upload */}
                 <div className="space-y-2">
