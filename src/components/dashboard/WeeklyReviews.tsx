@@ -269,7 +269,12 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   const handleSaturdaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeSession || !user) return;
-    if (!validateCommonFields()) return;
+
+    const [weekStrEarly] = activeSession.split("-");
+    const weekNumEarly = parseInt(weekStrEarly);
+    const isWeek6 = weekNumEarly === 6;
+
+    if (!isWeek6 && !validateCommonFields()) return;
 
     if (!videoFile) {
       toast({ title: "Please upload your face video review", variant: "destructive" });
