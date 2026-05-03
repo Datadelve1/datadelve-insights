@@ -269,7 +269,12 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
   const handleSaturdaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeSession || !user) return;
-    if (!validateCommonFields()) return;
+
+    const [weekStrEarly] = activeSession.split("-");
+    const weekNumEarly = parseInt(weekStrEarly);
+    const isWeek6 = weekNumEarly === 6;
+
+    if (!isWeek6 && !validateCommonFields()) return;
 
     if (!videoFile) {
       toast({ title: "Please upload your face video review", variant: "destructive" });
@@ -315,9 +320,9 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
         video_url: signedData.signedUrl,
         class_name: className,
         class_date: classDate || null,
-        topic_covered: topicCovered.trim(),
-        tutor_name: tutorName.trim(),
-        tutor_rating: tutorRating,
+        topic_covered: topicCovered.trim() || "Week 6 Video Review",
+        tutor_name: tutorName.trim() || "N/A",
+        tutor_rating: tutorRating || "5",
         question_answers: {},
       } as any);
       if (error) throw error;
@@ -593,7 +598,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
 
             return (
               <form onSubmit={handleSaturdaySubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
-                {commonFields}
+                {!showWeek6VideoGuidance && commonFields}
 
                 {showWeek6VideoGuidance && (
                   <div className="space-y-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
@@ -651,20 +656,22 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                 </div>
 
                 {/* Optional Written Review */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">
-                    Overall Delvetek Experience Review (Optional)
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Optionally add a written review alongside your video.
-                  </p>
-                  <Textarea
-                    value={optionalWrittenReview}
-                    onChange={(e) => setOptionalWrittenReview(e.target.value)}
-                    placeholder="Share your written thoughts (optional on Saturdays)..."
-                    className="bg-card border-border min-h-[100px]"
-                  />
-                </div>
+                {!showWeek6VideoGuidance && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      Overall Delvetek Experience Review (Optional)
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Optionally add a written review alongside your video.
+                    </p>
+                    <Textarea
+                      value={optionalWrittenReview}
+                      onChange={(e) => setOptionalWrittenReview(e.target.value)}
+                      placeholder="Share your written thoughts (optional on Saturdays)..."
+                      className="bg-card border-border min-h-[100px]"
+                    />
+                  </div>
+                )}
 
                 {/* Consent */}
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-card border border-border">
