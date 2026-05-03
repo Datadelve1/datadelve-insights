@@ -147,7 +147,7 @@ const Assignments = ({
     const questions = assignment.questions.map((q: any) =>
       typeof q === "string" ? q : q.question || ""
     );
-    const requireExcel = assignment.week_number === 5;
+    const requireExcel = assignment.week_number === 6;
     if (requireExcel) {
       if (!studentName.trim()) {
         toast({ title: "Please enter your full name", variant: "destructive" });
@@ -420,12 +420,12 @@ const Assignments = ({
                   {isActive && !submission && weekAccess && canSubmit && (
                     <div className="p-6 border-t border-border space-y-5 bg-card">
                       <p className="text-sm text-muted-foreground">
-                        {assignment.week_number === 5
+                        {assignment.week_number === 6
                           ? "Submit your full name and the Excel sheet you worked on before Wednesday 11:59 PM WAT."
                           : "Answer all questions below and submit before Wednesday 11:59 PM WAT. Your answers will be evaluated by AI."}
                       </p>
 
-                      {assignment.week_number === 5 && (
+                      {assignment.week_number === 6 && (
                         <div className="space-y-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
                           <div className="space-y-2">
                             <Label className="text-foreground">Full Name *</Label>
