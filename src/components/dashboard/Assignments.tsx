@@ -253,6 +253,9 @@ const Assignments = ({
 
       setActiveAssignment(null);
       setAnswers({});
+      setStudentName("");
+      setExcelFile(null);
+      setUploadProgress(0);
       fetchData();
       onScoreUpdate();
     } catch (err: any) {
