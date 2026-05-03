@@ -420,8 +420,9 @@ const Assignments = ({
                   {isActive && !submission && weekAccess && canSubmit && (
                     <div className="p-6 border-t border-border space-y-5 bg-card">
                       <p className="text-sm text-muted-foreground">
-                        Answer all questions below and submit before Wednesday
-                        11:59 PM WAT. Your answers will be evaluated by AI.
+                        {assignment.week_number === 5
+                          ? "Submit your full name and the Excel sheet you worked on before Wednesday 11:59 PM WAT."
+                          : "Answer all questions below and submit before Wednesday 11:59 PM WAT. Your answers will be evaluated by AI."}
                       </p>
 
                       {assignment.week_number === 5 && (
