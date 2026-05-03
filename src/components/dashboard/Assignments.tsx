@@ -147,6 +147,17 @@ const Assignments = ({
     const questions = assignment.questions.map((q: any) =>
       typeof q === "string" ? q : q.question || ""
     );
+    const requireExcel = assignment.week_number === 5;
+    if (requireExcel) {
+      if (!studentName.trim()) {
+        toast({ title: "Please enter your full name", variant: "destructive" });
+        return;
+      }
+      if (!excelFile) {
+        toast({ title: "Please upload your Excel sheet", variant: "destructive" });
+        return;
+      }
+    }
     const unanswered = questions.filter(
       (_: string, i: number) => !answers[i]?.trim()
     );
