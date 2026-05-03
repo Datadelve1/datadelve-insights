@@ -5,8 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Upload } from "lucide-react";
+import { uploadWithProgress } from "@/lib/uploadWithProgress";
 import {
   BookOpen,
   Lock,
@@ -98,6 +102,9 @@ const Assignments = ({
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
   const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
+  const [studentName, setStudentName] = useState("");
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -140,6 +147,17 @@ const Assignments = ({
     const questions = assignment.questions.map((q: any) =>
       typeof q === "string" ? q : q.question || ""
     );
+    const requireExcel = assignment.week_number === 5;
+    if (requireExcel) {
+      if (!studentName.trim()) {
+        toast({ title: "Please enter your full name", variant: "destructive" });
+        return;
+      }
+      if (!excelFile) {
+        toast({ title: "Please upload your Excel sheet", variant: "destructive" });
+        return;
+      }
+    }
     const unanswered = questions.filter(
       (_: string, i: number) => !answers[i]?.trim()
     );
@@ -158,15 +176,29 @@ const Assignments = ({
 
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
+
+      // Week 5: upload Excel sheet
+      let excelUrl: string | null = null;
+      if (requireExcel && excelFile) {
+        const ext = excelFile.name.split(".").pop();
+        const path = `${user!.id}/assignments/week-${assignment.week_number}-${Date.now()}.${ext}`;
+        await uploadWithProgress({
+          bucket: "form-uploads",
+          path,
+          file: excelFile,
+          onProgress: (p) => setUploadProgress(p),
+        });
+        const { data: pub } = supabase.storage.from("form-uploads").getPublicUrl(path);
+        excelUrl = pub.publicUrl;
+      }
+
       const modelData = {
         modelAnswers: assignment.model_answers.length > 0 ? assignment.model_answers : FALLBACK_MODEL_DATA.modelAnswers,
         keyConcepts: assignment.key_concepts.length > 0 ? assignment.key_concepts : FALLBACK_MODEL_DATA.keyConcepts,
       };
 
-      // Only call AI evaluation if model answers are configured
       const hasModelAnswers = modelData.modelAnswers.length > 0 && modelData.modelAnswers.some(a => a.trim());
 
-      // Call AI evaluation only if model answers are configured
       let evaluations: Evaluation[] | null = null;
       if (hasModelAnswers) {
         try {
@@ -194,10 +226,14 @@ const Assignments = ({
         : questions.length;
       const totalPossible = questions.length * 5;
 
+      const payloadAnswers = requireExcel
+        ? { student_name: studentName.trim(), excel_url: excelUrl, answers: answersData }
+        : answersData;
+
       const { error } = await supabase.from("assignment_submissions").insert({
         assignment_id: assignment.id,
         user_id: user!.id,
-        answers: answersData,
+        answers: payloadAnswers,
         score: totalScore,
         total: totalPossible,
         evaluation: evaluations,
@@ -217,6 +253,9 @@ const Assignments = ({
 
       setActiveAssignment(null);
       setAnswers({});
+      setStudentName("");
+      setExcelFile(null);
+      setUploadProgress(0);
       fetchData();
       onScoreUpdate();
     } catch (err: any) {
@@ -384,6 +423,41 @@ const Assignments = ({
                         Answer all questions below and submit before Wednesday
                         11:59 PM WAT. Your answers will be evaluated by AI.
                       </p>
+
+                      {assignment.week_number === 5 && (
+                        <div className="space-y-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Full Name *</Label>
+                            <Input
+                              value={studentName}
+                              onChange={(e) => setStudentName(e.target.value)}
+                              placeholder="Enter your full name"
+                              className="bg-secondary border-border"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Upload Excel Sheet *</Label>
+                            <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border bg-secondary cursor-pointer hover:border-primary transition-colors">
+                              <Upload className="w-5 h-5 text-primary" />
+                              <span className="text-sm text-muted-foreground truncate">
+                                {excelFile ? excelFile.name : "Click to upload your .xlsx / .xls / .csv file"}
+                              </span>
+                              <input
+                                type="file"
+                                accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                                className="hidden"
+                                onChange={(e) => setExcelFile(e.target.files?.[0] || null)}
+                              />
+                            </label>
+                            {uploadProgress > 0 && uploadProgress < 100 && (
+                              <div className="space-y-1">
+                                <Progress value={uploadProgress} className="h-2" />
+                                <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                       {questions.map((q: string, qi: number) => (
                         <div
                           key={qi}
