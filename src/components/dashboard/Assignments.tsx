@@ -176,15 +176,29 @@ const Assignments = ({
 
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
+
+      // Week 5: upload Excel sheet
+      let excelUrl: string | null = null;
+      if (requireExcel && excelFile) {
+        const ext = excelFile.name.split(".").pop();
+        const path = `${user!.id}/assignments/week-${assignment.week_number}-${Date.now()}.${ext}`;
+        await uploadWithProgress({
+          bucket: "form-uploads",
+          path,
+          file: excelFile,
+          onProgress: (p) => setUploadProgress(p),
+        });
+        const { data: pub } = supabase.storage.from("form-uploads").getPublicUrl(path);
+        excelUrl = pub.publicUrl;
+      }
+
       const modelData = {
         modelAnswers: assignment.model_answers.length > 0 ? assignment.model_answers : FALLBACK_MODEL_DATA.modelAnswers,
         keyConcepts: assignment.key_concepts.length > 0 ? assignment.key_concepts : FALLBACK_MODEL_DATA.keyConcepts,
       };
 
-      // Only call AI evaluation if model answers are configured
       const hasModelAnswers = modelData.modelAnswers.length > 0 && modelData.modelAnswers.some(a => a.trim());
 
-      // Call AI evaluation only if model answers are configured
       let evaluations: Evaluation[] | null = null;
       if (hasModelAnswers) {
         try {
@@ -212,10 +226,14 @@ const Assignments = ({
         : questions.length;
       const totalPossible = questions.length * 5;
 
+      const payloadAnswers = requireExcel
+        ? { student_name: studentName.trim(), excel_url: excelUrl, answers: answersData }
+        : answersData;
+
       const { error } = await supabase.from("assignment_submissions").insert({
         assignment_id: assignment.id,
         user_id: user!.id,
-        answers: answersData,
+        answers: payloadAnswers,
         score: totalScore,
         total: totalPossible,
         evaluation: evaluations,
