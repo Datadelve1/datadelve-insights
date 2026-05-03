@@ -181,7 +181,7 @@ const WeeklyReviewForm = () => {
                       <li>What measurable change happened? (job, income, skills, project)</li>
                     </ol>
 
-                    <p className="font-semibold text-sm mb-2">Use this script (fill in the brackets):</p>
+                    <p className="font-semibold text-sm mb-2">Use this script (fill in the brackets — use whatever applies to you):</p>
                     <div
                       className="text-sm leading-relaxed whitespace-pre-line p-4 rounded-lg border"
                       style={{ background: theme.card, borderColor: theme.border, color: theme.text }}
