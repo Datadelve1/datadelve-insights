@@ -102,6 +102,9 @@ const Assignments = ({
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
   const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
+  const [studentName, setStudentName] = useState("");
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     fetchData();
