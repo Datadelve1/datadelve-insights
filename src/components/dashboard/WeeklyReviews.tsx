@@ -656,20 +656,22 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
                 </div>
 
                 {/* Optional Written Review */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">
-                    Overall Delvetek Experience Review (Optional)
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Optionally add a written review alongside your video.
-                  </p>
-                  <Textarea
-                    value={optionalWrittenReview}
-                    onChange={(e) => setOptionalWrittenReview(e.target.value)}
-                    placeholder="Share your written thoughts (optional on Saturdays)..."
-                    className="bg-card border-border min-h-[100px]"
-                  />
-                </div>
+                {!showWeek6VideoGuidance && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      Overall Delvetek Experience Review (Optional)
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Optionally add a written review alongside your video.
+                    </p>
+                    <Textarea
+                      value={optionalWrittenReview}
+                      onChange={(e) => setOptionalWrittenReview(e.target.value)}
+                      placeholder="Share your written thoughts (optional on Saturdays)..."
+                      className="bg-card border-border min-h-[100px]"
+                    />
+                  </div>
+                )}
 
                 {/* Consent */}
                 <div className="flex items-start gap-3 p-4 rounded-lg bg-card border border-border">
