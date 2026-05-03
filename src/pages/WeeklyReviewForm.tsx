@@ -173,7 +173,7 @@ const WeeklyReviewForm = () => {
                   >
                     <p className="font-display font-semibold mb-2">📌 Please follow this script for your video</p>
                     <p className="text-xs mb-3" style={{ color: theme.textMuted }}>
-                      Answer these 3 simple questions in your video:
+                      Answer these 3 simple questions in your video — just use whatever applies to you:
                     </p>
                     <ol className="text-sm mb-4 space-y-1 list-decimal pl-5">
                       <li>What were you doing before Delvetek?</li>
@@ -181,7 +181,7 @@ const WeeklyReviewForm = () => {
                       <li>What measurable change happened? (job, income, skills, project)</li>
                     </ol>
 
-                    <p className="font-semibold text-sm mb-2">Use this script (fill in the brackets):</p>
+                    <p className="font-semibold text-sm mb-2">Use this script (fill in the brackets — use whatever applies to you):</p>
                     <div
                       className="text-sm leading-relaxed whitespace-pre-line p-4 rounded-lg border"
                       style={{ background: theme.card, borderColor: theme.border, color: theme.text }}
