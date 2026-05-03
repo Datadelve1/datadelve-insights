@@ -423,6 +423,41 @@ const Assignments = ({
                         Answer all questions below and submit before Wednesday
                         11:59 PM WAT. Your answers will be evaluated by AI.
                       </p>
+
+                      {assignment.week_number === 5 && (
+                        <div className="space-y-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Full Name *</Label>
+                            <Input
+                              value={studentName}
+                              onChange={(e) => setStudentName(e.target.value)}
+                              placeholder="Enter your full name"
+                              className="bg-secondary border-border"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Upload Excel Sheet *</Label>
+                            <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border bg-secondary cursor-pointer hover:border-primary transition-colors">
+                              <Upload className="w-5 h-5 text-primary" />
+                              <span className="text-sm text-muted-foreground truncate">
+                                {excelFile ? excelFile.name : "Click to upload your .xlsx / .xls / .csv file"}
+                              </span>
+                              <input
+                                type="file"
+                                accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                                className="hidden"
+                                onChange={(e) => setExcelFile(e.target.files?.[0] || null)}
+                              />
+                            </label>
+                            {uploadProgress > 0 && uploadProgress < 100 && (
+                              <div className="space-y-1">
+                                <Progress value={uploadProgress} className="h-2" />
+                                <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                       {questions.map((q: string, qi: number) => (
                         <div
                           key={qi}
