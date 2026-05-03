@@ -166,6 +166,48 @@ const WeeklyReviewForm = () => {
                 </div>
                 <div className="space-y-1">
                   <Label style={{ color: theme.text }}>Video Reflection (mp4/mov, max 1GB, face must be visible)</Label>
+
+                  <div
+                    className="rounded-xl p-5 mb-3 border"
+                    style={{ background: theme.goldLight, borderColor: theme.gold, color: theme.text }}
+                  >
+                    <p className="font-display font-semibold mb-2">📌 Please follow this script for your video</p>
+                    <p className="text-xs mb-3" style={{ color: theme.textMuted }}>
+                      Answer these 3 simple questions in your video:
+                    </p>
+                    <ol className="text-sm mb-4 space-y-1 list-decimal pl-5">
+                      <li>What were you doing before Delvetek?</li>
+                      <li>What did you achieve during/after the program?</li>
+                      <li>What measurable change happened? (job, income, skills, project)</li>
+                    </ol>
+
+                    <p className="font-semibold text-sm mb-2">Use this script (fill in the brackets):</p>
+                    <div
+                      className="text-sm leading-relaxed whitespace-pre-line p-4 rounded-lg border"
+                      style={{ background: theme.card, borderColor: theme.border, color: theme.text }}
+                    >
+{`Hi, my name is [Full Name], and I'm a participant of Delvetek's [Cohort Name/Number].
+
+Before joining Delvetek, I was [your situation before — e.g. struggling to learn on my own / unemployed / switching careers / lacking structure].
+
+One of the biggest challenges I faced was [specific problem — e.g. expensive courses, no clear roadmap, inconsistency].
+
+During the program, I was able to:
+• [Skill or tool learned]
+• [Project built or milestone achieved]
+• [Any measurable progress]
+
+After completing (or during) the program:
+I have [clear outcome — e.g. built X project / started freelancing / got a job / improved my income / gained confidence to apply for roles].
+
+What made Delvetek different was [structure / affordability / mentorship / community — be specific].
+
+If you're someone who is [target audience], I would recommend Delvetek because [reason based on real experience].
+
+Thank you.`}
+                    </div>
+                  </div>
+
                   <label
                     className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:border-solid"
                     style={{ borderColor: theme.border, background: theme.bg }}
