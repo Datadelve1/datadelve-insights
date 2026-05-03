@@ -320,9 +320,9 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
         video_url: signedData.signedUrl,
         class_name: className,
         class_date: classDate || null,
-        topic_covered: topicCovered.trim(),
-        tutor_name: tutorName.trim(),
-        tutor_rating: tutorRating,
+        topic_covered: topicCovered.trim() || "Week 6 Video Review",
+        tutor_name: tutorName.trim() || "N/A",
+        tutor_rating: tutorRating || "5",
         question_answers: {},
       } as any);
       if (error) throw error;
