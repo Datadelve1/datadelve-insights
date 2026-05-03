@@ -622,6 +622,10 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
 
                     <div className="space-y-2 rounded-lg border border-border bg-card p-4">
                       <p className="text-sm font-semibold text-foreground">Suggested script</p>
+                      <p className="text-xs italic text-muted-foreground">
+                        This script is only a guide — we truly want you to be genuine and authentic
+                        about your experience so far. Speak from the heart in your own words.
+                      </p>
                       <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed text-muted-foreground">
                         {WEEK_6_VIDEO_SCRIPT}
                       </pre>
