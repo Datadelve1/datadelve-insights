@@ -593,7 +593,7 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
 
             return (
               <form onSubmit={handleSaturdaySubmit} className="space-y-5 rounded-xl bg-secondary/50 p-6">
-                {commonFields}
+                {!showWeek6VideoGuidance && commonFields}
 
                 {showWeek6VideoGuidance && (
                   <div className="space-y-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
