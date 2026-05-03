@@ -173,7 +173,7 @@ const WeeklyReviewForm = () => {
                   >
                     <p className="font-display font-semibold mb-2">📌 Please follow this script for your video</p>
                     <p className="text-xs mb-3" style={{ color: theme.textMuted }}>
-                      Answer these 3 simple questions in your video:
+                      Answer these 3 simple questions in your video — just use whatever applies to you:
                     </p>
                     <ol className="text-sm mb-4 space-y-1 list-decimal pl-5">
                       <li>What were you doing before Delvetek?</li>
