@@ -21,16 +21,16 @@ export type StudentProject = {
 export const STUDENT_PROJECTS: StudentProject[] = [
   {
     slug: "restaurant-health-inspection-analysis-nyc",
-    title: "Project 1 — Public Health Inspection Insights",
+    title: "Project 1 - Restaurant Health Inspection Analysis - NYC",
     scenario:
-      "Imagine you've just joined a city public health unit as a junior data analyst. Your team has been handed years of restaurant inspection records — cuisine types, locations, inspection outcomes, scores, grades and the specific violations cited. Leadership wants to know where food safety risks are concentrated, which neighbourhoods and cuisines need extra attention, and how to spend a limited inspection budget wisely. Your job is to turn this messy real-world dataset into clear, decision-ready insights.",
+      "You are a Data Analyst for the NYC Department of Health. Your job is to analyze restaurant inspection results to identify patterns in violations, grades, and cuisine types across New York City. The dataset includes restaurant details, cuisine descriptions, inspection results, grades, and violation types. The city leadership wants to use data to improve public health policies, inspection scheduling, and food safety education.",
     image:
       "https://ik.imagekit.io/d3ejrh60s/prod/projects/Y7OBL6OTGW.jpg",
     skills: [
-      "Cleaning real, messy, real-world data",
-      "Categorising free-text fields (cuisines, violation descriptions)",
-      "Trend & time-series exploration",
-      "Translating raw data into actionable recommendations",
+      "Text Categorization",
+      "Data Cleaning (missing values, standardization)",
+      "Time-Series & Trend Analysis",
+      "Working with Real Raw Data",
     ],
     points: 150,
     durationHours: 3,
@@ -38,77 +38,77 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     tags: ["Data Cleaning", "SQL", "Excel", "Time Series"],
     datasets: [
       {
-        label: "Restaurant Inspection Results (CSV)",
+        label: "DOHMH NYC Restaurant Inspection Results (CSV)",
         url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/DOHMH_NYC_Restaurant_Inspection_Results.csv",
         sizeLabel: "~123 MB",
       },
       {
-        label: "Inspection Data Dictionary (XLSX)",
+        label: "Restaurant Inspection Data Dictionary (XLSX)",
         url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/RestaurantInspectionDataDictionary.xlsx",
         sizeLabel: "~70 KB",
       },
     ],
     details: {
       intro:
-        "The leadership team isn't interested in raw tables — they want a story. Your deliverable should answer: which types of restaurants keep failing, which areas are highest-risk, and where targeted inspections or food-safety education would have the biggest impact. Treat this like a real consulting brief: clean the data, dig into the patterns, and back every recommendation with evidence from the dataset.",
+        "The Commissioner wants to understand which types of restaurants are struggling with food safety, which neighborhoods are at highest risk, and what violations are most common. Use this dataset to build a report with insights.",
       questions: [
-        "What are the most frequently recurring violations, and where do they cluster geographically?",
-        "Which cuisine categories and neighbourhoods consistently show the weakest food-safety performance?",
-        "How have grades and violation rates shifted across boroughs and over time?",
-        "Given the patterns you find, where should the city focus its next round of inspections, training, or policy intervention?",
+        "Which violations are most common, and where do they occur most frequently?",
+        "Which cuisines and neighborhoods have the lowest food safety performance?",
+        "How do restaurant grades and violations vary across boroughs and over time?",
+        "Where should the city focus inspections, policies, or education to improve food safety?",
       ],
       techStack: ["Excel", "SQL", "Power BI"],
       notes: [
-        "The dataset ships with a separate data dictionary — keep it open while you clean. Many fields are coded and only make sense once you cross-reference it.",
-        "Because of the file size, loading everything into Excel will be painful. Push the raw data into a SQL database (or Power BI dataflow) and do your heavy cleaning there before visualising.",
+        "This data contains the raw data as well as a Data Dictionary. The data is messy so reference the Data Dictionary when needed.",
+        "For this amount of data it is recommended to put it into a database (SQL) for faster cleaning and analyzing.",
       ],
       steps: [
         {
-          title: "Get the data ready",
+          title: "Data Preparation",
           items: [
-            "Inspect missing or blank fields, especially cuisine descriptions, grades and inspection dates — decide whether to drop, flag or impute them.",
-            "Standardise inconsistent cuisine labels so similar entries (e.g. variations of the same cuisine) collapse into one clean category.",
-            "Cast inspection and grade dates into proper date types so you can do time-based analysis later.",
+            "Handle missing values (e.g., missing cuisine description or grades).",
+            "Standardize cuisine names (e.g., “Chinese” vs “Asian/Chinese”).",
+            "Convert inspection and grade dates to proper datetime format.",
           ],
         },
         {
-          title: "Get a feel for the data",
+          title: "Overall Insights",
           items: [
-            "Count total inspections per borough to understand inspection volume.",
-            "Look at how grades are distributed across the city and within each borough.",
-            "Break down the mix of inspection types (initial, re-inspection, pre-permit, etc.) to see what kind of activity dominates.",
+            "Count the total number of inspections by borough.",
+            "Calculate the distribution of grades (A, B, C, etc.) across NYC.",
+            "Identify the most common inspection types (Initial, Re-inspection, Pre-permit).",
           ],
         },
         {
-          title: "Dig into violations",
+          title: "Violation Analysis",
           items: [
-            "Surface the top recurring violations and describe what each one actually means using the data dictionary.",
-            "Separate critical from non-critical violations and compare their frequencies.",
-            "Map critical violations to boroughs and neighbourhoods to highlight high-risk zones.",
+            "Find the top 10 most frequent violations (e.g., “Evidence of mice,” “Improper food temperature”).",
+            "Compare critical vs. non-critical violations.",
+            "See which boroughs or neighborhoods have the highest rate of critical violations.",
           ],
         },
         {
-          title: "Compare cuisines",
+          title: "Cuisine Analysis",
           items: [
-            "Look at how grades vary across cuisine types — which cuisines tend to score better or worse on average?",
-            "Identify the cuisine categories with the lowest performance and the highest share of critical violations.",
-            "Sanity check: are these patterns driven by real risk, or by the sheer number of restaurants in that category?",
+            "Compare grades by cuisine type (e.g., Chinese vs American vs Italian).",
+            "Find the top 5 cuisines with the lowest average scores.",
+            "Identify cuisines with the highest proportion of “Critical” violations.",
           ],
         },
         {
-          title: "Look at place and time",
+          title: "Geographic & Time Trends",
           items: [
-            "Visualise grades and violation rates across boroughs (a map or clean bar chart works well).",
-            "Track whether scores are trending up or down over time — is the city actually improving?",
-            "Spot neighbourhoods that consistently underperform, even when overall numbers improve.",
+            "Visualize restaurant grades across boroughs (map or bar chart).",
+            "Check if violations or scores have improved or worsened over time.",
+            "Highlight if certain neighborhoods consistently perform worse.",
           ],
         },
         {
-          title: "Turn insights into recommendations",
+          title: "Recommendations",
           items: [
-            "Recommend specific zones or cuisine groups where the next inspection cycle should focus.",
-            "Suggest where targeted food-safety training or outreach would likely have the biggest impact.",
-            "Call out any policy or enforcement opportunities your analysis surfaces — and back each one with a chart or number.",
+            "Suggest where targeted inspections or public health campaigns should focus.",
+            "Identify cuisines/areas where more food safety training could reduce risks.",
+            "Highlight policy opportunities (e.g., stricter enforcement in high-violation zones).",
           ],
         },
       ],
