@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays, Download } from "lucide-react";
 import { getProjectBySlug } from "@/lib/studentProjects";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
+import ProjectSubmission from "@/components/dashboard/ProjectSubmission";
 
 const StudentProjectDetail = () => {
   const { slug } = useParams();
