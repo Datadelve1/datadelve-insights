@@ -8,6 +8,7 @@ export type StudentProject = {
   durationHours: number;
   publishedAt: string;
   tags: string[];
+  datasets?: { label: string; url: string; sizeLabel?: string }[];
   details: {
     intro: string;
     questions: string[];
