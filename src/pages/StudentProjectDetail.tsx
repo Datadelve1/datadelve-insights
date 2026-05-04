@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays } from "lucide-react";
+import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays, Download } from "lucide-react";
 import { getProjectBySlug } from "@/lib/studentProjects";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
@@ -111,6 +111,34 @@ const StudentProjectDetail = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {project.datasets && project.datasets.length > 0 && (
+              <Card className="border-border bg-card">
+                <CardContent className="p-6 space-y-3">
+                  <h3 className="font-display font-semibold text-foreground">Dataset Downloads</h3>
+                  <div className="space-y-2">
+                    {project.datasets.map((d) => (
+                      <a
+                        key={d.url}
+                        href={d.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        download
+                        className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background p-3 hover:border-primary/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Download className="w-4 h-4 text-primary shrink-0" />
+                          <span className="text-sm text-foreground truncate">{d.label}</span>
+                        </div>
+                        {d.sizeLabel && (
+                          <Badge variant="secondary" className="text-xs shrink-0">{d.sizeLabel}</Badge>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="details" className="mt-6 space-y-6">

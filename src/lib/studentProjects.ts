@@ -8,6 +8,7 @@ export type StudentProject = {
   durationHours: number;
   publishedAt: string;
   tags: string[];
+  datasets?: { label: string; url: string; sizeLabel?: string }[];
   details: {
     intro: string;
     questions: string[];
@@ -35,6 +36,18 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     durationHours: 3,
     publishedAt: "2025-10-03",
     tags: ["Data Cleaning", "SQL", "Excel", "Time Series"],
+    datasets: [
+      {
+        label: "DOHMH NYC Restaurant Inspection Results (CSV)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/DOHMH_NYC_Restaurant_Inspection_Results.csv",
+        sizeLabel: "~123 MB",
+      },
+      {
+        label: "Restaurant Inspection Data Dictionary (XLSX)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/RestaurantInspectionDataDictionary.xlsx",
+        sizeLabel: "~70 KB",
+      },
+    ],
     details: {
       intro:
         "The Commissioner wants to understand which types of restaurants are struggling with food safety, which neighborhoods are at highest risk, and what violations are most common. Use this dataset to build a report with insights.",
