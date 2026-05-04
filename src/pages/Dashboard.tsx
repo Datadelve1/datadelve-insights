@@ -284,6 +284,23 @@ const Dashboard = () => {
         {/* Assignments */}
         <Assignments attendance={attendance} submittedReviews={submittedReviews} onScoreUpdate={fetchDashboardData} />
 
+        {/* Practice Projects */}
+        <Card className="border-border bg-card">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2 text-foreground">
+              <BookOpen className="w-5 h-5 text-primary" /> Practice Projects
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Real-world, scenario-based projects to sharpen your analytical skills with raw data.
+            </p>
+            <Button asChild>
+              <a href="/dashboard/projects">Browse Projects</a>
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Certificate Payment */}
         <CertificatePayment />
 

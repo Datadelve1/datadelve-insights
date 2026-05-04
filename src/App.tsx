@@ -14,6 +14,8 @@ import WeeklyReviewForm from "./pages/WeeklyReviewForm";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import DashboardCommitment from "./pages/DashboardCommitment";
+import StudentProjects from "./pages/StudentProjects";
+import StudentProjectDetail from "./pages/StudentProjectDetail";
 import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -79,6 +81,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/commitment" element={<DashboardCommitment />} />
+            <Route path="/dashboard/projects" element={<StudentProjects />} />
+            <Route path="/dashboard/projects/:slug" element={<StudentProjectDetail />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/blog" element={<Blog />} />
