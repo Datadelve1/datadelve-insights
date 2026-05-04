@@ -1,0 +1,1 @@
+create policy "tmp upload project-datasets" on storage.objects for insert with check (bucket_id = 'project-datasets');
