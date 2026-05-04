@@ -206,6 +206,10 @@ const StudentProjectDetail = () => {
               ))}
             </div>
           </TabsContent>
+
+          <TabsContent value="submit" className="mt-6">
+            <ProjectSubmission projectSlug={project.slug} />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
