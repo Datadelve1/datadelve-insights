@@ -583,6 +583,45 @@ export type Database = {
         }
         Relationships: []
       }
+      project_submissions: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          file_url: string | null
+          id: string
+          link_url: string | null
+          notes: string | null
+          project_slug: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          notes?: string | null
+          project_slug: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          link_url?: string | null
+          notes?: string | null
+          project_slug?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       referrers: {
         Row: {
           code: string

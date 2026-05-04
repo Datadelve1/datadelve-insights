@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays, Download } from "lucide-react";
 import { getProjectBySlug } from "@/lib/studentProjects";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
+import ProjectSubmission from "@/components/dashboard/ProjectSubmission";
 
 const StudentProjectDetail = () => {
   const { slug } = useParams();
@@ -45,9 +46,10 @@ const StudentProjectDetail = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 max-w-xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="submit">Submit</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6 space-y-6">
@@ -203,6 +205,10 @@ const StudentProjectDetail = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="submit" className="mt-6">
+            <ProjectSubmission projectSlug={project.slug} />
           </TabsContent>
         </Tabs>
       </main>
