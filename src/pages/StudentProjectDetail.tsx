@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays } from "lucide-react";
+import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays, Download } from "lucide-react";
 import { getProjectBySlug } from "@/lib/studentProjects";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
