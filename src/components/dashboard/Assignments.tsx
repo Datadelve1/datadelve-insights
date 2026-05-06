@@ -286,6 +286,7 @@ const Assignments = ({
       setActiveAssignment(null);
       setAnswers({});
       setExcelFile(null);
+      setExcelLink("");
       setUploadProgress(0);
       fetchData();
       onScoreUpdate();
