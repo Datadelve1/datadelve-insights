@@ -53,6 +53,13 @@ interface Submission {
   created_at: string;
 }
 
+interface Week6SubmissionPayload {
+  student_name?: string;
+  student_email?: string;
+  excel_url?: string | null;
+  answers?: string[];
+}
+
 // Fallback model data used when assignments don't have model_answers configured
 const FALLBACK_MODEL_DATA = {
   modelAnswers: [] as string[],
@@ -102,9 +109,11 @@ const Assignments = ({
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
   const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
-  const [studentName, setStudentName] = useState("");
   const [excelFile, setExcelFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const studentDisplayName = profile?.full_name?.trim() || user?.email || "Student";
+  const studentEmail = profile?.email?.trim() || user?.email || "";
 
   useEffect(() => {
     fetchData();
@@ -149,10 +158,6 @@ const Assignments = ({
     );
     const requireExcel = assignment.week_number === 6;
     if (requireExcel) {
-      if (!studentName.trim()) {
-        toast({ title: "Please enter your full name", variant: "destructive" });
-        return;
-      }
       if (!excelFile) {
         toast({ title: "Please upload your Excel sheet", variant: "destructive" });
         return;
@@ -227,7 +232,12 @@ const Assignments = ({
       const totalPossible = questions.length * 5;
 
       const payloadAnswers = requireExcel
-        ? { student_name: studentName.trim(), excel_url: excelUrl, answers: answersData }
+        ? {
+            student_name: studentDisplayName,
+            student_email: studentEmail,
+            excel_url: excelUrl,
+            answers: answersData,
+          }
         : answersData;
 
       const { error } = await supabase.from("assignment_submissions").insert({
@@ -253,7 +263,6 @@ const Assignments = ({
 
       setActiveAssignment(null);
       setAnswers({});
-      setStudentName("");
       setExcelFile(null);
       setUploadProgress(0);
       fetchData();
@@ -306,6 +315,10 @@ const Assignments = ({
           <div className="space-y-3">
             {assignments.map((assignment) => {
               const submission = submissions[assignment.id];
+              const isWeek6 = assignment.week_number === 6;
+              const week6Submission = (isWeek6 && submission && !Array.isArray(submission.answers)
+                ? (submission.answers as Week6SubmissionPayload)
+                : null);
               const questions = assignment.questions.map((q: any) =>
                 typeof q === "string" ? q : q.question || ""
               );
@@ -413,18 +426,25 @@ const Assignments = ({
                     <div className="p-6 border-t border-border space-y-5 bg-card">
                       <p className="text-sm text-muted-foreground">
                         {assignment.week_number === 6
-                          ? "Submit your full name and the Excel sheet you worked on before Wednesday 11:59 PM WAT."
+                          ? "Upload your Excel sheet before Wednesday 11:59 PM WAT. Your saved dashboard name and email will be attached automatically."
                           : "Answer all questions below and submit before Wednesday 11:59 PM WAT. Your answers will be evaluated by AI."}
                       </p>
 
                       {assignment.week_number === 6 && (
                         <div className="space-y-4 rounded-lg border border-primary/40 bg-primary/5 p-4">
                           <div className="space-y-2">
-                            <Label className="text-foreground">Full Name *</Label>
+                            <Label className="text-foreground">Full Name</Label>
                             <Input
-                              value={studentName}
-                              onChange={(e) => setStudentName(e.target.value)}
-                              placeholder="Enter your full name"
+                              value={studentDisplayName}
+                              readOnly
+                              className="bg-secondary border-border"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-foreground">Email</Label>
+                            <Input
+                              value={studentEmail}
+                              readOnly
                               className="bg-secondary border-border"
                             />
                           </div>
@@ -518,7 +538,29 @@ const Assignments = ({
                           Submitted{" "}
                           {new Date(submission.created_at).toLocaleDateString()}
                         </p>
+                        {isWeek6 && week6Submission && (
+                          <div className="space-y-1 text-xs text-muted-foreground">
+                            <p>{week6Submission.student_name || studentDisplayName}</p>
+                            <p>{week6Submission.student_email || studentEmail}</p>
+                          </div>
+                        )}
                       </div>
+
+                      {isWeek6 && week6Submission?.excel_url && (
+                        <div className="rounded-lg border border-border bg-secondary/50 p-4">
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Uploaded Excel Sheet
+                          </p>
+                          <a
+                            href={week6Submission.excel_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-sm text-primary underline break-all"
+                          >
+                            Open uploaded file
+                          </a>
+                        </div>
+                      )}
 
                       {/* Per-question evaluation */}
                       {evalResults && Array.isArray(evalResults) ? (
@@ -554,6 +596,8 @@ const Assignments = ({
                                 <p className="text-sm text-foreground">
                                   {Array.isArray(submission.answers)
                                     ? submission.answers[i]
+                                    : Array.isArray(week6Submission?.answers)
+                                    ? week6Submission?.answers?.[i]
                                     : "—"}
                                 </p>
                               </div>
@@ -598,9 +642,9 @@ const Assignments = ({
                         </div>
                       ) : (
                         // Fallback: show raw answers if no evaluation
-                        Array.isArray(submission.answers) && (
+                        (Array.isArray(submission.answers) || Array.isArray(week6Submission?.answers)) && (
                           <div className="space-y-3">
-                            {submission.answers.map(
+                            {(Array.isArray(submission.answers) ? submission.answers : week6Submission?.answers || []).map(
                               (ans: string, i: number) => (
                                 <div
                                   key={i}
