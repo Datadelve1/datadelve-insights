@@ -160,8 +160,20 @@ const Assignments = ({
     );
     const requireExcel = assignment.week_number === 6;
     if (requireExcel) {
-      if (!excelFile) {
-        toast({ title: "Please upload your Excel sheet", variant: "destructive" });
+      if (!excelFile && !excelLink.trim()) {
+        toast({ title: "Upload your Excel sheet or paste a shareable link", variant: "destructive" });
+        return;
+      }
+      if (excelFile && excelFile.size > MAX_EXCEL_MB * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: `Max ${MAX_EXCEL_MB}MB. For larger files, upload to Google Drive / OneDrive and paste the share link instead.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (excelLink.trim() && !/^https?:\/\//i.test(excelLink.trim())) {
+        toast({ title: "Invalid link", description: "Link must start with http:// or https://", variant: "destructive" });
         return;
       }
     }
@@ -184,19 +196,27 @@ const Assignments = ({
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
 
-      // Week 5: upload Excel sheet
+      // Week 6: upload Excel sheet (or accept a shareable link for big files)
       let excelUrl: string | null = null;
       if (requireExcel && excelFile) {
         const ext = excelFile.name.split(".").pop();
         const path = `${user!.id}/assignments/week-${assignment.week_number}-${Date.now()}.${ext}`;
-        await uploadWithProgress({
-          bucket: "form-uploads",
-          path,
-          file: excelFile,
-          onProgress: (p) => setUploadProgress(p),
-        });
+        try {
+          await uploadWithProgress({
+            bucket: "form-uploads",
+            path,
+            file: excelFile,
+            onProgress: (p) => setUploadProgress(p),
+          });
+        } catch (uploadErr: any) {
+          throw new Error(
+            `Upload failed: ${uploadErr?.message || "unknown error"}. If your device is low on memory, try a smaller file or paste a Google Drive / OneDrive link instead.`
+          );
+        }
         const { data: pub } = supabase.storage.from("form-uploads").getPublicUrl(path);
         excelUrl = pub.publicUrl;
+      } else if (requireExcel && excelLink.trim()) {
+        excelUrl = excelLink.trim();
       }
 
       const modelData = {
