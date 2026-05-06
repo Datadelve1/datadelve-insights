@@ -610,25 +610,46 @@ const AssignmentManagement = () => {
                         )}
                       </div>
                     </div>
-                    {isExpanded && viewingAssignment && (
-                      <CardContent className="border-t border-border pt-4 space-y-3">
-                        {viewingAssignment.questions.map((q: any, qi: number) => {
-                          const questionText = typeof q === "string" ? q : q.question || "";
-                          const answer = Array.isArray(sub.answers) ? sub.answers[qi] : null;
-                          const answerText = typeof answer === "string" ? answer : (answer as any)?.answer || "No answer";
-                          return (
-                            <div key={qi} className="rounded-lg bg-secondary/50 p-3 space-y-1">
-                              <p className="text-xs font-medium text-muted-foreground">
-                                Q{qi + 1}: {questionText}
-                              </p>
-                              <p className="text-sm text-foreground whitespace-pre-wrap">
-                                {answerText}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </CardContent>
-                    )}
+                    {isExpanded && viewingAssignment && (() => {
+                      // Week 6 stores submissions as an object: { student_name, student_email, excel_url, answers: [...] }
+                      const isObjectPayload = sub.answers && !Array.isArray(sub.answers) && typeof sub.answers === "object";
+                      const answersArray: any[] = isObjectPayload
+                        ? ((sub.answers as any).answers || [])
+                        : (Array.isArray(sub.answers) ? sub.answers : []);
+                      const excelUrl = isObjectPayload ? (sub.answers as any).excel_url : null;
+                      return (
+                        <CardContent className="border-t border-border pt-4 space-y-3">
+                          {excelUrl && (
+                            <a
+                              href={excelUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 text-sm font-medium"
+                            >
+                              📎 Open uploaded Excel sheet
+                            </a>
+                          )}
+                          {viewingAssignment.questions.map((q: any, qi: number) => {
+                            const questionText = typeof q === "string" ? q : q.question || "";
+                            const answer = answersArray[qi];
+                            const answerText = typeof answer === "string" ? answer : (answer as any)?.answer || "No answer";
+                            return (
+                              <div key={qi} className="rounded-lg bg-secondary/50 p-3 space-y-1">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Q{qi + 1}: {questionText}
+                                </p>
+                                <p className="text-sm text-foreground whitespace-pre-wrap">
+                                  {answerText}
+                                </p>
+                              </div>
+                            );
+                          })}
+                          {viewingAssignment.questions.length === 0 && !excelUrl && (
+                            <p className="text-xs text-muted-foreground">No content in this submission.</p>
+                          )}
+                        </CardContent>
+                      );
+                    })()}
                   </Card>
                 );
               })}
