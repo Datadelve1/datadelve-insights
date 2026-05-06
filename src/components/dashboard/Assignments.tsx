@@ -110,7 +110,9 @@ const Assignments = ({
   const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
   const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
   const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [excelLink, setExcelLink] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const MAX_EXCEL_MB = 25;
 
   const studentDisplayName = profile?.full_name?.trim() || user?.email || "Student";
   const studentEmail = profile?.email?.trim() || user?.email || "";
@@ -158,8 +160,20 @@ const Assignments = ({
     );
     const requireExcel = assignment.week_number === 6;
     if (requireExcel) {
-      if (!excelFile) {
-        toast({ title: "Please upload your Excel sheet", variant: "destructive" });
+      if (!excelFile && !excelLink.trim()) {
+        toast({ title: "Upload your Excel sheet or paste a shareable link", variant: "destructive" });
+        return;
+      }
+      if (excelFile && excelFile.size > MAX_EXCEL_MB * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: `Max ${MAX_EXCEL_MB}MB. For larger files, upload to Google Drive / OneDrive and paste the share link instead.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (excelLink.trim() && !/^https?:\/\//i.test(excelLink.trim())) {
+        toast({ title: "Invalid link", description: "Link must start with http:// or https://", variant: "destructive" });
         return;
       }
     }
@@ -182,19 +196,27 @@ const Assignments = ({
     try {
       const answersData = questions.map((_: string, i: number) => answers[i] || "");
 
-      // Week 5: upload Excel sheet
+      // Week 6: upload Excel sheet (or accept a shareable link for big files)
       let excelUrl: string | null = null;
       if (requireExcel && excelFile) {
         const ext = excelFile.name.split(".").pop();
         const path = `${user!.id}/assignments/week-${assignment.week_number}-${Date.now()}.${ext}`;
-        await uploadWithProgress({
-          bucket: "form-uploads",
-          path,
-          file: excelFile,
-          onProgress: (p) => setUploadProgress(p),
-        });
+        try {
+          await uploadWithProgress({
+            bucket: "form-uploads",
+            path,
+            file: excelFile,
+            onProgress: (p) => setUploadProgress(p),
+          });
+        } catch (uploadErr: any) {
+          throw new Error(
+            `Upload failed: ${uploadErr?.message || "unknown error"}. If your device is low on memory, try a smaller file or paste a Google Drive / OneDrive link instead.`
+          );
+        }
         const { data: pub } = supabase.storage.from("form-uploads").getPublicUrl(path);
         excelUrl = pub.publicUrl;
+      } else if (requireExcel && excelLink.trim()) {
+        excelUrl = excelLink.trim();
       }
 
       const modelData = {
@@ -264,6 +286,7 @@ const Assignments = ({
       setActiveAssignment(null);
       setAnswers({});
       setExcelFile(null);
+      setExcelLink("");
       setUploadProgress(0);
       fetchData();
       onScoreUpdate();
@@ -453,7 +476,7 @@ const Assignments = ({
                             <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border bg-secondary cursor-pointer hover:border-primary transition-colors">
                               <Upload className="w-5 h-5 text-primary" />
                               <span className="text-sm text-muted-foreground truncate">
-                                {excelFile ? excelFile.name : "Click to upload your .xlsx / .xls / .csv file"}
+                                {excelFile ? `${excelFile.name} · ${(excelFile.size / 1024 / 1024).toFixed(2)} MB` : `Click to upload your .xlsx / .xls / .csv file (max ${MAX_EXCEL_MB}MB)`}
                               </span>
                               <input
                                 type="file"
@@ -468,6 +491,19 @@ const Assignments = ({
                                 <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
                               </div>
                             )}
+                            <div className="pt-2 space-y-2">
+                              <Label className="text-foreground text-xs">Or paste a shareable link (Google Drive, OneDrive, Dropbox)</Label>
+                              <Input
+                                type="url"
+                                placeholder="https://drive.google.com/..."
+                                value={excelLink}
+                                onChange={(e) => setExcelLink(e.target.value)}
+                                className="bg-secondary border-border"
+                              />
+                              <p className="text-[11px] text-muted-foreground">
+                                If your phone shows a "low memory" error while uploading, upload the file to Google Drive on a computer and paste the share link here instead. Make sure the link is set to "Anyone with the link can view".
+                              </p>
+                            </div>
                           </div>
                         </div>
                       )}
