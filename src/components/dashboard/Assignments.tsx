@@ -110,7 +110,9 @@ const Assignments = ({
   const [latestEvaluation, setLatestEvaluation] = useState<Evaluation[] | null>(null);
   const [showEvaluation, setShowEvaluation] = useState<string | null>(null);
   const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [excelLink, setExcelLink] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const MAX_EXCEL_MB = 25;
 
   const studentDisplayName = profile?.full_name?.trim() || user?.email || "Student";
   const studentEmail = profile?.email?.trim() || user?.email || "";
