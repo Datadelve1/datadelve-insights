@@ -476,7 +476,7 @@ const Assignments = ({
                             <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border bg-secondary cursor-pointer hover:border-primary transition-colors">
                               <Upload className="w-5 h-5 text-primary" />
                               <span className="text-sm text-muted-foreground truncate">
-                                {excelFile ? excelFile.name : "Click to upload your .xlsx / .xls / .csv file"}
+                                {excelFile ? `${excelFile.name} · ${(excelFile.size / 1024 / 1024).toFixed(2)} MB` : `Click to upload your .xlsx / .xls / .csv file (max ${MAX_EXCEL_MB}MB)`}
                               </span>
                               <input
                                 type="file"
@@ -491,6 +491,19 @@ const Assignments = ({
                                 <p className="text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
                               </div>
                             )}
+                            <div className="pt-2 space-y-2">
+                              <Label className="text-foreground text-xs">Or paste a shareable link (Google Drive, OneDrive, Dropbox)</Label>
+                              <Input
+                                type="url"
+                                placeholder="https://drive.google.com/..."
+                                value={excelLink}
+                                onChange={(e) => setExcelLink(e.target.value)}
+                                className="bg-secondary border-border"
+                              />
+                              <p className="text-[11px] text-muted-foreground">
+                                If your phone shows a "low memory" error while uploading, upload the file to Google Drive on a computer and paste the share link here instead. Make sure the link is set to "Anyone with the link can view".
+                              </p>
+                            </div>
                           </div>
                         </div>
                       )}
