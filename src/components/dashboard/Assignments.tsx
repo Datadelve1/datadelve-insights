@@ -310,13 +310,7 @@ const Assignments = ({
                 typeof q === "string" ? q : q.question || ""
               );
 
-              const friAttended =
-                attendance[`${assignment.week_number}-friday`] === "present";
-              const satAttended =
-                attendance[`${assignment.week_number}-saturday`] === "present";
-              const attended = friAttended || satAttended;
-
-              const weekAccess = isAdmin || isUnrestricted || attended;
+              const weekAccess = true;
               const isActive = activeAssignment === assignment.id;
               const canSubmit =
                 windowInfo.isOpen &&
@@ -331,8 +325,6 @@ const Assignments = ({
                   : submission?.evaluation || null;
 
               let lockMessage = "";
-              if (!attended && !isAdmin && !isUnrestricted)
-                lockMessage = "Attendance required";
 
               return (
                 <div
