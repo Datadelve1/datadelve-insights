@@ -617,6 +617,33 @@ const WeeklyReports = () => {
                   <div className="rounded-lg overflow-hidden bg-black">
                     <video src={selectedReview.video_url} controls className="w-full" />
                   </div>
+                  <div className="flex justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const url = selectedReview.video_url!;
+                          const res = await fetch(url);
+                          const blob = await res.blob();
+                          const objectUrl = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          const safeName = (selectedReview.full_name || "student")
+                            .replace(/[^a-z0-9]+/gi, "_");
+                          a.href = objectUrl;
+                          a.download = `${safeName}_week${selectedReview.week_number}_review.mp4`;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          URL.revokeObjectURL(objectUrl);
+                        } catch (e) {
+                          window.open(selectedReview.video_url!, "_blank");
+                        }
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-1" /> Download video
+                    </Button>
+                  </div>
 
                   {/* Approval Prompt (Super Admin) */}
                   {isPrimaryAdmin && (
