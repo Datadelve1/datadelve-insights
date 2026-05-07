@@ -628,7 +628,7 @@ const WeeklyReports = () => {
                           const blob = await res.blob();
                           const objectUrl = URL.createObjectURL(blob);
                           const a = document.createElement("a");
-                          const safeName = (selectedReview.profiles?.full_name || "student")
+                          const safeName = (selectedReview.full_name || "student")
                             .replace(/[^a-z0-9]+/gi, "_");
                           a.href = objectUrl;
                           a.download = `${safeName}_week${selectedReview.week_number}_review.mp4`;
