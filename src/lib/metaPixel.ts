@@ -21,3 +21,6 @@ export const trackInitiateCheckout = (params?: Record<string, any>) =>
   fbqTrack("InitiateCheckout", params);
 export const trackCompleteRegistration = (params?: Record<string, any>) =>
   fbqTrack("CompleteRegistration", params);
+export const trackContact = (params?: Record<string, any>) => fbqTrack("Contact", params);
+export const trackViewContent = (params?: Record<string, any>) =>
+  fbqTrack("ViewContent", params);

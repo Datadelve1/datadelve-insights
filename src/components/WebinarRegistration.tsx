@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, Clock, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import { trackLead } from "@/lib/metaPixel";
 
 const WebinarRegistration = () => {
   const EXTERNAL_FORM_URL = "https://forms.gle/rtGLzwfspG849Y4H6";
 
   const handleRegisterClick = () => {
+    trackLead({ content_name: "Webinar Registration" });
     window.open(EXTERNAL_FORM_URL, "_blank", "noopener,noreferrer");
   };
 

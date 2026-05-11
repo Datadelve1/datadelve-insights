@@ -1,4 +1,5 @@
 import { MessageCircle } from "lucide-react";
+import { trackContact } from "@/lib/metaPixel";
 
 const WhatsAppFloat = () => {
   return (
@@ -7,6 +8,7 @@ const WhatsAppFloat = () => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat on WhatsApp"
+      onClick={() => trackContact({ method: "whatsapp_float" })}
       className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 animate-fade-in"
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">

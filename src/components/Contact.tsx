@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, MapPin, Clock, Send, MessageCircle, Phone } from "lucide-react";
+import { trackContact } from "@/lib/metaPixel";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -34,6 +35,7 @@ const Contact = () => {
     }
 
     setIsLoading(true);
+    trackContact({ method: "contact_form" });
 
     // Open mailto with the form data
     const mailtoLink = `mailto:info@delvetek.io?subject=${encodeURIComponent(formData.subject || "Contact from Website")}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
