@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { trackInitiateCheckout } from "@/lib/metaPixel";
 import {
   ArrowRight,
   BookOpen,
@@ -142,7 +143,7 @@ const EnrollHub = () => {
             </div>
 
             <Button asChild variant="hero" size="lg" className="w-full group/btn">
-              <Link to="/enroll/beginner">
+              <Link to="/enroll/beginner" onClick={() => trackInitiateCheckout({ content_name: "Beginner Track", content_category: "beginner", currency: "NGN", value: 25000 })}>
                 Enroll in Beginner Track
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
@@ -203,7 +204,7 @@ const EnrollHub = () => {
             </div>
 
             <Button asChild variant="hero" size="lg" className="w-full group/btn">
-              <Link to="/enroll/professional">
+              <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
                 Enroll in Professional Track
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
@@ -289,7 +290,7 @@ const EnrollHub = () => {
             </div>
 
             <Button asChild variant="hero" size="lg" className="w-full group/btn">
-              <Link to="/enroll/advanced">
+              <Link to="/enroll/advanced" onClick={() => trackInitiateCheckout({ content_name: "Advanced Track", content_category: "advanced", currency: "NGN", value: 75000 })}>
                 Enroll in Advanced Track
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
@@ -591,7 +592,7 @@ const EnrollHub = () => {
             Seats fill fast. Lock in your spot today and start your data journey June 5.
           </p>
           <Button asChild variant="hero" size="lg">
-            <Link to="/enroll/professional">
+            <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
               Enroll Now
               <ArrowRight className="w-4 h-4" />
             </Link>

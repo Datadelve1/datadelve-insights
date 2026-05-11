@@ -9,8 +9,10 @@ import {
 import { ArrowLeft, Clock, CalendarDays, Monitor, Award, BookOpen, CheckCircle2, Sparkles, MessageCircle, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { trackViewContent } from "@/lib/metaPixel";
 
 interface CourseFAQ {
   question: string;
@@ -27,6 +29,10 @@ interface CourseDetailProps {
 }
 
 const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrationClosed }: CourseDetailProps) => {
+  useEffect(() => {
+    trackViewContent({ content_name: title, content_category: "course" });
+  }, [title]);
+
   // Add certificate FAQ if not already present
   const allFaqs = [...faqs];
   const hasCertFaq = faqs.some(f => f.question.toLowerCase().includes("certificate"));

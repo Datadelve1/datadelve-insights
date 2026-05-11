@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackCompleteRegistration } from "@/lib/metaPixel";
 
 const EnrollmentCallback = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +26,11 @@ const EnrollmentCallback = () => {
         if (error) throw error;
         if (data?.ok || data?.success) {
           setStatus("success");
+          trackCompleteRegistration({
+            content_name: data?.tier || "Enrollment",
+            currency: data?.currency || "NGN",
+            value: data?.amount,
+          });
         } else {
           setStatus("error");
           setErrorMsg(data?.error || "Verification failed");
