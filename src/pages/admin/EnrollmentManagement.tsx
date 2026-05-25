@@ -466,22 +466,41 @@ const EnrollmentManagement = () => {
         </div>
       )}
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          value={referralFilter}
-          onChange={(e) => setReferralFilter(e.target.value)}
-          placeholder="Filter by referral code..."
-          className="pl-9 pr-9 font-mono uppercase"
-        />
-        {referralFilter && (
-          <button
-            onClick={() => setReferralFilter("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative max-w-sm flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={studentFilter}
+            onChange={(e) => setStudentFilter(e.target.value)}
+            placeholder="Filter by student name or email..."
+            className="pl-9 pr-9"
+          />
+          {studentFilter && (
+            <button
+              onClick={() => setStudentFilter("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="relative max-w-sm flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={referralFilter}
+            onChange={(e) => setReferralFilter(e.target.value)}
+            placeholder="Filter by referral code..."
+            className="pl-9 pr-9 font-mono uppercase"
+          />
+          {referralFilter && (
+            <button
+              onClick={() => setReferralFilter("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <Tabs defaultValue="beginner">
