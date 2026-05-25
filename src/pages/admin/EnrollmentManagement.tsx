@@ -216,14 +216,18 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const filteredByReferral = useMemo(() => {
-    const q = referralFilter.trim().toUpperCase();
-    if (!q) return enrollments;
-    return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
-  }, [enrollments, referralFilter]);
+  const filteredEnrollments = useMemo(() => {
+    const ref = referralFilter.trim().toUpperCase();
+    const stu = studentFilter.trim().toLowerCase();
+    return enrollments.filter((e) => {
+      if (ref && !(e.referral_code || "").toUpperCase().includes(ref)) return false;
+      if (stu && !`${e.full_name} ${e.email}`.toLowerCase().includes(stu)) return false;
+      return true;
+    });
+  }, [enrollments, referralFilter, studentFilter]);
 
   const renderTable = (trackFilter: string) => {
-    const filtered = filteredByReferral.filter((e) => e.track === trackFilter);
+    const filtered = filteredEnrollments.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
       return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments match.</p>;
     }
