@@ -42,6 +42,7 @@ const EnrollmentManagement = () => {
   const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
   const [studentFilter, setStudentFilter] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "pending">("all");
 
   // Create student form state
   const [createOpen, setCreateOpen] = useState(false);
@@ -222,9 +223,11 @@ const EnrollmentManagement = () => {
     return enrollments.filter((e) => {
       if (ref && !(e.referral_code || "").toUpperCase().includes(ref)) return false;
       if (stu && !`${e.full_name} ${e.email}`.toLowerCase().includes(stu)) return false;
+      if (paymentFilter === "paid" && e.payment_status !== "paid") return false;
+      if (paymentFilter === "pending" && e.payment_status === "paid") return false;
       return true;
     });
-  }, [enrollments, referralFilter, studentFilter]);
+  }, [enrollments, referralFilter, studentFilter, paymentFilter]);
 
   const renderTable = (trackFilter: string) => {
     const filtered = filteredEnrollments.filter((e) => e.track === trackFilter);
@@ -501,6 +504,27 @@ const EnrollmentManagement = () => {
             </button>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-sm text-muted-foreground mr-1">Payment:</span>
+        {(["all", "paid", "pending"] as const).map((opt) => {
+          const count =
+            opt === "all"
+              ? filteredEnrollments.length + (paymentFilter !== "all" ? enrollments.filter((e) => paymentFilter === "paid" ? e.payment_status !== "paid" : e.payment_status === "paid").length : 0)
+              : enrollments.filter((e) => opt === "paid" ? e.payment_status === "paid" : e.payment_status !== "paid").length;
+          return (
+            <Button
+              key={opt}
+              size="sm"
+              variant={paymentFilter === opt ? "hero" : "outline"}
+              onClick={() => setPaymentFilter(opt)}
+              className="capitalize"
+            >
+              {opt} ({opt === "all" ? enrollments.length : count})
+            </Button>
+          );
+        })}
       </div>
 
       <Tabs defaultValue="beginner">
