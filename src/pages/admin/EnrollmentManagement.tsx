@@ -223,9 +223,11 @@ const EnrollmentManagement = () => {
     return enrollments.filter((e) => {
       if (ref && !(e.referral_code || "").toUpperCase().includes(ref)) return false;
       if (stu && !`${e.full_name} ${e.email}`.toLowerCase().includes(stu)) return false;
+      if (paymentFilter === "paid" && e.payment_status !== "paid") return false;
+      if (paymentFilter === "pending" && e.payment_status === "paid") return false;
       return true;
     });
-  }, [enrollments, referralFilter, studentFilter]);
+  }, [enrollments, referralFilter, studentFilter, paymentFilter]);
 
   const renderTable = (trackFilter: string) => {
     const filtered = filteredEnrollments.filter((e) => e.track === trackFilter);
