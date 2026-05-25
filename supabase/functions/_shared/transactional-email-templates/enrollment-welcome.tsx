@@ -34,18 +34,9 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
           <Heading as="h3" style={h3}>Your Class Schedule</Heading>
           <Text style={detailText}>{classSchedule === 'weekday' ? '📅 Weekday: Monday & Wednesday, 5:00 PM – 8:00 PM' : '📅 Weekend: Friday & Saturday, 6:00 PM – 9:00 PM'}</Text>
         </Section>
-        <Text style={text}><strong>Step 1:</strong> Log in to your student dashboard.</Text>
-        <Text style={text}><strong>Step 2:</strong> Change your password immediately.</Text>
-        <Text style={text}><strong>Step 3:</strong> Explore your dashboard — classes start June 12!</Text>
+        <Text style={text}>To get started, log in to your student dashboard, change your temporary password immediately, and explore your dashboard so you're ready when classes begin on <strong>June 12</strong>.</Text>
+        <Text style={text}>Before the course begins, please test your login access in advance — we strongly recommend doing this well before the first session so any issues can be resolved in time. If you run into any trouble accessing the platform, reach out to us by email at <a href="mailto:info@delvetek.io" style={{ color: '#D4A017' }}>info@delvetek.io</a> or via WhatsApp at <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>+44 7775 739225</a> and we'll get you sorted right away.</Text>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
-        <Section style={infoBox}>
-          <Heading as="h3" style={h3}>⚡ Test Your Login Before Classes Begin</Heading>
-          <Text style={detailText}>Before the course begins, please ensure you test your login access in advance.</Text>
-          <Text style={detailText}>If you experience any issues accessing the platform, please contact us:</Text>
-          <Text style={detailText}><strong>Email:</strong> info@delvetek.io</Text>
-          <Text style={detailText}><strong>WhatsApp Support:</strong> <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>https://wa.me/447775739225</a></Text>
-          <Text style={detailText}>We recommend testing your login access before the first session.</Text>
-        </Section>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
       </Container>
