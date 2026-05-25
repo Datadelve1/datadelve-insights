@@ -45,9 +45,6 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
-        <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
-        <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
-        <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
       </Container>
     </Body>
   </Html>
@@ -62,15 +59,15 @@ export const template = {
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif" }
 const container = { padding: '20px 25px' }
-const h1 = { fontSize: '28px', fontWeight: 'bold' as const, fontFamily: "'Space Grotesk', sans-serif", color: '#1A1A1A', margin: '0 0 20px' }
-const h3 = { fontSize: '19px', fontWeight: 'bold' as const, color: '#1A1A1A', margin: '20px 0 12px' }
-const text = { fontSize: '17px', color: '#333333', lineHeight: '1.6', margin: '0 0 16px' }
-const detailText = { fontSize: '17px', color: '#333333', margin: '0 0 8px' }
-const warningText = { fontSize: '16px', color: '#EF4444', margin: '10px 0 0', fontWeight: 'bold' as const }
-const certText = { fontSize: '16px', color: '#22C55E', margin: '16px 0' }
-const infoBox = { backgroundColor: '#F0F9FF', borderRadius: '8px', padding: '20px', margin: '20px 0' }
-const scheduleBox = { backgroundColor: '#F0FDF4', borderRadius: '8px', padding: '16px', margin: '20px 0' }
-const button = { backgroundColor: '#D4A017', color: '#0D0D0D', fontSize: '17px', fontWeight: 'bold' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none' }
-const stepText = { fontSize: '17px', color: '#333333', lineHeight: '1.6', margin: '0 0 12px' }
+const h1 = { fontSize: '24px', fontWeight: 'bold' as const, fontFamily: "'Space Grotesk', sans-serif", color: '#1A1A1A', margin: '0 0 18px' }
+const h3 = { fontSize: '17px', fontWeight: 'bold' as const, color: '#1A1A1A', margin: '20px 0 10px' }
+const text = { fontSize: '15px', color: '#333333', lineHeight: '1.6', margin: '0 0 14px' }
+const detailText = { fontSize: '15px', color: '#333333', margin: '0 0 6px' }
+const warningText = { fontSize: '14px', color: '#EF4444', margin: '10px 0 0', fontWeight: 'bold' as const }
+const certText = { fontSize: '14px', color: '#22C55E', margin: '16px 0' }
+const infoBox = { backgroundColor: '#F0F9FF', borderRadius: '8px', padding: '18px', margin: '18px 0' }
+const scheduleBox = { backgroundColor: '#F0FDF4', borderRadius: '8px', padding: '16px', margin: '18px 0' }
+const button = { backgroundColor: '#D4A017', color: '#0D0D0D', fontSize: '15px', fontWeight: 'bold' as const, borderRadius: '12px', padding: '12px 24px', textDecoration: 'none' }
+const stepText = { fontSize: '15px', color: '#333333', lineHeight: '1.6', margin: '0 0 10px' }
 const footer = { fontSize: '14px', color: '#777777', margin: '30px 0 0' }
 const footerBrand = { fontSize: '13px', color: '#999999', margin: '8px 0 0' }
