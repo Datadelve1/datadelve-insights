@@ -42,6 +42,7 @@ const EnrollmentManagement = () => {
   const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
   const [studentFilter, setStudentFilter] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "pending">("all");
 
   // Create student form state
   const [createOpen, setCreateOpen] = useState(false);
