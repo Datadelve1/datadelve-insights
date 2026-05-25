@@ -40,8 +40,8 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         <Text style={stepText}><strong>Step 3:</strong> Explore your dashboard so you're ready when <strong>classes begin on June 12</strong>.</Text>
         <Text style={stepText}><strong>Step 4:</strong> <strong>Test your login access well before the first session</strong> so any issues can be resolved in time.</Text>
         <Heading as="h3" style={h3}>Need Help Accessing the Platform?</Heading>
-        <Text style={stepText}><strong>Email:</strong> <a href="mailto:info@delvetek.io" style={{ color: '#D4A017', fontWeight: 'bold' }}>mailto:info@delvetek.io</a></Text>
-        <Text style={stepText}><strong>WhatsApp:</strong> <a href="https://wa.me/447775739225" style={{ color: '#D4A017', fontWeight: 'bold' }}>https://wa.me/447775739225</a></Text>
+        <Text style={stepText}><strong>Email:</strong> <a href="mailto:info@delvetek.io" style={{ color: '#D4A017', fontWeight: 'bold' }}>info@delvetek.io</a></Text>
+        <Text style={stepText}><strong>WhatsApp:</strong> <a href="https://wa.me/447775739225" style={{ color: '#D4A017', fontWeight: 'bold' }}>Chat with us on WhatsApp</a></Text>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
