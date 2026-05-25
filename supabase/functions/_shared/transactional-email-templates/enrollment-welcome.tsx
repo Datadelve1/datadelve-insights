@@ -34,8 +34,18 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
           <Heading as="h3" style={h3}>Your Class Schedule</Heading>
           <Text style={detailText}>{classSchedule === 'weekday' ? '📅 Weekday: Monday & Wednesday, 5:00 PM – 8:00 PM' : '📅 Weekend: Friday & Saturday, 6:00 PM – 9:00 PM'}</Text>
         </Section>
-        <Text style={text}>To get started, log in to your student dashboard, change your temporary password immediately, and explore your dashboard so you're ready when classes begin on <strong>June 12</strong>.</Text>
-        <Text style={text}>Before the course begins, please test your login access in advance — we strongly recommend doing this well before the first session so any issues can be resolved in time. If you run into any trouble accessing the platform, reach out to us by email at <a href="mailto:info@delvetek.io" style={{ color: '#D4A017' }}>info@delvetek.io</a> or via WhatsApp at <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>+44 7775 739225</a> and we'll get you sorted right away.</Text>
+        <Heading as="h3" style={h3}>Get Started — Next Steps</Heading>
+        <ul style={listStyle}>
+          <li style={listItem}>Log in to your student dashboard using the details above.</li>
+          <li style={listItem}>Change your temporary password immediately after your first login.</li>
+          <li style={listItem}>Explore your dashboard so you're ready when classes begin on <strong>June 12</strong>.</li>
+          <li style={listItem}>Test your login access well before the first session so any issues can be resolved in time.</li>
+        </ul>
+        <Heading as="h3" style={h3}>Need Help Accessing the Platform?</Heading>
+        <ul style={listStyle}>
+          <li style={listItem}>Email: <a href="mailto:info@delvetek.io" style={{ color: '#D4A017' }}>info@delvetek.io</a></li>
+          <li style={listItem}>WhatsApp: <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>+44 7775 739225</a></li>
+        </ul>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
