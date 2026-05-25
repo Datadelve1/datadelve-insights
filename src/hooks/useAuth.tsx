@@ -139,27 +139,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshCommitment = async () => {
-    if (user) {
-      if (isAdmin || ADMIN_EMAILS.includes(user.email ?? "")) {
-        setHasCommitted(true);
-        return;
-      }
-      const { data } = await supabase
+    if (!user) return;
+    if (isAdmin || ADMIN_EMAILS.includes(user.email ?? "")) {
+      setHasCommitted(true);
+      return;
+    }
+    const { data } = await supabase
+      .from("training_commitments")
+      .select("id")
+      .eq("user_id", user.id)
+      .limit(1);
+    if (data?.length) { setHasCommitted(true); return; }
+
+    if (user.email) {
+      const { data: legacy } = await supabase
         .from("training_commitments")
         .select("id")
-        .eq("user_id", user.id)
+        .eq("email", user.email)
         .limit(1);
-      if (!data?.length && user.email) {
-        const { data: legacy } = await supabase
-          .from("training_commitments")
-          .select("id")
-          .eq("email", user.email)
-          .limit(1);
-        setHasCommitted(!!legacy?.length);
-      } else {
-        setHasCommitted(!!data?.length);
-      }
+      if (legacy?.length) { setHasCommitted(true); return; }
     }
+
+    const { data: enrollments } = await supabase
+      .from("cohort2_enrollments")
+      .select("id")
+      .or(`user_id.eq.${user.id},email.eq.${user.email ?? ""}`)
+      .eq("commitment_accepted", true)
+      .limit(1);
+    setHasCommitted(!!enrollments?.length);
   };
 
   const isWithdrawn = profile?.student_status === "withdrawn";
