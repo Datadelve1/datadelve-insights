@@ -34,18 +34,17 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
           <Heading as="h3" style={h3}>Your Class Schedule</Heading>
           <Text style={detailText}>{classSchedule === 'weekday' ? '📅 Weekday: Monday & Wednesday, 5:00 PM – 8:00 PM' : '📅 Weekend: Friday & Saturday, 6:00 PM – 9:00 PM'}</Text>
         </Section>
-        <Heading as="h3" style={h3}>Get Started — Next Steps</Heading>
-        <ul style={listStyle}>
-          <li style={listItem}>Log in to your student dashboard using the details above.</li>
-          <li style={listItem}>Change your temporary password immediately after your first login.</li>
-          <li style={listItem}>Explore your dashboard so you're ready when classes begin on <strong>June 12</strong>.</li>
-          <li style={listItem}>Test your login access well before the first session so any issues can be resolved in time.</li>
-        </ul>
+        <Heading as="h3" style={h3}>Get Started — Follow These Steps</Heading>
+        <Text style={stepText}><strong>Step 1:</strong> <strong>Log in</strong> to your student dashboard using the email and temporary password above.</Text>
+        <Text style={stepText}><strong>Step 2:</strong> <strong>Change your temporary password immediately</strong> after your first login.</Text>
+        <Text style={stepText}><strong>Step 3:</strong> Explore your dashboard so you're ready when <strong>classes begin on June 12</strong>.</Text>
+        <Text style={stepText}><strong>Step 4:</strong> <strong>Test your login access well before the first session</strong> so any issues can be resolved in time.</Text>
         <Heading as="h3" style={h3}>Need Help Accessing the Platform?</Heading>
-        <ul style={listStyle}>
-          <li style={listItem}>Email: <a href="mailto:info@delvetek.io" style={{ color: '#D4A017' }}>info@delvetek.io</a></li>
-          <li style={listItem}>WhatsApp: <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>+44 7775 739225</a></li>
-        </ul>
+        <Text style={stepText}><strong>Email:</strong> <a href="mailto:info@delvetek.io" style={{ color: '#D4A017', fontWeight: 'bold' }}>info@delvetek.io</a></Text>
+        <Text style={stepText}><strong>WhatsApp:</strong> <a href="https://wa.me/447775739225" style={{ color: '#D4A017', fontWeight: 'bold' }}>+44 7775 739225</a></Text>
+        <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
+        <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
+        <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
@@ -72,7 +71,6 @@ const certText = { fontSize: '16px', color: '#22C55E', margin: '16px 0' }
 const infoBox = { backgroundColor: '#F0F9FF', borderRadius: '8px', padding: '20px', margin: '20px 0' }
 const scheduleBox = { backgroundColor: '#F0FDF4', borderRadius: '8px', padding: '16px', margin: '20px 0' }
 const button = { backgroundColor: '#D4A017', color: '#0D0D0D', fontSize: '17px', fontWeight: 'bold' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none' }
-const listStyle = { fontSize: '17px', color: '#333333', lineHeight: '1.7', paddingLeft: '20px', margin: '0 0 20px' }
-const listItem = { marginBottom: '8px' }
+const stepText = { fontSize: '17px', color: '#333333', lineHeight: '1.6', margin: '0 0 12px' }
 const footer = { fontSize: '14px', color: '#777777', margin: '30px 0 0' }
 const footerBrand = { fontSize: '13px', color: '#999999', margin: '8px 0 0' }
