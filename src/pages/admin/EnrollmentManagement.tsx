@@ -41,6 +41,7 @@ const EnrollmentManagement = () => {
   const [moveTrack, setMoveTrack] = useState("beginner");
   const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
+  const [studentFilter, setStudentFilter] = useState("");
 
   // Create student form state
   const [createOpen, setCreateOpen] = useState(false);
@@ -215,14 +216,18 @@ const EnrollmentManagement = () => {
     }
   };
 
-  const filteredByReferral = useMemo(() => {
-    const q = referralFilter.trim().toUpperCase();
-    if (!q) return enrollments;
-    return enrollments.filter((e) => (e.referral_code || "").toUpperCase().includes(q));
-  }, [enrollments, referralFilter]);
+  const filteredEnrollments = useMemo(() => {
+    const ref = referralFilter.trim().toUpperCase();
+    const stu = studentFilter.trim().toLowerCase();
+    return enrollments.filter((e) => {
+      if (ref && !(e.referral_code || "").toUpperCase().includes(ref)) return false;
+      if (stu && !`${e.full_name} ${e.email}`.toLowerCase().includes(stu)) return false;
+      return true;
+    });
+  }, [enrollments, referralFilter, studentFilter]);
 
   const renderTable = (trackFilter: string) => {
-    const filtered = filteredByReferral.filter((e) => e.track === trackFilter);
+    const filtered = filteredEnrollments.filter((e) => e.track === trackFilter);
     if (!filtered.length) {
       return <p className="text-muted-foreground text-sm py-8 text-center">No enrollments match.</p>;
     }
@@ -461,22 +466,41 @@ const EnrollmentManagement = () => {
         </div>
       )}
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          value={referralFilter}
-          onChange={(e) => setReferralFilter(e.target.value)}
-          placeholder="Filter by referral code..."
-          className="pl-9 pr-9 font-mono uppercase"
-        />
-        {referralFilter && (
-          <button
-            onClick={() => setReferralFilter("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative max-w-sm flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={studentFilter}
+            onChange={(e) => setStudentFilter(e.target.value)}
+            placeholder="Filter by student name or email..."
+            className="pl-9 pr-9"
+          />
+          {studentFilter && (
+            <button
+              onClick={() => setStudentFilter("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+        <div className="relative max-w-sm flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={referralFilter}
+            onChange={(e) => setReferralFilter(e.target.value)}
+            placeholder="Filter by referral code..."
+            className="pl-9 pr-9 font-mono uppercase"
+          />
+          {referralFilter && (
+            <button
+              onClick={() => setReferralFilter("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <Tabs defaultValue="beginner">
