@@ -45,9 +45,6 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
-        <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
-        <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
-        <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
       </Container>
     </Body>
   </Html>
