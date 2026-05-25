@@ -11,9 +11,8 @@ const SITE_NAME = "Delvetek"
 // The email API looks up this exact domain; a mismatch causes "No email domain record found".
 const SENDER_DOMAIN = "notify.www.datadelve.io"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
-// When display_from_root is enabled, this can be the root domain for cleaner branding,
-// even though actual sending uses the subdomain above.
-const FROM_DOMAIN = "datadelve.io"
+// It must align with the verified sender domain configured for this project.
+const FROM_DOMAIN = "www.datadelve.io"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
