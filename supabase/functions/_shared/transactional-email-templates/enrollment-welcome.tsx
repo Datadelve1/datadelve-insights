@@ -36,9 +36,8 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         </Section>
         <Text style={text}><strong>Step 1:</strong> Log in to your student dashboard.</Text>
         <Text style={text}><strong>Step 2:</strong> Change your password immediately.</Text>
-        <Text style={text}><strong>Step 3:</strong> Explore your dashboard — classes start June 5!</Text>
+        <Text style={text}><strong>Step 3:</strong> Explore your dashboard — classes start June 12!</Text>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
-        {certificateRequested && <Text style={certText}>✅ Certificate payment included — it will be issued upon program completion.</Text>}
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
       </Container>
