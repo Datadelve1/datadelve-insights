@@ -72,17 +72,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .eq("user_id", userId)
       .limit(1);
 
-    // Also check by email if no user_id match (legacy submissions)
-    if (!commitments?.length) {
-      const { data: legacyCommitments } = await supabase
-        .from("training_commitments")
-        .select("id")
-        .eq("email", email)
-        .limit(1);
-      setHasCommitted(!!legacyCommitments?.length);
-    } else {
+    if (commitments?.length) {
       setHasCommitted(true);
+      return;
     }
+
+    // Also check by email if no user_id match (legacy submissions)
+    const { data: legacyCommitments } = await supabase
+      .from("training_commitments")
+      .select("id")
+      .eq("email", email)
+      .limit(1);
+    if (legacyCommitments?.length) {
+      setHasCommitted(true);
+      return;
+    }
+
+    // Cohort 2 students accept commitment as part of enrollment — treat as committed
+    const { data: enrollments } = await supabase
+      .from("cohort2_enrollments")
+      .select("id")
+      .or(`user_id.eq.${userId},email.eq.${email}`)
+      .eq("commitment_accepted", true)
+      .limit(1);
+    setHasCommitted(!!enrollments?.length);
   };
 
   useEffect(() => {
