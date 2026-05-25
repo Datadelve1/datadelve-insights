@@ -41,6 +41,7 @@ const EnrollmentManagement = () => {
   const [moveTrack, setMoveTrack] = useState("beginner");
   const [moveSchedule, setMoveSchedule] = useState("weekend");
   const [referralFilter, setReferralFilter] = useState("");
+  const [studentFilter, setStudentFilter] = useState("");
 
   // Create student form state
   const [createOpen, setCreateOpen] = useState(false);
