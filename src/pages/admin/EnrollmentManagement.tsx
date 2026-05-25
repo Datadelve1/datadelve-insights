@@ -506,6 +506,27 @@ const EnrollmentManagement = () => {
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-sm text-muted-foreground mr-1">Payment:</span>
+        {(["all", "paid", "pending"] as const).map((opt) => {
+          const count =
+            opt === "all"
+              ? filteredEnrollments.length + (paymentFilter !== "all" ? enrollments.filter((e) => paymentFilter === "paid" ? e.payment_status !== "paid" : e.payment_status === "paid").length : 0)
+              : enrollments.filter((e) => opt === "paid" ? e.payment_status === "paid" : e.payment_status !== "paid").length;
+          return (
+            <Button
+              key={opt}
+              size="sm"
+              variant={paymentFilter === opt ? "hero" : "outline"}
+              onClick={() => setPaymentFilter(opt)}
+              className="capitalize"
+            >
+              {opt} ({opt === "all" ? enrollments.length : count})
+            </Button>
+          );
+        })}
+      </div>
+
       <Tabs defaultValue="beginner">
         <TabsList>
           <TabsTrigger value="beginner">Beginner ({counts.beginner})</TabsTrigger>
