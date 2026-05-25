@@ -13,7 +13,7 @@ const SENDER_DOMAIN = "notify.www.datadelve.io"
 // FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
 // When display_from_root is enabled, this can be the root domain for cleaner branding,
 // even though actual sending uses the subdomain above.
-const FROM_DOMAIN = "www.datadelve.io"
+const FROM_DOMAIN = "datadelve.io"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
