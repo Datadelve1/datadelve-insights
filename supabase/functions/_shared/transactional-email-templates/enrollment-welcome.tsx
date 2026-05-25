@@ -38,6 +38,14 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         <Text style={text}><strong>Step 2:</strong> Change your password immediately.</Text>
         <Text style={text}><strong>Step 3:</strong> Explore your dashboard — classes start June 12!</Text>
         <Button style={button} href="https://www.datadelve.io/auth">Log In to Your Dashboard</Button>
+        <Section style={infoBox}>
+          <Heading as="h3" style={h3}>⚡ Test Your Login Before Classes Begin</Heading>
+          <Text style={detailText}>Before the course begins, please ensure you test your login access in advance.</Text>
+          <Text style={detailText}>If you experience any issues accessing the platform, please contact us:</Text>
+          <Text style={detailText}><strong>Email:</strong> info@delvetek.io</Text>
+          <Text style={detailText}><strong>WhatsApp Support:</strong> <a href="https://wa.me/447775739225" style={{ color: '#D4A017' }}>https://wa.me/447775739225</a></Text>
+          <Text style={detailText}>We recommend testing your login access before the first session.</Text>
+        </Section>
         <Text style={footer}>Need help? Contact us at info@delvetek.io</Text>
         <Text style={footerBrand}>DELVETEK — Data Analytics & Tech Education</Text>
       </Container>
