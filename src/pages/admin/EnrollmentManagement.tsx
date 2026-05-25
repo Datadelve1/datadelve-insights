@@ -180,7 +180,9 @@ const EnrollmentManagement = () => {
 
   const openMoveDialog = (e: Enrollment) => {
     setMoveTarget(e);
-    setMoveTrack(e.track || "beginner");
+    // When moving Cohort 1 → Cohort 2, default to Professional track
+    const movingToC2 = e.cohort !== "Cohort 2";
+    setMoveTrack(movingToC2 ? "professional" : (e.track || "beginner"));
     setMoveSchedule(e.class_schedule || "weekend");
   };
 
