@@ -152,6 +152,7 @@ const Dashboard = () => {
                 <ArrowLeft className="w-4 h-4 mr-2" /> Home
               </a>
             </Button>
+            <ChangePasswordDialog />
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>
