@@ -24,6 +24,7 @@ import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 import CertificatePayment from "@/components/dashboard/CertificatePayment";
+import ChangePasswordDialog from "@/components/dashboard/ChangePasswordDialog";
 
 const Dashboard = () => {
   const { user, profile, isLoading, isAdmin, hasCommitted, isWithdrawn, signOut } = useAuth();
