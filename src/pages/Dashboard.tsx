@@ -24,6 +24,7 @@ import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 import CertificatePayment from "@/components/dashboard/CertificatePayment";
+import ChangePasswordDialog from "@/components/dashboard/ChangePasswordDialog";
 
 const Dashboard = () => {
   const { user, profile, isLoading, isAdmin, hasCommitted, isWithdrawn, signOut } = useAuth();
@@ -151,6 +152,7 @@ const Dashboard = () => {
                 <ArrowLeft className="w-4 h-4 mr-2" /> Home
               </a>
             </Button>
+            <ChangePasswordDialog />
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>
