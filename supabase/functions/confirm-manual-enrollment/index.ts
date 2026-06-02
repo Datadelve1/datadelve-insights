@@ -72,10 +72,28 @@ Deno.serve(async (req) => {
       user_metadata: { full_name: fullName },
     });
 
-    if (userError?.message?.includes("already been registered")) {
-      const { data: list } = await supabase.auth.admin.listUsers();
-      const found = list?.users?.find((u: any) => u.email?.toLowerCase() === email);
-      userId = found?.id;
+    if (userError?.message?.includes("already been registered") || userError?.message?.includes("already exists")) {
+      // Paginate through all users to find by email (listUsers default page size is small)
+      const perPage = 1000;
+      let page = 1;
+      while (!userId) {
+        const { data: list, error: listErr } = await supabase.auth.admin.listUsers({ page, perPage });
+        if (listErr) { console.error("listUsers error", listErr); break; }
+        const found = list?.users?.find((u: any) => u.email?.toLowerCase() === email);
+        if (found) { userId = found.id; break; }
+        if (!list?.users?.length || list.users.length < perPage) break;
+        page++;
+        if (page > 50) break;
+      }
+      // Fallback: look up via profiles table (kept in sync via handle_new_user trigger)
+      if (!userId) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("id")
+          .ilike("email", email)
+          .maybeSingle();
+        userId = prof?.id;
+      }
       // Reset password so welcome email works
       if (userId) {
         await supabase.auth.admin.updateUserById(userId, { password });
