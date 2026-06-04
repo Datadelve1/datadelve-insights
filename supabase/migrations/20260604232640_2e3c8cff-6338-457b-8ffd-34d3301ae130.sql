@@ -1,0 +1,1 @@
+ALTER TABLE public.cohort2_enrollments ALTER COLUMN cohort SET DEFAULT 'Cohort 3';
