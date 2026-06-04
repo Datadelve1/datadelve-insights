@@ -10,7 +10,7 @@ interface AdminCohortContextType {
 const AdminCohortContext = createContext<AdminCohortContextType | undefined>(undefined);
 
 export const AdminCohortProvider = ({ children }: { children: ReactNode }) => {
-  const [cohort, setCohort] = useState<Cohort>("Cohort 2");
+  const [cohort, setCohort] = useState<Cohort>("Cohort 3");
   return (
     <AdminCohortContext.Provider value={{ cohort, setCohort }}>
       {children}
