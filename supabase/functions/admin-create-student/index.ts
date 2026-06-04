@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     const email = String(body?.email || "").trim().toLowerCase();
     const track = String(body?.track || "beginner").trim().toLowerCase();
     const classSchedule = String(body?.class_schedule || "weekend").trim().toLowerCase();
-    const cohort = String(body?.cohort || "Cohort 2").trim();
+    const cohort = String(body?.cohort || "Cohort 3").trim();
     const certificateRequested = Boolean(body?.certificate_requested);
 
     if (!fullName) return respond(false, { error: "Full name is required" });

@@ -20,7 +20,7 @@ const Hero = () => {
             className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 mb-6 opacity-0 animate-fade-in hover:from-primary/30 hover:to-accent/30 transition-all duration-300 group cursor-pointer"
           >
             <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">NEW</span>
-            <span className="text-sm text-foreground">🚀 Currently Enrolling: Data Analysis Cohort 2</span>
+            <span className="text-sm text-foreground">🚀 Currently Enrolling: Data Analysis Cohort 3</span>
             <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
           </a>
 
@@ -38,7 +38,7 @@ const Hero = () => {
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in animation-delay-400 text-balance">
-            Join our June 5 Cohort (12 Weeks Program)
+            Join our July 31 Cohort (12 Weeks Program)
           </p>
 
           {/* CTA Buttons */}
@@ -49,7 +49,7 @@ const Hero = () => {
               className="group"
               onClick={() => document.getElementById('delve-school')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Enroll in Cohort 2
+              Enroll in Cohort 3
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
