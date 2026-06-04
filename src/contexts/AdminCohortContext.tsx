@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type Cohort = "Cohort 1" | "Cohort 2";
+type Cohort = "Cohort 1" | "Cohort 2" | "Cohort 3";
 
 interface AdminCohortContextType {
   cohort: Cohort;

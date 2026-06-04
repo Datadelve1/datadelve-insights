@@ -117,6 +117,7 @@ function CohortSelector() {
       <SelectContent>
         <SelectItem value="Cohort 1">Cohort 1</SelectItem>
         <SelectItem value="Cohort 2">Cohort 2</SelectItem>
+        <SelectItem value="Cohort 3">Cohort 3</SelectItem>
       </SelectContent>
     </Select>
   );
