@@ -45,7 +45,7 @@ const EnrollHub = () => {
       <div className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg border-b border-primary/30">
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm font-semibold text-center sm:text-left">
-            🔥 Cohort 2 enrolling now • Limited seats • Starts June 5
+            🔥 Cohort 3 enrolling now • Limited seats • Starts July 31
           </p>
           <Button
             onClick={scrollToTracks}
@@ -67,13 +67,13 @@ const EnrollHub = () => {
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <BookOpen className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Cohort 2 Enrollment</span>
+            <span className="text-sm text-muted-foreground">Cohort 3 Enrollment</span>
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-6">
             Choose Your <span className="gradient-text">Delvetek</span> Track
           </h1>
           <p className="text-muted-foreground text-base md:text-lg mb-8">
-            Pick the path that matches your goals. All tracks start June 5 • Live online • Virtual Graduation 🎓
+            Pick the path that matches your goals. All tracks start July 31 • Live online • Virtual Graduation 🎓
           </p>
 
           {/* Hero Enroll CTA */}
@@ -301,7 +301,7 @@ const EnrollHub = () => {
         {/* Bottom note */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground text-sm">
-            All tracks start June 5 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
+            All tracks start July 31 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
 
@@ -539,8 +539,8 @@ const EnrollHub = () => {
                 a: "The commitment fee secures your seat in the cohort and demonstrates your dedication. It's non-refundable and counts toward unlocking your full learning experience.",
               },
               {
-                q: "When does Cohort 2 start?",
-                a: "All tracks officially begin on June 5. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
+                q: "When does Cohort 3 start?",
+                a: "All tracks officially begin on July 31. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
               },
               {
                 q: "What's the difference between the tracks?",
@@ -589,7 +589,7 @@ const EnrollHub = () => {
             Ready to <span className="gradient-text">Transform</span> Your Career?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Seats fill fast. Lock in your spot today and start your data journey June 5.
+            Seats fill fast. Lock in your spot today and start your data journey July 31.
           </p>
           <Button asChild variant="hero" size="lg">
             <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
