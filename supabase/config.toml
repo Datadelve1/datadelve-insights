@@ -25,5 +25,3 @@ project_id = "cszwkukwkcrecirbvvee"
     verify_jwt = false
   [functions.send-ambassador-confirmation]
     verify_jwt = false
-  [functions.bootstrap-new-admins]
-    verify_jwt = false
