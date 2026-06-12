@@ -6,6 +6,8 @@ const ADMIN_EMAILS = [
   "datadelve1@gmail.com",
   "goodydavis82@gmail.com",
   "adewoleaderemi2019@gmail.com",
+  "marvellousayomide992@gmail.com",
+  "davidgbadebo4@gmail.com",
 ];
 
 interface AuthContextType {
