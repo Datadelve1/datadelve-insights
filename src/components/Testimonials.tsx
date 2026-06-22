@@ -87,10 +87,10 @@ const Testimonials = () => {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      // Anon policy now filters: Friday written reviews auto-show, Saturday only if approved
+      // Read from the safe public view (no PII like email/full name)
       const { data } = await supabase
-        .from("weekly_reviews")
-        .select("full_name, written_reflection, video_url, session_day" as any)
+        .from("public_testimonials" as any)
+        .select("first_name, written_reflection, video_url, session_day")
         .order("created_at", { ascending: false })
         .limit(20);
       if (data) {
@@ -116,15 +116,12 @@ const Testimonials = () => {
       videoUrl: null as string | null,
     })),
     ...studentReviews.map((r) => ({
-      name: r.full_name,
+      name: r.first_name,
       role: "Delvetek Student",
       content: r.written_reflection || "Watch my video review!",
-      avatar: r.full_name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2),
+      avatar: (r.first_name || "S")
+        .slice(0, 2)
+        .toUpperCase(),
       videoUrl: r.video_url,
     })),
   ];
