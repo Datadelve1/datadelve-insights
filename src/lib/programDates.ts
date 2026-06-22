@@ -1,13 +1,13 @@
 /**
- * Program Date Mapping
+ * Program Date Mapping (Cohort 2)
  * Maps each week to its actual Friday and Saturday calendar dates.
- * Week 1: Fri Mar 27 / Sat Mar 28, 2026
- * Week 2: Fri Apr 3 / Sat Apr 4, 2026
- * ... follows weekly pattern through Week 8.
+ * Week 1: Fri Jun 12 / Sat Jun 13, 2026
+ * Week 2: Fri Jun 19 / Sat Jun 20, 2026
+ * ... follows weekly pattern through Week 8 (Fri Jul 31 / Sat Aug 1, 2026).
  */
 
-// Program starts Friday March 27, 2026 at 6 PM WAT (UTC+1)
-export const PROGRAM_START = new Date("2026-03-27T18:00:00+01:00");
+// Program starts Friday June 12, 2026 at 6 PM WAT (UTC+1)
+export const PROGRAM_START = new Date("2026-06-12T18:00:00+01:00");
 export const TOTAL_WEEKS = 8;
 
 export interface SessionDate {
