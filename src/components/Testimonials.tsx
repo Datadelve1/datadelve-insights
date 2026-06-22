@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface StudentReview {
-  full_name: string;
+  first_name: string;
   written_reflection: string | null;
   video_url: string | null;
   session_day: string;
