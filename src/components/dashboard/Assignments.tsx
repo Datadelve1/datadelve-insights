@@ -135,14 +135,14 @@ const Assignments = ({
     const studentCohort = enrollment?.cohort ?? "Cohort 1";
 
     const [{ data: assignData }, { data: subData }] = await Promise.all([
-      supabase.from("assignments").select("*").eq("cohort", studentCohort).order("week_number"),
+      supabase.from("assignments_student" as any).select("*").eq("cohort", studentCohort).order("week_number"),
       supabase.from("assignment_submissions").select("*").eq("user_id", user.id),
     ]);
     const parsedAssignments = (assignData || []).map((a: any) => ({
       ...a,
       questions:
         typeof a.questions === "string" ? JSON.parse(a.questions) : a.questions,
-      model_answers: Array.isArray(a.model_answers) ? a.model_answers : [],
+      model_answers: [],
       key_concepts: Array.isArray(a.key_concepts) ? a.key_concepts : [],
     }));
     setAssignments(parsedAssignments);

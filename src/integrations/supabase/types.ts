@@ -225,6 +225,13 @@ export type Database = {
             referencedRelation: "assignments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "assignment_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments_student"
+            referencedColumns: ["id"]
+          },
         ]
       }
       assignments: {
@@ -1061,7 +1068,69 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      assignments_student: {
+        Row: {
+          cohort: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          key_concepts: Json | null
+          questions: Json | null
+          title: string | null
+          week_number: number | null
+        }
+        Insert: {
+          cohort?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          key_concepts?: Json | null
+          questions?: Json | null
+          title?: string | null
+          week_number?: number | null
+        }
+        Update: {
+          cohort?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          key_concepts?: Json | null
+          questions?: Json | null
+          title?: string | null
+          week_number?: number | null
+        }
+        Relationships: []
+      }
+      public_testimonials: {
+        Row: {
+          created_at: string | null
+          first_name: string | null
+          id: string | null
+          session_day: string | null
+          video_url: string | null
+          week_number: number | null
+          written_reflection: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_name?: never
+          id?: string | null
+          session_day?: string | null
+          video_url?: string | null
+          week_number?: number | null
+          written_reflection?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_name?: never
+          id?: string | null
+          session_day?: string | null
+          video_url?: string | null
+          week_number?: number | null
+          written_reflection?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_email: {
