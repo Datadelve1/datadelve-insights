@@ -136,6 +136,7 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     durationHours: 3,
     publishedAt: "2026-02-19",
     tags: ["SQL", "Pandas", "Excel", "Finance"],
+    access: { tracks: ["Professional"], cohorts: ["Cohort 2"] },
     datasets: [
       {
         label: "Orders (CSV)",
