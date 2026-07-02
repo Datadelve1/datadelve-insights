@@ -131,7 +131,23 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     durationHours: 3,
     publishedAt: "2026-02-19",
     tags: ["SQL", "Pandas", "Excel", "Finance"],
-    datasets: [],
+    datasets: [
+      {
+        label: "Orders (CSV)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/orders.csv",
+        sizeLabel: "~254 KB",
+      },
+      {
+        label: "Products Catalog (CSV)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/products.csv",
+        sizeLabel: "~17 KB",
+      },
+      {
+        label: "Marketing Spend (CSV)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/marketing_spend.csv",
+        sizeLabel: "~10 KB",
+      },
+    ],
     details: {
       intro:
         "BrightCart is an online retailer selling products across 8 categories through their website, mobile app, third-party marketplaces, and social commerce. The company did $1M+ in gross revenue over the past two years, but net margins have been shrinking. The CEO wants to know which product categories and sales channels are truly profitable after all costs, which marketing platforms are delivering the best return on ad spend, and whether the return rate is eating into margins. You have three datasets: order-level transactions, a product catalog with cost data, and monthly marketing spend by platform.",
