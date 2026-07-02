@@ -9,6 +9,11 @@ export type StudentProject = {
   publishedAt: string;
   tags: string[];
   datasets?: { label: string; url: string; sizeLabel?: string }[];
+  /** Optional access gate. If omitted, project is visible to all committed students. */
+  access?: {
+    tracks?: string[];
+    cohorts?: string[];
+  };
   details: {
     intro: string;
     questions: string[];
