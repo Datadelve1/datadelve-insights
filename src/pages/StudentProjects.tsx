@@ -12,7 +12,7 @@ const StudentProjects = () => {
   const { user, isLoading, hasCommitted } = useAuth();
   const { enrollment, isLoading: enrollmentLoading } = useStudentEnrollment();
 
-  if (isLoading) {
+  if (isLoading || enrollmentLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -21,6 +21,8 @@ const StudentProjects = () => {
   }
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <Navigate to="/dashboard" replace />;
+
+  const visibleProjects = STUDENT_PROJECTS.filter((p) => canAccessProject(p.access, enrollment));
 
   return (
     <div className="min-h-screen bg-background">
