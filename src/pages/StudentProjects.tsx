@@ -5,10 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2, Clock, Award } from "lucide-react";
 import { STUDENT_PROJECTS } from "@/lib/studentProjects";
+import { useStudentEnrollment, canAccessProject } from "@/hooks/useStudentEnrollment";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const StudentProjects = () => {
   const { user, isLoading, hasCommitted } = useAuth();
+  const { enrollment, isLoading: enrollmentLoading } = useStudentEnrollment();
 
   if (isLoading) {
     return (
