@@ -47,7 +47,7 @@ const StudentProjects = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {STUDENT_PROJECTS.map((p) => (
+          {visibleProjects.map((p) => (
             <Card key={p.slug} className="overflow-hidden border-border bg-card hover:border-primary/40 transition-colors">
               <div className="aspect-video w-full overflow-hidden bg-secondary">
                 <img src={p.image} alt={p.title} className="w-full h-full object-cover" loading="lazy" />
