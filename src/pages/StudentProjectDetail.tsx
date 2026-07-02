@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2, Clock, Award, CheckCircle2, CalendarDays, Download } from "lucide-react";
 import { getProjectBySlug } from "@/lib/studentProjects";
+import { useStudentEnrollment, canAccessProject } from "@/hooks/useStudentEnrollment";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import ProjectSubmission from "@/components/dashboard/ProjectSubmission";
 
 const StudentProjectDetail = () => {
   const { slug } = useParams();
   const { user, isLoading, hasCommitted } = useAuth();
+  const { enrollment, isLoading: enrollmentLoading } = useStudentEnrollment();
   const project = slug ? getProjectBySlug(slug) : undefined;
 
-  if (isLoading) {
+  if (isLoading || enrollmentLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -24,6 +26,7 @@ const StudentProjectDetail = () => {
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <Navigate to="/dashboard" replace />;
   if (!project) return <Navigate to="/dashboard/projects" replace />;
+  if (!canAccessProject(project.access, enrollment)) return <Navigate to="/dashboard/projects" replace />;
 
   return (
     <div className="min-h-screen bg-background">
