@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2, Clock, Award } from "lucide-react";
 import { STUDENT_PROJECTS } from "@/lib/studentProjects";
+import { useStudentEnrollment, canAccessProject } from "@/hooks/useStudentEnrollment";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const StudentProjects = () => {
   const { user, isLoading, hasCommitted } = useAuth();
+  const { enrollment, isLoading: enrollmentLoading } = useStudentEnrollment();
 
-  if (isLoading) {
+  if (isLoading || enrollmentLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -19,6 +21,8 @@ const StudentProjects = () => {
   }
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <Navigate to="/dashboard" replace />;
+
+  const visibleProjects = STUDENT_PROJECTS.filter((p) => canAccessProject(p.access, enrollment));
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,7 +47,7 @@ const StudentProjects = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {STUDENT_PROJECTS.map((p) => (
+          {visibleProjects.map((p) => (
             <Card key={p.slug} className="overflow-hidden border-border bg-card hover:border-primary/40 transition-colors">
               <div className="aspect-video w-full overflow-hidden bg-secondary">
                 <img src={p.image} alt={p.title} className="w-full h-full object-cover" loading="lazy" />
