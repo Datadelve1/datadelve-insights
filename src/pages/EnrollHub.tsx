@@ -41,6 +41,13 @@ import {
 } from "@/components/ui/table";
 
 const EnrollHub = () => {
+  const discountActive = isDiscountActive();
+  const registrationOpen = isRegistrationOpen();
+  const feeLabel = "Discounted Fee";
+  const beginnerFee = discountActive ? DISCOUNTED_PRICES.beginner : NORMAL_PRICES.beginner;
+  const professionalFee = discountActive ? DISCOUNTED_PRICES.professional : NORMAL_PRICES.professional;
+  const advancedFee = discountActive ? DISCOUNTED_PRICES.advanced : NORMAL_PRICES.advanced;
+
   const scrollToTracks = () => {
     document.getElementById("tracks")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
