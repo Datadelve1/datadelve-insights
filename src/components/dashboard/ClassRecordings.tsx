@@ -39,8 +39,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
       const { data: enrollment } = await supabase
         .from("cohort2_enrollments")
         .select("cohort")
-        .eq("user_id", user!.id)
-        .eq("payment_status", "paid")
+        .or(`user_id.eq.${user!.id},email.eq.${user!.email ?? ""}`)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();

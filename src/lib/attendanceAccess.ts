@@ -103,7 +103,9 @@ export function hasReviewForWeek(
   weekNumber: number,
   submittedReviews: Record<string, boolean>
 ): boolean {
-  return !!submittedReviews[`${weekNumber}-friday`] || !!submittedReviews[`${weekNumber}-saturday`];
+  return !!submittedReviews[`${weekNumber}-any`] ||
+         !!submittedReviews[`${weekNumber}-friday`] ||
+         !!submittedReviews[`${weekNumber}-saturday`];
 }
 
 /** Count number of sessions where student was absent */

@@ -41,7 +41,7 @@ const Dashboard = () => {
       supabase
         .from("weekly_reviews")
         .select("week_number, session_day" as any)
-        .eq("user_id", user.id),
+        .or(`user_id.eq.${user.id},email.eq.${user.email ?? ""}`),
       supabase
         .from("assignment_submissions")
         .select("assignment_id, score, total, assignments!inner(week_number)")
@@ -50,13 +50,14 @@ const Dashboard = () => {
       supabase.from("google_review_confirmations" as any).select("week_number").eq("user_id", user.id),
     ]);
 
-    // Build submittedWeeks (unique week numbers) and submittedReviews (session-specific)
+    // Build submittedWeeks (unique week numbers), session-specific reviews, and a week-level unlock flag.
     const weeks = new Set<number>();
     const reviews: Record<string, boolean> = {};
     (reviewData || []).forEach((r: any) => {
       weeks.add(r.week_number);
       const day = r.session_day || "friday";
       reviews[`${r.week_number}-${day}`] = true;
+      reviews[`${r.week_number}-any`] = true;
     });
     setSubmittedWeeks(weeks);
     setSubmittedReviews(reviews);
