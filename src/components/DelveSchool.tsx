@@ -54,7 +54,7 @@ const DelveSchool = () => {
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦150,000</span>
               <div className="text-xl font-bold text-primary">FREE <span className="text-xs font-normal text-muted-foreground">(This Cohort Only)</span></div>
-              <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦10,000</span></p>
+              <p className="text-sm text-foreground mt-1">{feeLabel}: <span className="font-semibold">₦{priceFor("beginner").toLocaleString()}</span></p>
             </div>
 
             <ul className="space-y-2 mb-4 flex-1">
