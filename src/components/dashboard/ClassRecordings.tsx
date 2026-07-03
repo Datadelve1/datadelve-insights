@@ -95,12 +95,6 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                 const timingOk = isPrivileged || isAfter10PMForSession(rec.week_number, day === "saturday" ? "saturday" : "friday");
                 const reviewDone = isPrivileged || hasReviewForWeek(rec.week_number, submittedReviews);
                 const unlocked = isPrivileged || (timingOk && reviewDone);
-                const attKey = `${rec.week_number}-${day}`;
-                const attended =
-                  attendance[attKey] === "present" ||
-                  attendance[`${rec.week_number}-friday`] === "present" ||
-                  attendance[`${rec.week_number}-saturday`] === "present";
-
                 let statusMessage = "";
                 if (!timingOk) statusMessage = "Available after 10 PM";
                 else if (!reviewDone) statusMessage = "Submit review first";
