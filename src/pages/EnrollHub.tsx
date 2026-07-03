@@ -2,6 +2,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import {
+  DISCOUNTED_PRICES,
+  NORMAL_PRICES,
+  isDiscountActive,
+  isRegistrationOpen,
+} from "@/lib/enrollmentPricing";
+import {
   ArrowRight,
   BookOpen,
   Check,
@@ -35,6 +41,13 @@ import {
 } from "@/components/ui/table";
 
 const EnrollHub = () => {
+  const discountActive = isDiscountActive();
+  const registrationOpen = isRegistrationOpen();
+  const feeLabel = "Discounted Fee";
+  const beginnerFee = discountActive ? DISCOUNTED_PRICES.beginner : NORMAL_PRICES.beginner;
+  const professionalFee = discountActive ? DISCOUNTED_PRICES.professional : NORMAL_PRICES.professional;
+  const advancedFee = discountActive ? DISCOUNTED_PRICES.advanced : NORMAL_PRICES.advanced;
+
   const scrollToTracks = () => {
     document.getElementById("tracks")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -45,16 +58,22 @@ const EnrollHub = () => {
       <div className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg border-b border-primary/30">
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm font-semibold text-center sm:text-left">
-            🔥 Cohort 3 enrolling now • Limited seats • Starts July 31
+            {registrationOpen
+              ? discountActive
+                ? "🔥 Cohort 3 · Discounted fee ends 24th July · Normal price from 25th · Registration closes 30th July"
+                : "⚠️ Cohort 3 · Discount ended — normal price applies · Registration closes 30th July"
+              : "🚫 Cohort 3 registration closed (30th July). New cohort details coming soon."}
           </p>
-          <Button
-            onClick={scrollToTracks}
-            size="sm"
-            variant="secondary"
-            className="font-bold whitespace-nowrap shadow-md hover:scale-105 transition-transform"
-          >
-            Enroll Now <ArrowRight className="w-4 h-4 ml-1" />
-          </Button>
+          {registrationOpen && (
+            <Button
+              onClick={scrollToTracks}
+              size="sm"
+              variant="secondary"
+              className="font-bold whitespace-nowrap shadow-md hover:scale-105 transition-transform"
+            >
+              Enroll Now <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -106,12 +125,15 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Beginner Track</p>
 
             <div className="mb-4">
-              <span className="text-muted-foreground line-through text-sm">₦150,000</span>
+              {discountActive && (
+                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.beginner.toLocaleString()}</span>
+              )}
               <div className="text-xl font-bold text-primary">
-                FREE <span className="text-xs font-normal text-muted-foreground">(This Cohort Only)</span>
+                ₦{beginnerFee.toLocaleString()}
+                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
               </div>
               <p className="text-sm text-foreground mt-1">
-                Commitment Fee: <span className="font-semibold">₦10,000</span>
+                {feeLabel}: <span className="font-semibold">₦{beginnerFee.toLocaleString()}</span>
               </p>
             </div>
 
@@ -164,10 +186,15 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
 
             <div className="mb-4">
-              <span className="text-muted-foreground line-through text-sm">₦275,000</span>
-              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              {discountActive && (
+                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.professional.toLocaleString()}</span>
+              )}
+              <div className="text-xl font-bold text-primary">
+                ₦{professionalFee.toLocaleString()}
+                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
+              </div>
               <p className="text-sm text-foreground mt-1">
-                Commitment Fee: <span className="font-semibold">₦50,000</span>
+                {feeLabel}: <span className="font-semibold">₦{professionalFee.toLocaleString()}</span>
               </p>
             </div>
 
@@ -222,10 +249,15 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
 
             <div className="mb-4">
-              <span className="text-muted-foreground line-through text-sm">₦350,000</span>
-              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              {discountActive && (
+                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.advanced.toLocaleString()}</span>
+              )}
+              <div className="text-xl font-bold text-primary">
+                ₦{advancedFee.toLocaleString()}
+                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
+              </div>
               <p className="text-sm text-foreground mt-1">
-                Commitment Fee: <span className="font-semibold">₦100,000</span>
+                {feeLabel}: <span className="font-semibold">₦{advancedFee.toLocaleString()}</span>
               </p>
             </div>
 
@@ -325,7 +357,7 @@ const EnrollHub = () => {
               </TableHeader>
               <TableBody>
                 {[
-                  ["Commitment Fee", "₦10,000", "₦50,000", "₦100,000"],
+                  [feeLabel, `₦${beginnerFee.toLocaleString()}`, `₦${professionalFee.toLocaleString()}`, `₦${advancedFee.toLocaleString()}`],
                   ["Program Duration", "8 weeks", "12 weeks", "12 weeks + 3mo internship"],
                   ["SQL Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
                   ["Excel Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
@@ -535,8 +567,8 @@ const EnrollHub = () => {
           <Accordion type="single" collapsible className="space-y-3">
             {[
               {
-                q: "What is the commitment fee for?",
-                a: "The commitment fee secures your seat in the cohort and demonstrates your dedication. It's non-refundable and counts toward unlocking your full learning experience.",
+                q: "What is the discounted fee for?",
+                a: "The discounted fee secures your seat in Cohort 3 at a reduced rate — available only until 24th July. From 25th July the normal price applies, and registration closes on 30th July. It's non-refundable.",
               },
               {
                 q: "When does Cohort 3 start?",
@@ -552,7 +584,7 @@ const EnrollHub = () => {
               },
               {
                 q: "How do I pay?",
-                a: "Click Enroll on your chosen track. On the final step, you'll see our bank details (Wema Bank · 0127561293 · Delvetek Limited). Transfer the commitment fee, then send your proof of payment to WhatsApp +44 7775 739225 for confirmation.",
+                a: "Click Enroll on your chosen track. On the final step, you'll see our bank details (Wema Bank · 0127561293 · Delvetek Limited). Transfer the discounted fee, then send your proof of payment to WhatsApp +44 7775 739225 for confirmation.",
               },
               {
                 q: "Is the certificate included?",

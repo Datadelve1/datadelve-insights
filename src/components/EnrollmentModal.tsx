@@ -7,16 +7,24 @@ import { Copy, MessageCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackLead, trackInitiateCheckout } from "@/lib/metaPixel";
+import {
+  DISCOUNTED_PRICES,
+  NORMAL_PRICES,
+  isDiscountActive,
+  isRegistrationOpen,
+  PRICING_NOTICE,
+  type TrackId,
+} from "@/lib/enrollmentPricing";
 
 const BANK_NAME = "Wema Bank";
 const ACCOUNT_NUMBER = "0127561293";
 const ACCOUNT_NAME = "Delvetek Limited";
 const WHATSAPP_NUMBER = "447775739225";
 
-const TRACKS: { id: string; label: string; price: number }[] = [
-  { id: "beginner", label: "Beginner", price: 10000 },
-  { id: "professional", label: "Professional", price: 50000 },
-  { id: "advanced", label: "Advanced", price: 100000 },
+const TRACK_LABELS: { id: TrackId; label: string }[] = [
+  { id: "beginner", label: "Beginner" },
+  { id: "professional", label: "Professional" },
+  { id: "advanced", label: "Advanced" },
 ];
 
 interface EnrollmentModalProps {
@@ -26,14 +34,22 @@ interface EnrollmentModalProps {
 }
 
 const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalProps) => {
-  const [selected, setSelected] = useState(defaultTrack || "professional");
+  const initialTrack = (defaultTrack as TrackId) || "professional";
+  const [selected, setSelected] = useState<TrackId>(initialTrack);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [reference, setReference] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const track = TRACKS.find((t) => t.id === selected) || TRACKS[1];
+  const discountActive = isDiscountActive();
+  const registrationOpen = isRegistrationOpen();
+  const priceFor = (id: TrackId) => (discountActive ? DISCOUNTED_PRICES[id] : NORMAL_PRICES[id]);
+  const track = {
+    id: selected,
+    label: TRACK_LABELS.find((t) => t.id === selected)?.label || "Professional",
+    price: priceFor(selected),
+  };
 
   // Reset on close
   useEffect(() => {
@@ -107,31 +123,55 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           </DialogTitle>
           <p className="text-sm text-muted-foreground pt-1">
             {reference
-              ? "Your spot is reserved. Pay the commitment fee, then send proof on WhatsApp."
+              ? "Your spot is reserved. Pay the discounted fee, then send proof on WhatsApp."
               : "1. Your details · 2. Pay & send proof on WhatsApp"}
           </p>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Deadline notice */}
+          <div className={`rounded-lg px-3 py-2 text-xs font-medium border ${
+            !registrationOpen
+              ? "bg-destructive/10 border-destructive/30 text-destructive"
+              : discountActive
+              ? "bg-primary/10 border-primary/30 text-foreground"
+              : "bg-amber-500/10 border-amber-500/30 text-foreground"
+          }`}>
+            {!registrationOpen
+              ? "🚫 Registration for Cohort 3 closed on 30th July."
+              : discountActive
+              ? "⏳ Discounted fee ends 24th July · Normal price applies from 25th July · Registration closes 30th July"
+              : "⚠️ Discount ended — normal price now applies · Registration closes 30th July"}
+          </div>
+
           {/* Track selection (always visible) */}
           <div className="space-y-2">
             <p className="text-sm font-semibold text-foreground">Choose your track</p>
             <div className="grid grid-cols-3 gap-2">
-              {TRACKS.map((t) => (
-                <button
-                  key={t.id}
-                  disabled={!!reference}
-                  onClick={() => setSelected(t.id)}
-                  className={`p-3 rounded-lg border-2 text-left transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
-                    selected === t.id
-                      ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
-                  <p className="text-xs text-primary font-bold mt-0.5">₦{t.price.toLocaleString()}</p>
-                </button>
-              ))}
+              {TRACK_LABELS.map((t) => {
+                const price = priceFor(t.id);
+                const normal = NORMAL_PRICES[t.id];
+                return (
+                  <button
+                    key={t.id}
+                    disabled={!!reference || !registrationOpen}
+                    onClick={() => setSelected(t.id)}
+                    className={`p-3 rounded-lg border-2 text-left transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
+                      selected === t.id
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
+                    {discountActive && (
+                      <p className="text-[10px] text-muted-foreground line-through leading-tight">
+                        ₦{normal.toLocaleString()}
+                      </p>
+                    )}
+                    <p className="text-xs text-primary font-bold mt-0.5">₦{price.toLocaleString()}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -180,13 +220,15 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 variant="hero"
                 size="lg"
                 className="w-full"
-                disabled={submitting}
+                disabled={submitting || !registrationOpen}
                 onClick={handleSubmitDetails}
               >
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…
                   </>
+                ) : !registrationOpen ? (
+                  <>Registration Closed</>
                 ) : (
                   <>Continue to payment →</>
                 )}
