@@ -567,8 +567,8 @@ const EnrollHub = () => {
           <Accordion type="single" collapsible className="space-y-3">
             {[
               {
-                q: "What is the commitment fee for?",
-                a: "The commitment fee secures your seat in the cohort and demonstrates your dedication. It's non-refundable and counts toward unlocking your full learning experience.",
+                q: "What is the discounted fee for?",
+                a: "The discounted fee secures your seat in Cohort 3 at a reduced rate — available only until 24th July. From 25th July the normal price applies, and registration closes on 30th July. It's non-refundable.",
               },
               {
                 q: "When does Cohort 3 start?",
