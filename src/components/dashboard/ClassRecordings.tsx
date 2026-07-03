@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Video, Lock, Play, Loader2, Shield, Clock, FileText } from "lucide-react";
 import ProtectedVideoPlayer from "./ProtectedVideoPlayer";
-import { hasWeekAccess, hasReviewForWeek, isVideoExempt } from "@/lib/attendanceAccess";
+import { hasReviewForWeek, isAfter10PMForSession, isVideoExempt } from "@/lib/attendanceAccess";
 
 interface ClassRecording {
   id: string;
@@ -39,8 +39,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
       const { data: enrollment } = await supabase
         .from("cohort2_enrollments")
         .select("cohort")
-        .eq("user_id", user!.id)
-        .eq("payment_status", "paid")
+        .or(`user_id.eq.${user!.id},email.eq.${user!.email ?? ""}`)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -92,18 +91,12 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
             <div className="space-y-3">
               {recordings.map((rec) => {
                 const day = (rec as any).session_day || "friday";
-                const timingOk = hasWeekAccess(rec.week_number, attendance, isAdmin, user?.id);
-                const reviewDone = isAdmin || isVideoExempt(user?.id) || hasReviewForWeek(rec.week_number, submittedReviews);
-                const unlocked = timingOk && reviewDone;
-                const attKey = `${rec.week_number}-${day}`;
-                const attended =
-                  attendance[attKey] === "present" ||
-                  attendance[`${rec.week_number}-friday`] === "present" ||
-                  attendance[`${rec.week_number}-saturday`] === "present";
-
+                const isPrivileged = isAdmin || isVideoExempt(user?.id);
+                const timingOk = isPrivileged || isAfter10PMForSession(rec.week_number, day === "saturday" ? "saturday" : "friday");
+                const reviewDone = isPrivileged || hasReviewForWeek(rec.week_number, submittedReviews);
+                const unlocked = isPrivileged || (timingOk && reviewDone);
                 let statusMessage = "";
-                if (!attended) statusMessage = "Attendance required to unlock";
-                else if (!timingOk) statusMessage = "Available after 10 PM";
+                if (!timingOk) statusMessage = "Available after 10 PM";
                 else if (!reviewDone) statusMessage = "Submit review first";
                 
 
@@ -152,9 +145,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
                         </button>
                       ) : (
                         <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg flex items-center gap-1">
-                          {!attended ? (
-                            <Lock className="w-3 h-3" />
-                          ) : !timingOk ? (
+                          {!timingOk ? (
                             <Clock className="w-3 h-3" />
                           ) : (
                             <FileText className="w-3 h-3" />
