@@ -2,6 +2,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import {
+  DISCOUNTED_PRICES,
+  NORMAL_PRICES,
+  isDiscountActive,
+  isRegistrationOpen,
+} from "@/lib/enrollmentPricing";
+import {
   ArrowRight,
   BookOpen,
   Check,
