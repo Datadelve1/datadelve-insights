@@ -58,16 +58,22 @@ const EnrollHub = () => {
       <div className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg border-b border-primary/30">
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm font-semibold text-center sm:text-left">
-            🔥 Cohort 3 enrolling now • Limited seats • Starts July 31
+            {registrationOpen
+              ? discountActive
+                ? "🔥 Cohort 3 · Discounted fee ends 24th July · Normal price from 25th · Registration closes 30th July"
+                : "⚠️ Cohort 3 · Discount ended — normal price applies · Registration closes 30th July"
+              : "🚫 Cohort 3 registration closed (30th July). New cohort details coming soon."}
           </p>
-          <Button
-            onClick={scrollToTracks}
-            size="sm"
-            variant="secondary"
-            className="font-bold whitespace-nowrap shadow-md hover:scale-105 transition-transform"
-          >
-            Enroll Now <ArrowRight className="w-4 h-4 ml-1" />
-          </Button>
+          {registrationOpen && (
+            <Button
+              onClick={scrollToTracks}
+              size="sm"
+              variant="secondary"
+              className="font-bold whitespace-nowrap shadow-md hover:scale-105 transition-transform"
+            >
+              Enroll Now <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
         </div>
       </div>
 
