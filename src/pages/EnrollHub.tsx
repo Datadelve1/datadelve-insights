@@ -357,7 +357,7 @@ const EnrollHub = () => {
               </TableHeader>
               <TableBody>
                 {[
-                  ["Commitment Fee", "₦10,000", "₦50,000", "₦100,000"],
+                  [feeLabel, `₦${beginnerFee.toLocaleString()}`, `₦${professionalFee.toLocaleString()}`, `₦${advancedFee.toLocaleString()}`],
                   ["Program Duration", "8 weeks", "12 weeks", "12 weeks + 3mo internship"],
                   ["SQL Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
                   ["Excel Training", "Fundamentals", "Beginner → Advanced", "Beginner → Advanced"],
