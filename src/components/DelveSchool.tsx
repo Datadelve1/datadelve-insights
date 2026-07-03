@@ -2,6 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Check, AlertTriangle, Briefcase, Rocket, GraduationCap, FileText, Linkedin, Users } from "lucide-react";
 import EnrollmentModal from "@/components/EnrollmentModal";
+import { DISCOUNTED_PRICES, NORMAL_PRICES, isDiscountActive } from "@/lib/enrollmentPricing";
+
+const discountActive = isDiscountActive();
+const feeLabel = discountActive ? "Discounted Fee" : "Fee";
+const priceFor = (t: "beginner" | "professional" | "advanced") =>
+  discountActive ? DISCOUNTED_PRICES[t] : NORMAL_PRICES[t];
 
 const DelveSchool = () => {
   const [enrollOpen, setEnrollOpen] = useState(false);
@@ -48,7 +54,7 @@ const DelveSchool = () => {
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦150,000</span>
               <div className="text-xl font-bold text-primary">FREE <span className="text-xs font-normal text-muted-foreground">(This Cohort Only)</span></div>
-              <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦10,000</span></p>
+              <p className="text-sm text-foreground mt-1">{feeLabel}: <span className="font-semibold">₦{priceFor("beginner").toLocaleString()}</span></p>
             </div>
 
             <ul className="space-y-2 mb-4 flex-1">
@@ -91,7 +97,7 @@ const DelveSchool = () => {
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦275,000</span>
               <div className="text-xl font-bold text-primary">Discount Applied</div>
-              <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦50,000</span></p>
+              <p className="text-sm text-foreground mt-1">{feeLabel}: <span className="font-semibold">₦{priceFor("professional").toLocaleString()}</span></p>
             </div>
 
             <ul className="space-y-2 mb-4 flex-1">
@@ -135,7 +141,7 @@ const DelveSchool = () => {
             <div className="mb-4">
               <span className="text-muted-foreground line-through text-sm">₦350,000</span>
               <div className="text-xl font-bold text-primary">Discount Applied</div>
-              <p className="text-sm text-foreground mt-1">Commitment Fee: <span className="font-semibold">₦100,000</span></p>
+              <p className="text-sm text-foreground mt-1">{feeLabel}: <span className="font-semibold">₦{priceFor("advanced").toLocaleString()}</span></p>
             </div>
 
             <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">Full Learning Path</p>
