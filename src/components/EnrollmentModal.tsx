@@ -34,14 +34,22 @@ interface EnrollmentModalProps {
 }
 
 const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalProps) => {
-  const [selected, setSelected] = useState(defaultTrack || "professional");
+  const initialTrack = (defaultTrack as TrackId) || "professional";
+  const [selected, setSelected] = useState<TrackId>(initialTrack);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [reference, setReference] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const track = TRACKS.find((t) => t.id === selected) || TRACKS[1];
+  const discountActive = isDiscountActive();
+  const registrationOpen = isRegistrationOpen();
+  const priceFor = (id: TrackId) => (discountActive ? DISCOUNTED_PRICES[id] : NORMAL_PRICES[id]);
+  const track = {
+    id: selected,
+    label: TRACK_LABELS.find((t) => t.id === selected)?.label || "Professional",
+    price: priceFor(selected),
+  };
 
   // Reset on close
   useEffect(() => {
