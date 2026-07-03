@@ -584,7 +584,7 @@ const EnrollHub = () => {
               },
               {
                 q: "How do I pay?",
-                a: "Click Enroll on your chosen track. On the final step, you'll see our bank details (Wema Bank · 0127561293 · Delvetek Limited). Transfer the commitment fee, then send your proof of payment to WhatsApp +44 7775 739225 for confirmation.",
+                a: "Click Enroll on your chosen track. On the final step, you'll see our bank details (Wema Bank · 0127561293 · Delvetek Limited). Transfer the discounted fee, then send your proof of payment to WhatsApp +44 7775 739225 for confirmation.",
               },
               {
                 q: "Is the certificate included?",
