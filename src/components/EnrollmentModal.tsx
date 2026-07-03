@@ -7,16 +7,24 @@ import { Copy, MessageCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { trackLead, trackInitiateCheckout } from "@/lib/metaPixel";
+import {
+  DISCOUNTED_PRICES,
+  NORMAL_PRICES,
+  isDiscountActive,
+  isRegistrationOpen,
+  PRICING_NOTICE,
+  type TrackId,
+} from "@/lib/enrollmentPricing";
 
 const BANK_NAME = "Wema Bank";
 const ACCOUNT_NUMBER = "0127561293";
 const ACCOUNT_NAME = "Delvetek Limited";
 const WHATSAPP_NUMBER = "447775739225";
 
-const TRACKS: { id: string; label: string; price: number }[] = [
-  { id: "beginner", label: "Beginner", price: 10000 },
-  { id: "professional", label: "Professional", price: 50000 },
-  { id: "advanced", label: "Advanced", price: 100000 },
+const TRACK_LABELS: { id: TrackId; label: string }[] = [
+  { id: "beginner", label: "Beginner" },
+  { id: "professional", label: "Professional" },
+  { id: "advanced", label: "Advanced" },
 ];
 
 interface EnrollmentModalProps {
