@@ -2,6 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Check, AlertTriangle, Briefcase, Rocket, GraduationCap, FileText, Linkedin, Users } from "lucide-react";
 import EnrollmentModal from "@/components/EnrollmentModal";
+import { DISCOUNTED_PRICES, NORMAL_PRICES, isDiscountActive } from "@/lib/enrollmentPricing";
+
+const discountActive = isDiscountActive();
+const feeLabel = discountActive ? "Discounted Fee" : "Fee";
+const priceFor = (t: "beginner" | "professional" | "advanced") =>
+  discountActive ? DISCOUNTED_PRICES[t] : NORMAL_PRICES[t];
 
 const DelveSchool = () => {
   const [enrollOpen, setEnrollOpen] = useState(false);
