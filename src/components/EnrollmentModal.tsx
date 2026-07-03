@@ -220,13 +220,15 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                 variant="hero"
                 size="lg"
                 className="w-full"
-                disabled={submitting}
+                disabled={submitting || !registrationOpen}
                 onClick={handleSubmitDetails}
               >
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…
                   </>
+                ) : !registrationOpen ? (
+                  <>Registration Closed</>
                 ) : (
                   <>Continue to payment →</>
                 )}
