@@ -44,7 +44,16 @@ export function canAccessProject(
 ): boolean {
   if (!access) return true;
   if (!enrollment) return false;
-  if (access.tracks && (!enrollment.track || !access.tracks.includes(enrollment.track))) return false;
-  if (access.cohorts && (!enrollment.cohort || !access.cohorts.includes(enrollment.cohort))) return false;
+  const norm = (s: string) => s.trim().toLowerCase();
+  if (access.tracks && access.tracks.length > 0) {
+    if (!enrollment.track) return false;
+    const allowed = access.tracks.map(norm);
+    if (!allowed.includes(norm(enrollment.track))) return false;
+  }
+  if (access.cohorts && access.cohorts.length > 0) {
+    if (!enrollment.cohort) return false;
+    const allowed = access.cohorts.map(norm);
+    if (!allowed.includes(norm(enrollment.cohort))) return false;
+  }
   return true;
 }
