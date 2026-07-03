@@ -249,10 +249,15 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
 
             <div className="mb-4">
-              <span className="text-muted-foreground line-through text-sm">₦350,000</span>
-              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              {discountActive && (
+                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.advanced.toLocaleString()}</span>
+              )}
+              <div className="text-xl font-bold text-primary">
+                ₦{advancedFee.toLocaleString()}
+                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
+              </div>
               <p className="text-sm text-foreground mt-1">
-                Commitment Fee: <span className="font-semibold">₦100,000</span>
+                {feeLabel}: <span className="font-semibold">₦{advancedFee.toLocaleString()}</span>
               </p>
             </div>
 
