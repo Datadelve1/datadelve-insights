@@ -186,10 +186,15 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
 
             <div className="mb-4">
-              <span className="text-muted-foreground line-through text-sm">₦275,000</span>
-              <div className="text-xl font-bold text-primary">Discount Applied</div>
+              {discountActive && (
+                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.professional.toLocaleString()}</span>
+              )}
+              <div className="text-xl font-bold text-primary">
+                ₦{professionalFee.toLocaleString()}
+                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
+              </div>
               <p className="text-sm text-foreground mt-1">
-                Commitment Fee: <span className="font-semibold">₦50,000</span>
+                {feeLabel}: <span className="font-semibold">₦{professionalFee.toLocaleString()}</span>
               </p>
             </div>
 
