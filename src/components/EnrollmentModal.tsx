@@ -123,31 +123,55 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
           </DialogTitle>
           <p className="text-sm text-muted-foreground pt-1">
             {reference
-              ? "Your spot is reserved. Pay the commitment fee, then send proof on WhatsApp."
+              ? "Your spot is reserved. Pay the discounted fee, then send proof on WhatsApp."
               : "1. Your details · 2. Pay & send proof on WhatsApp"}
           </p>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Deadline notice */}
+          <div className={`rounded-lg px-3 py-2 text-xs font-medium border ${
+            !registrationOpen
+              ? "bg-destructive/10 border-destructive/30 text-destructive"
+              : discountActive
+              ? "bg-primary/10 border-primary/30 text-foreground"
+              : "bg-amber-500/10 border-amber-500/30 text-foreground"
+          }`}>
+            {!registrationOpen
+              ? "🚫 Registration for Cohort 3 closed on 30th July."
+              : discountActive
+              ? "⏳ Discounted fee ends 24th July · Normal price applies from 25th July · Registration closes 30th July"
+              : "⚠️ Discount ended — normal price now applies · Registration closes 30th July"}
+          </div>
+
           {/* Track selection (always visible) */}
           <div className="space-y-2">
             <p className="text-sm font-semibold text-foreground">Choose your track</p>
             <div className="grid grid-cols-3 gap-2">
-              {TRACKS.map((t) => (
-                <button
-                  key={t.id}
-                  disabled={!!reference}
-                  onClick={() => setSelected(t.id)}
-                  className={`p-3 rounded-lg border-2 text-left transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
-                    selected === t.id
-                      ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
-                  <p className="text-xs text-primary font-bold mt-0.5">₦{t.price.toLocaleString()}</p>
-                </button>
-              ))}
+              {TRACK_LABELS.map((t) => {
+                const price = priceFor(t.id);
+                const normal = NORMAL_PRICES[t.id];
+                return (
+                  <button
+                    key={t.id}
+                    disabled={!!reference || !registrationOpen}
+                    onClick={() => setSelected(t.id)}
+                    className={`p-3 rounded-lg border-2 text-left transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
+                      selected === t.id
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
+                    {discountActive && (
+                      <p className="text-[10px] text-muted-foreground line-through leading-tight">
+                        ₦{normal.toLocaleString()}
+                      </p>
+                    )}
+                    <p className="text-xs text-primary font-bold mt-0.5">₦{price.toLocaleString()}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
