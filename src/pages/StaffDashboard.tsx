@@ -345,6 +345,9 @@ const StaffDashboard = () => {
           <p className="text-muted-foreground text-sm">{staffProfile?.email}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => window.location.assign("/staff/ops")}>
+            Operations Centre
+          </Button>
           <Badge variant={status === "active" ? "default" : status === "idle" ? "secondary" : "outline"} className="capitalize">
             {status}
           </Badge>

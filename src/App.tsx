@@ -53,6 +53,14 @@ import StaffAdminDashboard from "./pages/StaffAdminDashboard";
 import EnrollHub from "./pages/EnrollHub";
 import EnrollTier from "./pages/EnrollTier";
 import RouteTracker from "./components/RouteTracker";
+import StaffOpsLayout from "./components/ops/StaffOpsLayout";
+import OpsDashboard from "./pages/ops/OpsDashboard";
+import OpsCalendar from "./pages/ops/OpsCalendar";
+import OpsCohorts from "./pages/ops/OpsCohorts";
+import OpsCohortDetail from "./pages/ops/OpsCohortDetail";
+import OpsCommunications from "./pages/ops/OpsCommunications";
+import OpsTasks from "./pages/ops/OpsTasks";
+import OpsActivity from "./pages/ops/OpsActivity";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +124,15 @@ const App = () => (
             <Route path="/staff/change-password" element={<StaffChangePassword />} />
             <Route path="/staff/onboarding" element={<StaffOnboarding />} />
             <Route path="/staff/dashboard" element={<StaffDashboard />} />
+            <Route path="/staff/ops" element={<StaffOpsLayout />}>
+              <Route index element={<OpsDashboard />} />
+              <Route path="calendar" element={<OpsCalendar />} />
+              <Route path="cohorts" element={<OpsCohorts />} />
+              <Route path="cohorts/:id" element={<OpsCohortDetail />} />
+              <Route path="emails" element={<OpsCommunications />} />
+              <Route path="tasks" element={<OpsTasks />} />
+              <Route path="activity" element={<OpsActivity />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
