@@ -34,6 +34,10 @@ export default function StaffOpsLayout() {
     })();
   }, [user]);
 
+  useEffect(() => {
+    document.title = "Delvetek Ops Centre — Internal Control Panel";
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
