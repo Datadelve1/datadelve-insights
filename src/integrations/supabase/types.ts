@@ -566,6 +566,414 @@ export type Database = {
           },
         ]
       }
+      ops_activity_log: {
+        Row: {
+          action: string
+          actor_kind: string
+          actor_user_id: string | null
+          created_at: string
+          detail: Json
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_kind?: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_kind?: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      ops_checklist_items: {
+        Row: {
+          cohort_id: string
+          created_at: string
+          done: boolean
+          done_at: string | null
+          done_by: string | null
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          cohort_id: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          cohort_id?: string
+          created_at?: string
+          done?: boolean
+          done_at?: string | null
+          done_by?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_checklist_items_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_cohort_staff: {
+        Row: {
+          cohort_id: string
+          created_at: string
+          id: string
+          role: string | null
+          staff_user_id: string
+        }
+        Insert: {
+          cohort_id: string
+          created_at?: string
+          id?: string
+          role?: string | null
+          staff_user_id: string
+        }
+        Update: {
+          cohort_id?: string
+          created_at?: string
+          id?: string
+          role?: string | null
+          staff_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_cohort_staff_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_cohort_students: {
+        Row: {
+          cohort_id: string
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_id: string
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_id?: string
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_cohort_students_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_cohorts: {
+        Row: {
+          beginner_dates: string[]
+          created_at: string
+          created_by: string | null
+          graduation_date: string | null
+          id: string
+          name: string | null
+          notes: string | null
+          number: number
+          onboarding_date: string | null
+          professional_dates: string[]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          beginner_dates?: string[]
+          created_at?: string
+          created_by?: string | null
+          graduation_date?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          number: number
+          onboarding_date?: string | null
+          professional_dates?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          beginner_dates?: string[]
+          created_at?: string
+          created_by?: string | null
+          graduation_date?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          number?: number
+          onboarding_date?: string | null
+          professional_dates?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ops_emails: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          body: string
+          cohort_id: string | null
+          created_at: string
+          created_by: string | null
+          email_type: string
+          error: string | null
+          failed_count: number
+          id: string
+          recipients: Json
+          scheduled_at: string | null
+          sent_at: string | null
+          sent_count: number
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          body?: string
+          cohort_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          email_type?: string
+          error?: string | null
+          failed_count?: number
+          id?: string
+          recipients?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          body?: string
+          cohort_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          email_type?: string
+          error?: string | null
+          failed_count?: number
+          id?: string
+          recipients?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_emails_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_events: {
+        Row: {
+          cohort_id: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          kind: string
+          location: string | null
+          notes: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          location?: string | null
+          notes?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          location?: string | null
+          notes?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_events_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read_at: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ops_tasks: {
+        Row: {
+          assignee_user_id: string | null
+          cohort_id: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          is_company_task: boolean
+          notes: string | null
+          priority: string
+          recurrence: Json | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assignee_user_id?: string | null
+          cohort_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_company_task?: boolean
+          notes?: string | null
+          priority?: string
+          recurrence?: Json | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assignee_user_id?: string | null
+          cohort_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_company_task?: boolean
+          notes?: string | null
+          priority?: string
+          recurrence?: Json | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_tasks_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "ops_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1151,6 +1559,7 @@ export type Database = {
         Returns: boolean
       }
       is_primary_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
