@@ -56,6 +56,7 @@ import RouteTracker from "./components/RouteTracker";
 import StaffOpsLayout from "./components/ops/StaffOpsLayout";
 import OpsDashboard from "./pages/ops/OpsDashboard";
 import OpsCalendar from "./pages/ops/OpsCalendar";
+import OpsTrainingSchedule from "./pages/ops/OpsTrainingSchedule";
 import OpsCohorts from "./pages/ops/OpsCohorts";
 import OpsCohortDetail from "./pages/ops/OpsCohortDetail";
 import OpsCommunications from "./pages/ops/OpsCommunications";
@@ -127,6 +128,7 @@ const App = () => (
             <Route path="/staff/ops" element={<StaffOpsLayout />}>
               <Route index element={<OpsDashboard />} />
               <Route path="calendar" element={<OpsCalendar />} />
+              <Route path="training-schedule" element={<OpsTrainingSchedule />} />
               <Route path="cohorts" element={<OpsCohorts />} />
               <Route path="cohorts/:id" element={<OpsCohortDetail />} />
               <Route path="emails" element={<OpsCommunications />} />
