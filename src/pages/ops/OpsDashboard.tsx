@@ -49,10 +49,9 @@ export default function OpsDashboard() {
         <p className="text-sm text-muted-foreground">Today's snapshot of company operations. Nothing sends without your approval.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard icon={CheckSquare} label="Today's Tasks" value={data.todayTasks.length} tone="primary" />
         <StatCard icon={AlertTriangle} label="Overdue Tasks" value={data.overdueTasks.length} tone="destructive" />
-        <StatCard icon={Mail} label="Emails Awaiting Approval" value={pendingEmails} tone="primary" />
         <StatCard icon={CalendarClock} label="Upcoming Events (14d)" value={data.events.length} tone="default" />
       </div>
 
