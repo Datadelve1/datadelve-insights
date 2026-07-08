@@ -56,8 +56,9 @@ const AmbassadorSignup = () => {
         contentType: file.type,
       });
       if (error) throw error;
-      const { data } = supabase.storage.from("form-uploads").getPublicUrl(path);
-      setPhotoUrl(data.publicUrl);
+      const { data, error: signErr } = await supabase.storage.from("form-uploads").createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr) throw signErr;
+      setPhotoUrl(data.signedUrl);
       setPhotoPreview(URL.createObjectURL(file));
     } catch (err: any) {
       toast({ title: "Upload failed", description: err.message, variant: "destructive" });
