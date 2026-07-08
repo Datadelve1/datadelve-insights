@@ -56,6 +56,7 @@ import RouteTracker from "./components/RouteTracker";
 import StaffOpsLayout from "./components/ops/StaffOpsLayout";
 import OpsDashboard from "./pages/ops/OpsDashboard";
 import OpsCalendar from "./pages/ops/OpsCalendar";
+import OpsTrainingSchedule from "./pages/ops/OpsTrainingSchedule";
 import OpsCohorts from "./pages/ops/OpsCohorts";
 import OpsCohortDetail from "./pages/ops/OpsCohortDetail";
 import OpsCommunications from "./pages/ops/OpsCommunications";
