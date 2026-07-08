@@ -1,326 +1,381 @@
 import { useMemo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronRight, GraduationCap, Sparkles, BookOpen, Wrench, Briefcase } from "lucide-react";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval, isSameDay, parseISO, differenceInCalendarDays, startOfWeek, endOfWeek, addDays } from "date-fns";
+import { Flag } from "lucide-react";
+import {
+  addMonths,
+  differenceInCalendarDays,
+  eachMonthOfInterval,
+  format,
+  startOfMonth,
+} from "date-fns";
 
-type EventKind = "onboarding" | "beginner" | "project" | "professional" | "graduation";
-
-interface TEvent {
-  id: string;
-  cohort: number;
-  kind: EventKind;
-  start: string; // ISO date
-  end?: string;  // ISO date (inclusive) for ranges
-  title: string;
-  description: string;
-}
-
-const KIND_META: Record<EventKind, { label: string; color: string; ring: string; text: string; icon: any }> = {
-  onboarding:   { label: "Onboarding",   color: "bg-sky-500",     ring: "ring-sky-400/40",     text: "text-sky-50",     icon: Sparkles },
-  beginner:     { label: "Beginner",     color: "bg-emerald-500", ring: "ring-emerald-400/40", text: "text-emerald-50", icon: BookOpen },
-  project:      { label: "Project Phase",color: "bg-amber-500",   ring: "ring-amber-400/40",   text: "text-amber-950",  icon: Wrench },
-  professional: { label: "Professional", color: "bg-indigo-500",  ring: "ring-indigo-400/40",  text: "text-indigo-50",  icon: Briefcase },
-  graduation:   { label: "Graduation",   color: "bg-primary",     ring: "ring-primary/40",     text: "text-primary-foreground", icon: GraduationCap },
+type PhaseKind = "beginner" | "project" | "professional";
+type Segment = { kind: PhaseKind; start: Date; end: Date };
+type Cohort = {
+  number: number;
+  segments: Segment[];
+  graduation: Date;
 };
 
-// Full schedule July 2026 – July 2027
-const EVENTS: TEvent[] = [
-  // July 2026
-  { id: "c2-grad",   cohort: 2, kind: "graduation",   start: "2026-07-31", title: "Cohort 2 Graduation", description: "Cohort 2 completes the programme." },
-  { id: "c3-onb",    cohort: 3, kind: "onboarding",   start: "2026-07-31", title: "Cohort 3 Onboarding", description: "Kick-off session for Cohort 3." },
+const d = (s: string) => new Date(s + "T00:00:00");
 
-  // Aug – Sep 2026
-  { id: "c3-beg",    cohort: 3, kind: "beginner",     start: "2026-08-01", end: "2026-09-11", title: "Cohort 3 Beginner Class", description: "6 weeks of foundational training." },
-  { id: "c2-pro",    cohort: 2, kind: "professional", start: "2026-08-08", end: "2026-08-29", title: "Cohort 2 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c3-proj",   cohort: 3, kind: "project",      start: "2026-09-12", end: "2026-09-25", title: "Cohort 3 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c3-pro",    cohort: 3, kind: "professional", start: "2026-09-26", end: "2026-10-23", title: "Cohort 3 Professional Class", description: "4 weeks of professional training." },
+// Break: Jan 1–Jan 28, 2027 (inclusive pause window)
+const BREAK_START = d("2027-01-01");
+const BREAK_END = d("2027-01-28");
 
-  // Oct – Nov 2026
-  { id: "c3-grad",   cohort: 3, kind: "graduation",   start: "2026-10-09", title: "Cohort 3 Graduation", description: "Cohort 3 completes the programme." },
-  { id: "c4-onb",    cohort: 4, kind: "onboarding",   start: "2026-10-09", title: "Cohort 4 Onboarding", description: "Kick-off session for Cohort 4." },
-  { id: "c4-beg",    cohort: 4, kind: "beginner",     start: "2026-10-10", end: "2026-11-20", title: "Cohort 4 Beginner Class", description: "6 weeks of foundational training." },
-  { id: "c4-grad",   cohort: 4, kind: "graduation",   start: "2026-11-20", title: "Cohort 4 Graduation", description: "Cohort 4 completes the programme." },
-  { id: "c5-onb",    cohort: 5, kind: "onboarding",   start: "2026-11-20", title: "Cohort 5 Onboarding", description: "Kick-off session for Cohort 5." },
-  { id: "c4-proj",   cohort: 4, kind: "project",      start: "2026-11-21", end: "2026-12-04", title: "Cohort 4 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c5-beg",    cohort: 5, kind: "beginner",     start: "2026-11-21", end: "2027-01-01", title: "Cohort 5 Beginner Class", description: "6 weeks of foundational training." },
-
-  // Dec 2026 – Jan 2027
-  { id: "c4-pro",    cohort: 4, kind: "professional", start: "2026-12-05", end: "2027-01-01", title: "Cohort 4 Professional Class", description: "4 weeks of professional training." },
-  { id: "c5-grad",   cohort: 5, kind: "graduation",   start: "2027-01-01", title: "Cohort 5 Graduation", description: "Cohort 5 completes the programme." },
-  { id: "c6-onb",    cohort: 6, kind: "onboarding",   start: "2027-01-01", title: "Cohort 6 Onboarding", description: "Kick-off session for Cohort 6." },
-  { id: "c5-proj",   cohort: 5, kind: "project",      start: "2027-01-02", end: "2027-01-15", title: "Cohort 5 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c5-pro",    cohort: 5, kind: "professional", start: "2027-01-08", end: "2027-01-29", title: "Cohort 5 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c6-beg",    cohort: 6, kind: "beginner",     start: "2027-01-02", end: "2027-02-12", title: "Cohort 6 Beginner Class", description: "6 weeks of foundational training." },
-
-  // Feb – Mar 2027
-  { id: "c6-proj",   cohort: 6, kind: "project",      start: "2027-02-13", end: "2027-02-26", title: "Cohort 6 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c6-grad",   cohort: 6, kind: "graduation",   start: "2027-02-12", title: "Cohort 6 Graduation", description: "Cohort 6 completes the programme." },
-  { id: "c7-onb",    cohort: 7, kind: "onboarding",   start: "2027-02-12", title: "Cohort 7 Onboarding", description: "Kick-off session for Cohort 7." },
-  { id: "c6-pro",    cohort: 6, kind: "professional", start: "2027-02-19", end: "2027-03-12", title: "Cohort 6 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c7-beg",    cohort: 7, kind: "beginner",     start: "2027-02-13", end: "2027-03-26", title: "Cohort 7 Beginner Class", description: "6 weeks of foundational training." },
-
-  // Mar – Apr 2027
-  { id: "c7-proj",   cohort: 7, kind: "project",      start: "2027-03-27", end: "2027-04-09", title: "Cohort 7 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c7-grad",   cohort: 7, kind: "graduation",   start: "2027-03-26", title: "Cohort 7 Graduation", description: "Cohort 7 completes the programme." },
-  { id: "c8-onb",    cohort: 8, kind: "onboarding",   start: "2027-03-26", title: "Cohort 8 Onboarding", description: "Kick-off session for Cohort 8." },
-  { id: "c7-pro",    cohort: 7, kind: "professional", start: "2027-04-02", end: "2027-04-23", title: "Cohort 7 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c8-beg",    cohort: 8, kind: "beginner",     start: "2027-03-27", end: "2027-05-07", title: "Cohort 8 Beginner Class", description: "6 weeks of foundational training." },
-
-  // May – Jun 2027
-  { id: "c8-proj",   cohort: 8, kind: "project",      start: "2027-05-08", end: "2027-05-21", title: "Cohort 8 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c8-grad",   cohort: 8, kind: "graduation",   start: "2027-05-07", title: "Cohort 8 Graduation", description: "Cohort 8 completes the programme." },
-  { id: "c9-onb",    cohort: 9, kind: "onboarding",   start: "2027-05-07", title: "Cohort 9 Onboarding", description: "Kick-off session for Cohort 9." },
-  { id: "c8-pro",    cohort: 8, kind: "professional", start: "2027-05-14", end: "2027-06-04", title: "Cohort 8 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c9-beg",    cohort: 9, kind: "beginner",     start: "2027-05-08", end: "2027-06-18", title: "Cohort 9 Beginner Class", description: "6 weeks of foundational training." },
-
-  // Jun – Jul 2027
-  { id: "c9-proj",   cohort: 9, kind: "project",      start: "2027-06-19", end: "2027-07-02", title: "Cohort 9 Project Phase", description: "2 weeks of projects & assessments." },
-  { id: "c9-grad",   cohort: 9, kind: "graduation",   start: "2027-06-18", title: "Cohort 9 Graduation", description: "Cohort 9 completes the programme." },
-  { id: "c10-onb",   cohort: 10, kind: "onboarding",  start: "2027-06-18", title: "Cohort 10 Onboarding", description: "Kick-off session for Cohort 10." },
-  { id: "c9-pro",    cohort: 9, kind: "professional", start: "2027-06-25", end: "2027-07-16", title: "Cohort 9 Professional Class", description: "Advanced concepts & career readiness." },
-  { id: "c10-beg",   cohort: 10, kind: "beginner",    start: "2027-06-19", end: "2027-07-30", title: "Cohort 10 Beginner Class", description: "6 weeks of foundational training." },
-
-  { id: "c10-grad",  cohort: 10, kind: "graduation",  start: "2027-07-30", title: "Cohort 10 Graduation", description: "Cohort 10 completes the programme." },
-  { id: "c11-onb",   cohort: 11, kind: "onboarding",  start: "2027-07-30", title: "Cohort 11 Onboarding", description: "Kick-off session for Cohort 11." },
+const COHORTS: Cohort[] = [
+  {
+    number: 3,
+    segments: [
+      { kind: "beginner", start: d("2026-07-31"), end: d("2026-09-11") },
+      { kind: "project", start: d("2026-09-11"), end: d("2026-09-25") },
+      { kind: "professional", start: d("2026-09-25"), end: d("2026-10-23") },
+    ],
+    graduation: d("2026-10-23"),
+  },
+  {
+    number: 4,
+    segments: [
+      { kind: "beginner", start: d("2026-09-11"), end: d("2026-10-23") },
+      { kind: "project", start: d("2026-10-23"), end: d("2026-11-06") },
+      { kind: "professional", start: d("2026-11-06"), end: d("2026-12-04") },
+    ],
+    graduation: d("2026-12-04"),
+  },
+  {
+    number: 5,
+    segments: [
+      { kind: "beginner", start: d("2026-10-23"), end: d("2026-12-04") },
+      { kind: "project", start: d("2026-12-04"), end: d("2026-12-18") },
+      { kind: "professional", start: d("2026-12-18"), end: d("2027-01-01") },
+      { kind: "professional", start: d("2027-01-28"), end: d("2027-02-11") },
+    ],
+    graduation: d("2027-02-11"),
+  },
+  {
+    number: 6,
+    segments: [
+      { kind: "beginner", start: d("2026-12-04"), end: d("2027-01-01") },
+      { kind: "beginner", start: d("2027-01-28"), end: d("2027-02-11") },
+      { kind: "project", start: d("2027-02-11"), end: d("2027-02-25") },
+      { kind: "professional", start: d("2027-02-25"), end: d("2027-03-25") },
+    ],
+    graduation: d("2027-03-25"),
+  },
+  {
+    number: 7,
+    segments: [
+      { kind: "beginner", start: d("2027-02-11"), end: d("2027-03-25") },
+      { kind: "project", start: d("2027-03-25"), end: d("2027-04-08") },
+      { kind: "professional", start: d("2027-04-08"), end: d("2027-05-06") },
+    ],
+    graduation: d("2027-05-06"),
+  },
+  {
+    number: 8,
+    segments: [
+      { kind: "beginner", start: d("2027-03-25"), end: d("2027-05-06") },
+      { kind: "project", start: d("2027-05-06"), end: d("2027-05-20") },
+      { kind: "professional", start: d("2027-05-20"), end: d("2027-06-17") },
+    ],
+    graduation: d("2027-06-17"),
+  },
+  {
+    number: 9,
+    segments: [
+      { kind: "beginner", start: d("2027-05-06"), end: d("2027-06-17") },
+      { kind: "project", start: d("2027-06-17"), end: d("2027-07-01") },
+      { kind: "professional", start: d("2027-07-01"), end: d("2027-07-29") },
+    ],
+    graduation: d("2027-07-29"),
+  },
+  {
+    number: 10,
+    segments: [
+      { kind: "beginner", start: d("2027-06-17"), end: d("2027-07-29") },
+      { kind: "project", start: d("2027-07-29"), end: d("2027-08-12") },
+      { kind: "professional", start: d("2027-08-12"), end: d("2027-09-09") },
+    ],
+    graduation: d("2027-09-09"),
+  },
+  {
+    number: 11,
+    segments: [{ kind: "beginner", start: d("2027-07-29"), end: d("2027-09-09") }],
+    graduation: d("2027-09-09"), // ongoing placeholder, not shown
+  },
 ];
 
-function eventInterval(e: TEvent) {
-  const s = parseISO(e.start);
-  const en = e.end ? parseISO(e.end) : s;
-  return { start: s, end: en };
-}
+const TIMELINE_START = d("2026-07-31");
+const TIMELINE_END = d("2027-09-30");
+const TOTAL_DAYS = differenceInCalendarDays(TIMELINE_END, TIMELINE_START);
 
-function eventsForMonth(month: Date) {
-  const mStart = startOfMonth(month);
-  const mEnd = endOfMonth(month);
-  return EVENTS.filter((e) => {
-    const { start, end } = eventInterval(e);
-    return start <= mEnd && end >= mStart;
-  }).sort((a, b) => parseISO(a.start).getTime() - parseISO(b.start).getTime() || a.cohort - b.cohort);
-}
+const PHASE_META: Record<PhaseKind, { label: string; cls: string; badge: string }> = {
+  beginner: {
+    label: "Beginner Class",
+    cls: "bg-blue-500/85 hover:bg-blue-500 text-white border-blue-600",
+    badge: "bg-blue-500 text-white",
+  },
+  project: {
+    label: "Project Phase",
+    cls: "bg-orange-500/85 hover:bg-orange-500 text-white border-orange-600",
+    badge: "bg-orange-500 text-white",
+  },
+  professional: {
+    label: "Professional Class",
+    cls: "bg-emerald-500/85 hover:bg-emerald-500 text-white border-emerald-600",
+    badge: "bg-emerald-500 text-white",
+  },
+};
 
-function eventsForDay(day: Date) {
-  return EVENTS.filter((e) => {
-    const { start, end } = eventInterval(e);
-    return isWithinInterval(day, { start, end });
-  });
+function pctFromStart(date: Date) {
+  const days = differenceInCalendarDays(date, TIMELINE_START);
+  return (days / TOTAL_DAYS) * 100;
 }
-
-const RANGE_START = new Date(2026, 6, 1);  // Jul 2026
-const RANGE_END = new Date(2027, 6, 31);   // Jul 2027
+function widthPct(start: Date, end: Date) {
+  return (differenceInCalendarDays(end, start) / TOTAL_DAYS) * 100;
+}
 
 export default function OpsTrainingSchedule() {
-  const [cursor, setCursor] = useState<Date>(RANGE_START);
-  const [filter, setFilter] = useState<EventKind | "all">("all");
+  const [zoom, setZoom] = useState(1.6); // width multiplier
 
-  const months = useMemo(() => {
-    const arr: Date[] = [];
-    let d = RANGE_START;
-    while (d <= RANGE_END) { arr.push(d); d = addMonths(d, 1); }
-    return arr;
-  }, []);
-
-  const monthEvents = useMemo(
-    () => eventsForMonth(cursor).filter(e => filter === "all" || e.kind === filter),
-    [cursor, filter]
+  const months = useMemo(
+    () => eachMonthOfInterval({ start: startOfMonth(TIMELINE_START), end: TIMELINE_END }),
+    []
   );
-
-  const gridDays = useMemo(() => {
-    const start = startOfWeek(startOfMonth(cursor));
-    const end = endOfWeek(endOfMonth(cursor));
-    const days: Date[] = [];
-    let d = start;
-    while (d <= end) { days.push(d); d = addDays(d, 1); }
-    return days;
-  }, [cursor]);
-
-  const canPrev = cursor > RANGE_START;
-  const canNext = cursor < startOfMonth(RANGE_END);
 
   return (
     <TooltipProvider delayDuration={100}>
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-3xl font-display font-bold">Training Schedule</h1>
-            <p className="text-sm text-muted-foreground">Full training cycle · July 2026 – July 2027</p>
+            <h1 className="text-2xl font-display font-bold">Training Schedule</h1>
+            <p className="text-sm text-muted-foreground">
+              Cohort swimlanes — Jul 2026 → Sep 2027. Cohorts overlap; each row is one cohort.
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" disabled={!canPrev} onClick={() => setCursor(subMonths(cursor, 1))}><ChevronLeft className="w-4 h-4"/></Button>
-            <div className="min-w-40 text-center font-medium">{format(cursor, "MMMM yyyy")}</div>
-            <Button variant="outline" size="icon" disabled={!canNext} onClick={() => setCursor(addMonths(cursor, 1))}><ChevronRight className="w-4 h-4"/></Button>
+            <Legend swatch="bg-blue-500" label="Beginner (6w)" />
+            <Legend swatch="bg-orange-500" label="Project (2w)" />
+            <Legend swatch="bg-emerald-500" label="Professional (4w)" />
+            <Legend swatch="bg-yellow-400" label="Graduation" icon />
+            <Legend swatch="bg-muted border border-dashed border-muted-foreground" label="Break" />
           </div>
         </div>
 
-        {/* Legend / filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>All</Button>
-          {(Object.keys(KIND_META) as EventKind[]).map(k => {
-            const m = KIND_META[k];
-            const Icon = m.icon;
-            return (
-              <Button key={k} variant={filter === k ? "default" : "outline"} size="sm" onClick={() => setFilter(k)} className="gap-1.5">
-                <span className={`inline-block w-2.5 h-2.5 rounded-full ${m.color}`} />
-                <Icon className="w-3.5 h-3.5" />
-                {m.label}
-              </Button>
-            );
-          })}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">Zoom</span>
+          <button
+            className="px-2 py-1 rounded border border-border hover:bg-secondary"
+            onClick={() => setZoom((z) => Math.max(1, z - 0.2))}
+          >
+            −
+          </button>
+          <button
+            className="px-2 py-1 rounded border border-border hover:bg-secondary"
+            onClick={() => setZoom((z) => Math.min(3, z + 0.2))}
+          >
+            +
+          </button>
         </div>
 
-        {/* Month quick jump */}
-        <div className="flex flex-wrap gap-1.5">
-          {months.map(m => (
-            <button
-              key={m.toISOString()}
-              onClick={() => setCursor(m)}
-              className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                isSameDay(startOfMonth(m), startOfMonth(cursor))
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "border-border hover:bg-secondary"
-              }`}
-            >
-              {format(m, "MMM yy")}
-            </button>
-          ))}
-        </div>
-
-        {/* Grid + timeline */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Mini month grid */}
-          <Card className="lg:col-span-1">
-            <CardContent className="p-4">
-              <div className="text-sm font-medium mb-3">{format(cursor, "MMMM yyyy")}</div>
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {["S","M","T","W","T","F","S"].map((d, i) => (
-                  <div key={i} className="text-[10px] uppercase text-muted-foreground py-1">{d}</div>
-                ))}
-                {gridDays.map(d => {
-                  const evs = eventsForDay(d).filter(e => filter === "all" || e.kind === filter);
-                  const inMonth = d.getMonth() === cursor.getMonth();
-                  const primary = evs[0];
-                  const cell = (
-                    <div className={`aspect-square rounded-md border text-xs flex flex-col items-center justify-start p-1 gap-0.5 ${
-                      inMonth ? "border-border" : "border-transparent opacity-40"
-                    } ${isSameDay(d, new Date()) ? "ring-1 ring-primary" : ""}`}>
-                      <span className={inMonth ? "" : "text-muted-foreground"}>{format(d, "d")}</span>
-                      {evs.length > 0 && (
-                        <div className="flex gap-0.5 flex-wrap justify-center">
-                          {evs.slice(0, 3).map(e => (
-                            <span key={e.id} className={`w-1.5 h-1.5 rounded-full ${KIND_META[e.kind].color}`} />
-                          ))}
-                        </div>
-                      )}
+        <Card className="overflow-x-auto">
+          <div style={{ width: `${100 * zoom}%`, minWidth: "1100px" }} className="relative">
+            {/* Month header */}
+            <div className="flex border-b border-border sticky top-0 bg-card z-10">
+              <div className="w-28 shrink-0 px-3 py-2 text-xs font-medium text-muted-foreground border-r border-border">
+                Cohort
+              </div>
+              <div className="relative flex-1 h-9">
+                {months.map((m) => {
+                  const left = pctFromStart(m);
+                  const next = addMonths(m, 1);
+                  const w = widthPct(m, next > TIMELINE_END ? TIMELINE_END : next);
+                  return (
+                    <div
+                      key={m.toISOString()}
+                      className="absolute top-0 h-full border-r border-border/60 text-[11px] text-muted-foreground px-1.5 py-2 whitespace-nowrap"
+                      style={{ left: `${left}%`, width: `${w}%` }}
+                    >
+                      {format(m, "MMM yy")}
                     </div>
-                  );
-                  return primary ? (
-                    <Tooltip key={d.toISOString()}>
-                      <TooltipTrigger asChild><div className="cursor-help">{cell}</div></TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs">
-                        <div className="font-medium mb-1">{format(d, "EEE, MMM d")}</div>
-                        <div className="space-y-1">
-                          {evs.map(e => (
-                            <div key={e.id} className="flex items-center gap-1.5 text-xs">
-                              <span className={`w-2 h-2 rounded-full ${KIND_META[e.kind].color}`} />
-                              <span>{e.title}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <div key={d.toISOString()}>{cell}</div>
                   );
                 })}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Timeline for the month */}
-          <div className="lg:col-span-2 space-y-3">
-            {monthEvents.length === 0 && (
-              <Card><CardContent className="p-6 text-sm text-muted-foreground">No events for this month with the current filter.</CardContent></Card>
-            )}
-            {monthEvents.map(e => {
-              const m = KIND_META[e.kind];
-              const Icon = m.icon;
-              const { start, end } = eventInterval(e);
-              const isRange = !!e.end && !isSameDay(start, end);
-              const days = differenceInCalendarDays(end, start) + 1;
-              return (
-                <Tooltip key={e.id}>
-                  <TooltipTrigger asChild>
-                    <div className={`group rounded-lg border border-border bg-card hover:bg-secondary/40 transition-colors overflow-hidden cursor-help`}>
-                      <div className="flex">
-                        <div className={`w-1.5 ${m.color}`} />
-                        <div className="flex-1 p-4 flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-md ${m.color} ${m.text} flex items-center justify-center shrink-0`}>
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium">{e.title}</span>
-                              <Badge variant="outline" className="text-[10px]">Cohort {e.cohort}</Badge>
-                              <Badge variant="secondary" className="text-[10px]">{m.label}</Badge>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              {isRange
-                                ? `${format(start, "EEE, MMM d")} → ${format(end, "EEE, MMM d, yyyy")} · ${days} days`
-                                : format(start, "EEEE, MMMM d, yyyy")}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="left" className="max-w-xs">
-                    <div className="font-medium mb-1">{e.title}</div>
-                    <div className="text-xs text-muted-foreground mb-2">
-                      {isRange
-                        ? `${format(start, "MMM d")} – ${format(end, "MMM d, yyyy")}`
-                        : format(start, "MMMM d, yyyy")}
-                    </div>
-                    <div className="text-xs">{e.description}</div>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+            {/* Rows */}
+            <div className="relative">
+              {/* Break overlay across all rows */}
+              <div
+                className="absolute top-0 bottom-0 pointer-events-none z-[1]"
+                style={{
+                  left: `calc(7rem + ${pctFromStart(BREAK_START)}% * (100% - 7rem) / 100%)`,
+                }}
+              />
+              {COHORTS.map((cohort) => (
+                <CohortRow key={cohort.number} cohort={cohort} />
+              ))}
+
+              {/* Break band (absolute over the timeline area) */}
+              <BreakBand />
+            </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Full chronological overview grouped by month */}
-        <div className="space-y-4 pt-4 border-t border-border">
-          <h2 className="text-lg font-display font-semibold">Full cycle overview</h2>
-          {months.map(m => {
-            const evs = eventsForMonth(m).filter(e => filter === "all" || e.kind === filter);
-            if (evs.length === 0) return null;
-            return (
-              <div key={m.toISOString()}>
-                <div className="text-sm font-medium text-muted-foreground mb-2">{format(m, "MMMM yyyy")}</div>
-                <div className="grid gap-2 md:grid-cols-2">
-                  {evs.map(e => {
-                    const meta = KIND_META[e.kind];
-                    const { start, end } = eventInterval(e);
-                    const isRange = !!e.end && !isSameDay(start, end);
-                    return (
-                      <div key={`${m.toISOString()}-${e.id}`} className="flex items-center gap-3 p-2.5 rounded-md border border-border bg-card">
-                        <span className={`w-2 h-2 rounded-full ${meta.color} shrink-0`} />
-                        <div className="text-xs flex-1 min-w-0 truncate">
-                          <span className="font-medium">{e.title}</span>
-                          <span className="text-muted-foreground"> · {isRange ? `${format(start, "MMM d")} – ${format(end, "MMM d")}` : format(start, "MMM d")}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Monthly grouped list */}
+        <MonthlyGrouping />
       </div>
     </TooltipProvider>
+  );
+}
+
+function Legend({ swatch, label, icon }: { swatch: string; label: string; icon?: boolean }) {
+  return (
+    <div className="flex items-center gap-1.5 text-xs">
+      <span className={`inline-block w-3 h-3 rounded-sm ${swatch} flex items-center justify-center`}>
+        {icon && <Flag className="w-2 h-2 text-black" />}
+      </span>
+      <span className="text-muted-foreground">{label}</span>
+    </div>
+  );
+}
+
+function CohortRow({ cohort }: { cohort: Cohort }) {
+  const showGrad = cohort.number !== 11;
+  return (
+    <div className="flex border-b border-border/60 hover:bg-secondary/20">
+      <div className="w-28 shrink-0 px-3 py-3 text-sm font-medium border-r border-border flex items-center">
+        Cohort {cohort.number}
+      </div>
+      <div className="relative flex-1 h-12">
+        {cohort.segments.map((s, i) => {
+          const meta = PHASE_META[s.kind];
+          return (
+            <Tooltip key={i}>
+              <TooltipTrigger asChild>
+                <div
+                  className={`absolute top-2 h-8 rounded-md border shadow-sm cursor-pointer transition-all ${meta.cls}`}
+                  style={{
+                    left: `${pctFromStart(s.start)}%`,
+                    width: `${widthPct(s.start, s.end)}%`,
+                  }}
+                >
+                  <span className="block truncate px-2 py-1 text-[11px] font-medium">
+                    {meta.label}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-xs">
+                  <div className="font-semibold">Cohort {cohort.number} — {meta.label}</div>
+                  <div className="text-muted-foreground">
+                    {format(s.start, "MMM d, yyyy")} → {format(s.end, "MMM d, yyyy")}
+                  </div>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
+        {showGrad && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className="absolute top-1 h-10 w-6 -ml-3 flex items-center justify-center z-[2]"
+                style={{ left: `${pctFromStart(cohort.graduation)}%` }}
+              >
+                <div className="w-6 h-6 rounded-full bg-yellow-400 border-2 border-yellow-600 flex items-center justify-center shadow-md">
+                  <Flag className="w-3 h-3 text-black" fill="black" />
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="text-xs">
+                <div className="font-semibold">🎓 Cohort {cohort.number} Graduation</div>
+                <div className="text-muted-foreground">
+                  {format(cohort.graduation, "EEEE, MMM d, yyyy")}
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BreakBand() {
+  const left = pctFromStart(BREAK_START);
+  const width = widthPct(BREAK_START, BREAK_END);
+  return (
+    <div
+      className="absolute top-0 bottom-0 pointer-events-none"
+      style={{ left: `calc(7rem + (100% - 7rem) * ${left} / 100)`, width: `calc((100% - 7rem) * ${width} / 100)` }}
+    >
+      <div className="w-full h-full bg-muted/40 border-x-2 border-dashed border-muted-foreground/60 flex items-start justify-center">
+        <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-background/80 px-1.5 py-0.5 rounded">
+          Training Break · No Classes
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MonthlyGrouping() {
+  const events = useMemo(() => {
+    const list: { date: Date; label: string; kind: PhaseKind | "graduation" | "break"; cohort?: number }[] = [];
+    COHORTS.forEach((c) => {
+      c.segments.forEach((s) => {
+        list.push({ date: s.start, label: `Cohort ${c.number} — ${PHASE_META[s.kind].label} starts`, kind: s.kind, cohort: c.number });
+      });
+      if (c.number !== 11) {
+        list.push({ date: c.graduation, label: `Cohort ${c.number} Graduation 🎓`, kind: "graduation", cohort: c.number });
+      }
+    });
+    list.push({ date: BREAK_START, label: "Training Break begins", kind: "break" });
+    list.push({ date: BREAK_END, label: "Training resumes", kind: "break" });
+    return list.sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, []);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, typeof events>();
+    events.forEach((e) => {
+      const key = format(e.date, "MMMM yyyy");
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    });
+    return Array.from(map.entries());
+  }, [events]);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-display font-semibold">Monthly Milestones</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {grouped.map(([month, items]) => (
+          <Card key={month} className="p-4">
+            <h3 className="font-semibold text-sm mb-2">{month}</h3>
+            <ul className="space-y-1.5">
+              {items.map((e, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs">
+                  <Badge
+                    className={
+                      e.kind === "graduation"
+                        ? "bg-yellow-400 text-black hover:bg-yellow-400"
+                        : e.kind === "break"
+                        ? "bg-muted text-muted-foreground hover:bg-muted"
+                        : PHASE_META[e.kind as PhaseKind].badge
+                    }
+                  >
+                    {format(e.date, "MMM d")}
+                  </Badge>
+                  <span className="text-foreground/90 leading-snug">{e.label}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }
