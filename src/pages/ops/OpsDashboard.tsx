@@ -49,10 +49,9 @@ export default function OpsDashboard() {
         <p className="text-sm text-muted-foreground">Today's snapshot of company operations. Nothing sends without your approval.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard icon={CheckSquare} label="Today's Tasks" value={data.todayTasks.length} tone="primary" />
         <StatCard icon={AlertTriangle} label="Overdue Tasks" value={data.overdueTasks.length} tone="destructive" />
-        <StatCard icon={Mail} label="Emails Awaiting Approval" value={pendingEmails} tone="primary" />
         <StatCard icon={CalendarClock} label="Upcoming Events (14d)" value={data.events.length} tone="default" />
       </div>
 
@@ -83,18 +82,6 @@ export default function OpsDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Mail className="w-4 h-4"/> Emails Pending Approval</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {data.emails.length === 0 && <p className="text-sm text-muted-foreground">No emails prepared.</p>}
-            {data.emails.map((e: any) => (
-              <Link key={e.id} to="/staff/ops/emails" className="flex items-center justify-between text-sm border-b border-border pb-2 hover:bg-secondary/40 rounded px-2">
-                <span className="truncate">{e.subject || "(no subject)"}</span>
-                <Badge variant={e.status === "waiting_approval" ? "default" : "outline"}>{e.status.replace("_"," ")}</Badge>
-              </Link>
-            ))}
-          </CardContent>
-        </Card>
 
         <Card>
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><CalendarClock className="w-4 h-4"/> Upcoming Events</CardTitle></CardHeader>

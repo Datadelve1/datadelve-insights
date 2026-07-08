@@ -13,9 +13,6 @@ const items = [
   { to: "/staff/ops/calendar", label: "Calendar", icon: Calendar },
   { to: "/staff/ops/training-schedule", label: "Training Schedule", icon: GraduationCap },
   { to: "/staff/ops/cohorts", label: "Cohorts", icon: Users },
-  { to: "/staff/ops/emails", label: "Communications", icon: Mail },
-  { to: "/staff/ops/tasks", label: "Tasks", icon: CheckSquare },
-  { to: "/staff/ops/activity", label: "Activity Log", icon: ScrollText },
 ];
 
 export default function StaffOpsLayout() {

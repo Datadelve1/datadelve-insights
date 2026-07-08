@@ -1,6 +1,5 @@
 import teamCeo from "@/assets/team-ceo.jpeg";
 import teamOperations from "@/assets/team-operations.jpeg";
-import teamLead from "@/assets/team-lead.jpeg";
 
 const team = [
   {
@@ -12,11 +11,6 @@ const team = [
     name: "Oshinubi Pipeloluwa",
     role: "Co-Founder & Tutor",
     image: teamOperations,
-  },
-  {
-    name: "Goodness Oloyede",
-    role: "Operations & Team Lead",
-    image: teamLead,
   },
 ];
 
@@ -36,7 +30,7 @@ const MeetTheTeam = () => {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {team.map((member, index) => (
             <div
               key={index}
