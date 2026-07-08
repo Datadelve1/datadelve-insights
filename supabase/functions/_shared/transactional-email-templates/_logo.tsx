@@ -3,7 +3,7 @@ import * as React from 'npm:react@18.3.1'
 import { Img, Section } from 'npm:@react-email/components@0.0.22'
 
 export const DELVETEK_LOGO_URL =
-  'https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/form-uploads/brand/delvetek-email-logo.png'
+  'https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/ambassador-assets/brand/delvetek-email-logo.png'
 
 export const LogoHeader = () => (
   <Section style={{ textAlign: 'center', padding: '24px 0 8px' }}>
