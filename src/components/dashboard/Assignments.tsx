@@ -213,8 +213,9 @@ const Assignments = ({
             `Upload failed: ${uploadErr?.message || "unknown error"}. If your device is low on memory, try a smaller file or paste a Google Drive / OneDrive link instead.`
           );
         }
-        const { data: pub } = supabase.storage.from("form-uploads").getPublicUrl(path);
-        excelUrl = pub.publicUrl;
+        const { data: signed, error: signErr } = await supabase.storage.from("form-uploads").createSignedUrl(path, 60 * 60 * 24 * 365);
+        if (signErr) throw signErr;
+        excelUrl = signed.signedUrl;
       } else if (requireExcel && excelLink.trim()) {
         excelUrl = excelLink.trim();
       }

@@ -43,8 +43,10 @@ const WeeklyReviewForm = () => {
       file,
       onProgress: (p) => setUploadProgress(p),
     });
-    const { data } = supabase.storage.from("form-uploads").getPublicUrl(path);
-    return data.publicUrl;
+    // form-uploads is now a private bucket — issue a long-lived signed URL for the stored reference.
+    const { data, error } = await supabase.storage.from("form-uploads").createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (error) throw error;
+    return data.signedUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
