@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 const items = [
   { to: "/staff/ops", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/staff/ops/calendar", label: "Calendar", icon: Calendar },
+  { to: "/staff/ops/training-schedule", label: "Training Schedule", icon: GraduationCap },
   { to: "/staff/ops/cohorts", label: "Cohorts", icon: Users },
   { to: "/staff/ops/emails", label: "Communications", icon: Mail },
   { to: "/staff/ops/tasks", label: "Tasks", icon: CheckSquare },
