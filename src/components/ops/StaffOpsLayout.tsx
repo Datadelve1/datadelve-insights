@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Calendar, Users, Mail, CheckSquare, ScrollText,
-  LogOut, ArrowLeft, Loader2, Bell,
+  LogOut, ArrowLeft, Loader2, Bell, GraduationCap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
