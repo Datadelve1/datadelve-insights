@@ -29,6 +29,7 @@ const COHORTS: Cohort[] = [
   {
     number: 3,
     segments: [
+      { kind: "pre_onboarding", start: d("2026-07-26"), end: d("2026-07-31") },
       { kind: "beginner", start: d("2026-07-31"), end: d("2026-09-11") },
       { kind: "project", start: d("2026-09-11"), end: d("2026-09-25") },
       { kind: "professional", start: d("2026-09-25"), end: d("2026-10-23") },
@@ -38,6 +39,7 @@ const COHORTS: Cohort[] = [
   {
     number: 4,
     segments: [
+      { kind: "pre_onboarding", start: d("2026-09-06"), end: d("2026-09-11") },
       { kind: "beginner", start: d("2026-09-11"), end: d("2026-10-23") },
       { kind: "project", start: d("2026-10-23"), end: d("2026-11-06") },
       { kind: "professional", start: d("2026-11-06"), end: d("2026-12-04") },
@@ -47,6 +49,7 @@ const COHORTS: Cohort[] = [
   {
     number: 5,
     segments: [
+      { kind: "pre_onboarding", start: d("2026-10-18"), end: d("2026-10-23") },
       { kind: "beginner", start: d("2026-10-23"), end: d("2026-12-04") },
       { kind: "project", start: d("2026-12-04"), end: d("2026-12-18") },
       { kind: "professional", start: d("2026-12-18"), end: d("2027-01-01") },
@@ -57,6 +60,7 @@ const COHORTS: Cohort[] = [
   {
     number: 6,
     segments: [
+      { kind: "pre_onboarding", start: d("2026-11-29"), end: d("2026-12-04") },
       { kind: "beginner", start: d("2026-12-04"), end: d("2027-01-01") },
       { kind: "beginner", start: d("2027-01-28"), end: d("2027-02-11") },
       { kind: "project", start: d("2027-02-11"), end: d("2027-02-25") },
@@ -67,6 +71,7 @@ const COHORTS: Cohort[] = [
   {
     number: 7,
     segments: [
+      { kind: "pre_onboarding", start: d("2027-02-06"), end: d("2027-02-11") },
       { kind: "beginner", start: d("2027-02-11"), end: d("2027-03-25") },
       { kind: "project", start: d("2027-03-25"), end: d("2027-04-08") },
       { kind: "professional", start: d("2027-04-08"), end: d("2027-05-06") },
@@ -76,6 +81,7 @@ const COHORTS: Cohort[] = [
   {
     number: 8,
     segments: [
+      { kind: "pre_onboarding", start: d("2027-03-20"), end: d("2027-03-25") },
       { kind: "beginner", start: d("2027-03-25"), end: d("2027-05-06") },
       { kind: "project", start: d("2027-05-06"), end: d("2027-05-20") },
       { kind: "professional", start: d("2027-05-20"), end: d("2027-06-17") },
@@ -85,6 +91,7 @@ const COHORTS: Cohort[] = [
   {
     number: 9,
     segments: [
+      { kind: "pre_onboarding", start: d("2027-05-01"), end: d("2027-05-06") },
       { kind: "beginner", start: d("2027-05-06"), end: d("2027-06-17") },
       { kind: "project", start: d("2027-06-17"), end: d("2027-07-01") },
       { kind: "professional", start: d("2027-07-01"), end: d("2027-07-29") },
@@ -94,6 +101,7 @@ const COHORTS: Cohort[] = [
   {
     number: 10,
     segments: [
+      { kind: "pre_onboarding", start: d("2027-06-12"), end: d("2027-06-17") },
       { kind: "beginner", start: d("2027-06-17"), end: d("2027-07-29") },
       { kind: "project", start: d("2027-07-29"), end: d("2027-08-12") },
       { kind: "professional", start: d("2027-08-12"), end: d("2027-09-09") },
@@ -102,16 +110,24 @@ const COHORTS: Cohort[] = [
   },
   {
     number: 11,
-    segments: [{ kind: "beginner", start: d("2027-07-29"), end: d("2027-09-09") }],
+    segments: [
+      { kind: "pre_onboarding", start: d("2027-07-24"), end: d("2027-07-29") },
+      { kind: "beginner", start: d("2027-07-29"), end: d("2027-09-09") },
+    ],
     graduation: d("2027-09-09"), // ongoing placeholder, not shown
   },
 ];
 
-const TIMELINE_START = d("2026-07-31");
+const TIMELINE_START = d("2026-07-26");
 const TIMELINE_END = d("2027-09-30");
 const TOTAL_DAYS = differenceInCalendarDays(TIMELINE_END, TIMELINE_START);
 
 const PHASE_META: Record<PhaseKind, { label: string; cls: string; badge: string }> = {
+  pre_onboarding: {
+    label: "Pre-Onboarding (5d)",
+    cls: "bg-purple-500/85 hover:bg-purple-500 text-white border-purple-600",
+    badge: "bg-purple-500 text-white",
+  },
   beginner: {
     label: "Beginner Class",
     cls: "bg-blue-500/85 hover:bg-blue-500 text-white border-blue-600",
