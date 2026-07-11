@@ -34,7 +34,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-3" onClick={handleLogoClick}>
-            <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
+            <img src={delvetekLogo} alt="Delvetek — expert 1:1 data analytics and tech training" className="h-10 w-auto rounded-lg" />
             <span className="font-display font-bold text-xl text-foreground">
               Delve<span className="text-primary">Tek</span>
             </span>
@@ -62,9 +62,12 @@ const Navbar = () => {
           <button
             className="md:hidden text-foreground"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
+
         </div>
 
         {/* Mobile Navigation */}

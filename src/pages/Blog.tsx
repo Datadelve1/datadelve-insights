@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import SEO from "@/components/SEO";
 import { ArrowRight, ArrowLeft, Calendar, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -626,7 +627,13 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Blog | Data, Tech & Career Insights | Delvetek"
+        description="Articles and guides on data analytics, project management, business analysis, cybersecurity, and building a career in tech."
+        path="/blog"
+      />
       <Navbar />
+
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">

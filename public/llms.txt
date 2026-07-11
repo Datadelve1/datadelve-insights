@@ -1,0 +1,26 @@
+# DataDelve (Delvetek)
+
+> Expert 1:1 data analytics and tech training. Delvetek runs cohort-based programs in data analysis, project management, business analysis, cybersecurity, software engineering, and data engineering.
+
+## Pages
+
+- [Home](/): Overview of Delvetek's training programs and mentorship model.
+- [Free Webinar](/webinar): Free intro webinar for prospective students.
+- [Enroll](/enroll): Enrollment tiers and pricing for the current cohort.
+- [Case Studies](/case-studies): Real trainee projects across data, PM, BA, cybersecurity, and engineering.
+- [Blog](/blog): Articles on data analytics, tech careers, and training updates.
+- [Ambassador Program](/ambassador): Referral / ambassador signup.
+
+## Courses
+
+- [Data Analysis](/courses/data-analysis): SQL, Excel, Power BI, Python for analytics.
+- [Project Management](/courses/project-management): Agile, Scrum, Jira, delivery frameworks.
+- [Business Analysis](/courses/business-analysis): Requirements, stakeholder mapping, BRDs.
+- [Cybersecurity](/courses/cybersecurity): Network security, vulnerability assessment, compliance.
+- [Software Engineering](/courses/software-engineering): Full-stack web development with modern frameworks.
+- [Data Engineering](/courses/data-engineering): ETL pipelines, Python, Airflow, cloud warehouses.
+
+## Optional
+
+- [Privacy Policy](/privacy-policy): How we handle personal data.
+- [Terms of Service](/terms-of-service): Terms governing use of the platform.

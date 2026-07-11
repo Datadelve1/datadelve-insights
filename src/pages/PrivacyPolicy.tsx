@@ -1,11 +1,18 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import SEO from "@/components/SEO";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy | Delvetek"
+        description="How Delvetek collects, uses, and protects your personal information."
+        path="/privacy-policy"
+      />
       <Navbar />
+
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6 max-w-4xl">
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-8 text-foreground">Privacy Policy</h1>

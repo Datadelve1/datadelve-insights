@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.datadelve.io/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.datadelve.io/courses/data-analysis</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/courses/project-management</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/courses/business-analysis</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/courses/cybersecurity</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/courses/software-engineering</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/courses/data-engineering</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.datadelve.io/webinar</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.datadelve.io/case-studies</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.datadelve.io/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.datadelve.io/enroll</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.datadelve.io/ambassador</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.datadelve.io/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.datadelve.io/terms-of-service</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

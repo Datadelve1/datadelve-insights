@@ -11,12 +11,27 @@ import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import SEO from "@/components/SEO";
 
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="DataDelve | Expert 1:1 Data Analytics & Tech Training"
+        description="Cohort-based training in data analytics, project management, business analysis, cybersecurity, software and data engineering. Learn 1:1 with expert mentors."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          name: "Delvetek",
+          alternateName: "DataDelve",
+          url: "https://www.datadelve.io",
+          email: "info@delvetek.io",
+        }}
+      />
       <Navbar />
+
       <main>
         <Hero />
         <DelveSchool />
