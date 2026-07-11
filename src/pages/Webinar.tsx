@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Calendar, Clock, MapPin, ArrowRight, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import WebinarCountdown from "@/components/WebinarCountdown";
+import SEO from "@/components/SEO";
 import webinarFlyerMain from "@/assets/webinar-flyer-main.jpg";
 import webinarFlyerSpeaker from "@/assets/webinar-flyer-speaker.jpg";
 
@@ -65,6 +66,11 @@ const Webinar = () => {
 
   return (
     <div className="min-h-screen font-body" style={{ background: theme.bg, color: theme.text }}>
+      <SEO
+        title="Free Data Analytics Webinar | Delvetek"
+        description="Register free for Delvetek's live webinar. Learn how to break into data analytics with the right roadmap, tools and mentorship."
+        path="/webinar"
+      />
       {/* Hero */}
       <section className="relative py-16 md:py-28 overflow-hidden">
         <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(ellipse at top right, ${theme.goldLight}, transparent 60%)` }} />
