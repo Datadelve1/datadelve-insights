@@ -1,7 +1,9 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import SEO from "@/components/SEO";
 import { ArrowRight, BarChart2, FolderKanban, Briefcase, Shield, Database, Code } from "lucide-react";
+
 import { LucideIcon } from "lucide-react";
 
 interface CaseStudy {
