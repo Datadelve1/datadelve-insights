@@ -12,7 +12,18 @@ import { LucideIcon } from "lucide-react";
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { trackViewContent } from "@/lib/metaPixel";
+
+const slugMap: Record<string, string> = {
+  "Data Analysis": "data-analysis",
+  "Project Management": "project-management",
+  "Business Analysis": "business-analysis",
+  "Cybersecurity": "cybersecurity",
+  "Software Engineering": "software-engineering",
+  "Data Engineering": "data-engineering",
+};
+
 
 interface CourseFAQ {
   question: string;
@@ -45,7 +56,31 @@ const CourseDetailPage = ({ title, tagline, icon: Icon, skills, faqs, registrati
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${title} Course | Delvetek`}
+        description={tagline}
+        path={`/courses/${slugMap[title] ?? title.toLowerCase().replace(/\s+/g, "-")}`}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Course",
+            name: title,
+            description: tagline,
+            provider: { "@type": "Organization", name: "Delvetek", url: "https://www.datadelve.io" },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: allFaqs.map((f) => ({
+              "@type": "Question",
+              name: f.question,
+              acceptedAnswer: { "@type": "Answer", text: f.answer },
+            })),
+          },
+        ]}
+      />
       <Navbar />
+
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           {/* Back */}
