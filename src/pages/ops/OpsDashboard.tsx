@@ -1,100 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useOutletContext, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CalendarClock, Mail, CheckSquare, Users, Activity } from "lucide-react";
-import { format, isToday, isBefore, startOfDay } from "date-fns";
+import { AlertTriangle, CalendarClock, CheckSquare, Users, Activity } from "lucide-react";
+import { format, isToday, isBefore, startOfDay, addDays, isAfter, isSameDay } from "date-fns";
 
 type Ctx = { user: any; isAdmin: boolean };
+
+const TYPE_META: Record<string, { label: string; cls: string }> = {
+  dashboard:      { label: "🛠 Dashboard",      cls: "bg-slate-500 text-white" },
+  email:          { label: "📧 Email",          cls: "bg-blue-500 text-white" },
+  class_link:     { label: "🔗 Class Link",     cls: "bg-emerald-500 text-white" },
+  pre_onboarding: { label: "🎓 Pre-Onboarding", cls: "bg-purple-500 text-white" },
+  break:          { label: "⏸ Break",           cls: "bg-amber-500 text-black" },
+};
 
 export default function OpsDashboard() {
   const { user } = useOutletContext<Ctx>();
   const [data, setData] = useState<any>({
-    todayTasks: [], overdueTasks: [], events: [], cohorts: [], emails: [], activity: [],
+    tasks: [], cohorts: [], activity: [], staff: [],
   });
 
   useEffect(() => {
     (async () => {
-      const today = startOfDay(new Date()).toISOString();
-      const in14 = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString();
-      const [tasks, events, cohorts, emails, activity] = await Promise.all([
+      const [tasks, cohorts, activity, staff] = await Promise.all([
         supabase.from("ops_tasks").select("*").neq("status", "completed").order("due_date", { ascending: true }),
-        supabase.from("ops_events").select("*").gte("starts_at", today).lte("starts_at", in14).order("starts_at"),
-        supabase.from("ops_cohorts").select("*").order("number", { ascending: false }).limit(5),
-        supabase.from("ops_emails").select("*").in("status", ["waiting_approval", "scheduled", "draft"]).order("scheduled_at", { ascending: true }).limit(10),
+        supabase.from("ops_cohorts").select("*").order("number", { ascending: false }).limit(6),
         supabase.from("ops_activity_log").select("*").order("created_at", { ascending: false }).limit(10),
+        supabase.from("staff_profiles").select("user_id, full_name, email"),
       ]);
 
-      const allTasks = tasks.data || [];
-      const todayTasks = allTasks.filter(t => t.due_date && isToday(new Date(t.due_date)));
-      const overdueTasks = allTasks.filter(t => t.due_date && isBefore(new Date(t.due_date), startOfDay(new Date())));
-
       setData({
-        todayTasks, overdueTasks,
-        events: events.data || [],
+        tasks: tasks.data || [],
         cohorts: cohorts.data || [],
-        emails: emails.data || [],
         activity: activity.data || [],
+        staff: staff.data || [],
       });
     })();
   }, [user]);
 
-  const pendingEmails = data.emails.filter((e: any) => e.status === "waiting_approval").length;
+  const staffMap = useMemo(() => Object.fromEntries((data.staff||[]).map((s:any)=>[s.user_id, s.full_name || s.email])), [data.staff]);
+
+  const today = startOfDay(new Date());
+  const in14 = addDays(today, 14);
+  const todayTasks = data.tasks.filter((t: any) => t.due_date && isSameDay(new Date(t.due_date), today));
+  const overdueTasks = data.tasks.filter((t: any) => t.due_date && isBefore(new Date(t.due_date), today));
+  const upcomingTasks = data.tasks.filter((t: any) => t.due_date && isAfter(new Date(t.due_date), today) && !isAfter(new Date(t.due_date), in14));
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display font-bold">Operations Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Today's snapshot of company operations. Nothing sends without your approval.</p>
+        <p className="text-sm text-muted-foreground">Today's snapshot across all cohorts. Assign staff, tick off tasks, and stay ahead.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatCard icon={CheckSquare} label="Today's Tasks" value={data.todayTasks.length} tone="primary" />
-        <StatCard icon={AlertTriangle} label="Overdue Tasks" value={data.overdueTasks.length} tone="destructive" />
-        <StatCard icon={CalendarClock} label="Upcoming Events (14d)" value={data.events.length} tone="default" />
+        <StatCard icon={CheckSquare} label="Today's Tasks" value={todayTasks.length} tone="primary" />
+        <StatCard icon={AlertTriangle} label="Overdue Tasks" value={overdueTasks.length} tone="destructive" />
+        <StatCard icon={CalendarClock} label="Upcoming (14 days)" value={upcomingTasks.length} tone="default" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><CheckSquare className="w-4 h-4"/> Today's Tasks</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {data.todayTasks.length === 0 && <p className="text-sm text-muted-foreground">Nothing due today.</p>}
-            {data.todayTasks.map((t: any) => (
-              <div key={t.id} className="flex items-center justify-between text-sm border-b border-border pb-2">
-                <span>{t.title}</span>
-                <Badge variant="outline">{t.priority}</Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-destructive"/> Overdue</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {data.overdueTasks.length === 0 && <p className="text-sm text-muted-foreground">No overdue tasks.</p>}
-            {data.overdueTasks.map((t: any) => (
-              <div key={t.id} className="flex items-center justify-between text-sm border-b border-border pb-2">
-                <span>{t.title}</span>
-                <span className="text-xs text-destructive">{format(new Date(t.due_date), "MMM d")}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><CalendarClock className="w-4 h-4"/> Upcoming Events</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {data.events.length === 0 && <p className="text-sm text-muted-foreground">No upcoming events.</p>}
-            {data.events.map((e: any) => (
-              <div key={e.id} className="flex items-center justify-between text-sm border-b border-border pb-2">
-                <span>{e.title}</span>
-                <span className="text-xs text-muted-foreground">{format(new Date(e.starts_at), "MMM d, HH:mm")}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <TaskList title="Today's Tasks" icon={CheckSquare} tasks={todayTasks} staffMap={staffMap} empty="Nothing due today." />
+        <TaskList title="Overdue" icon={AlertTriangle} iconCls="text-destructive" tasks={overdueTasks} staffMap={staffMap} empty="No overdue tasks." showDate />
+        <TaskList title="Upcoming (next 14 days)" icon={CalendarClock} tasks={upcomingTasks} staffMap={staffMap} empty="Nothing coming up." showDate />
 
         <Card>
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><Users className="w-4 h-4"/> Cohorts</CardTitle></CardHeader>
@@ -121,6 +91,35 @@ export default function OpsDashboard() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function TaskList({ title, icon: Icon, iconCls, tasks, staffMap, empty, showDate }: any) {
+  return (
+    <Card>
+      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Icon className={`w-4 h-4 ${iconCls || ""}`}/> {title}</CardTitle></CardHeader>
+      <CardContent className="space-y-2 max-h-80 overflow-auto">
+        {tasks.length === 0 && <p className="text-sm text-muted-foreground">{empty}</p>}
+        {tasks.map((t: any) => {
+          const meta = t.task_type ? TYPE_META[t.task_type] : null;
+          return (
+            <Link key={t.id} to="/staff/ops/tasks" className="flex items-start justify-between gap-2 text-sm border-b border-border pb-2 hover:bg-secondary/40 rounded px-1">
+              <div className="flex-1">
+                <div className="text-sm">{t.title}</div>
+                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                  {meta && <Badge className={`${meta.cls} text-[10px] px-1.5 py-0`}>{meta.label}</Badge>}
+                  <span className="text-[11px] text-muted-foreground">
+                    {t.assignee_user_id ? staffMap[t.assignee_user_id] || "—" : "Unassigned"}
+                  </span>
+                </div>
+              </div>
+              {showDate && t.due_date && <span className="text-xs text-muted-foreground whitespace-nowrap">{format(new Date(t.due_date), "MMM d")}</span>}
+              {!showDate && <Badge variant="outline" className="text-[10px]">{t.priority}</Badge>}
+            </Link>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }
 
