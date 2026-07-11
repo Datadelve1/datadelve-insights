@@ -924,7 +924,9 @@ export type Database = {
           notes: string | null
           priority: string
           recurrence: Json | null
+          source: string | null
           status: string
+          task_type: string | null
           title: string
           updated_at: string
         }
@@ -942,7 +944,9 @@ export type Database = {
           notes?: string | null
           priority?: string
           recurrence?: Json | null
+          source?: string | null
           status?: string
+          task_type?: string | null
           title: string
           updated_at?: string
         }
@@ -960,7 +964,9 @@ export type Database = {
           notes?: string | null
           priority?: string
           recurrence?: Json | null
+          source?: string | null
           status?: string
+          task_type?: string | null
           title?: string
           updated_at?: string
         }
