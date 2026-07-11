@@ -69,7 +69,13 @@ const caseStudies: CaseStudy[] = [
 const CaseStudies = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Case Studies | Real Trainee Projects | Delvetek"
+        description="Explore real-world projects delivered by Delvetek trainees across data analysis, project management, business analysis, cybersecurity, data engineering, and software engineering."
+        path="/case-studies"
+      />
       <Navbar />
+
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
