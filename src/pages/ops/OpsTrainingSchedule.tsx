@@ -11,7 +11,7 @@ import {
   startOfMonth,
 } from "date-fns";
 
-type PhaseKind = "beginner" | "project" | "professional";
+type PhaseKind = "pre_onboarding" | "beginner" | "project" | "professional";
 type Segment = { kind: PhaseKind; start: Date; end: Date };
 type Cohort = {
   number: number;
