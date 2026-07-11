@@ -172,6 +172,7 @@ export default function OpsTrainingSchedule() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Legend swatch="bg-purple-500" label="Pre-Onboarding (5d)" />
             <Legend swatch="bg-blue-500" label="Beginner (6w)" />
             <Legend swatch="bg-orange-500" label="Project (2w)" />
             <Legend swatch="bg-emerald-500" label="Professional (4w)" />
