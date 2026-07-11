@@ -36,7 +36,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="lg:col-span-2">
             <a href="#home" className="flex items-center gap-3 mb-6">
-              <img src={delvetekLogo} alt="Delvetek" className="h-10 w-auto rounded-lg" />
+              <img src={delvetekLogo} alt="Delvetek — expert 1:1 data analytics and tech training" className="h-10 w-auto rounded-lg" />
               <span className="font-display font-bold text-xl text-foreground">
                 Delve<span className="text-primary">Tek</span>
               </span>
