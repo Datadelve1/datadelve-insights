@@ -1577,6 +1577,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      user_in_cohort: {
+        Args: { _cohort: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
