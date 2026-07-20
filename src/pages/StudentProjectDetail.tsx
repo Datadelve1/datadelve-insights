@@ -123,13 +123,26 @@ const StudentProjectDetail = () => {
                   <h3 className="font-display font-semibold text-foreground">Dataset Downloads</h3>
                   <div className="space-y-2">
                     {project.datasets.map((d) => (
-                      <a
-                        key={d.url}
-                        href={d.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        download
-                        className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background p-3 hover:border-primary/50 transition-colors"
+                      <button
+                        key={d.path || d.url}
+                        type="button"
+                        onClick={async () => {
+                          if (d.url) {
+                            window.open(d.url, "_blank", "noopener");
+                            return;
+                          }
+                          if (!d.path) return;
+                          const { supabase } = await import("@/integrations/supabase/client");
+                          const { data, error } = await supabase.storage
+                            .from("project-datasets")
+                            .createSignedUrl(d.path, 3600, { download: true });
+                          if (error || !data?.signedUrl) {
+                            alert("You need to be signed in as a paid student to download this dataset.");
+                            return;
+                          }
+                          window.open(data.signedUrl, "_blank", "noopener");
+                        }}
+                        className="w-full flex items-center justify-between gap-3 rounded-lg border border-border bg-background p-3 hover:border-primary/50 transition-colors text-left"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <Download className="w-4 h-4 text-primary shrink-0" />
@@ -138,7 +151,7 @@ const StudentProjectDetail = () => {
                         {d.sizeLabel && (
                           <Badge variant="secondary" className="text-xs shrink-0">{d.sizeLabel}</Badge>
                         )}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </CardContent>
