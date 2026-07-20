@@ -8,7 +8,7 @@ export type StudentProject = {
   durationHours: number;
   publishedAt: string;
   tags: string[];
-  datasets?: { label: string; url: string; sizeLabel?: string }[];
+  datasets?: { label: string; url?: string; path?: string; sizeLabel?: string }[];
   /** Optional access gate. If omitted, project is visible to all committed students. */
   access?: {
     tracks?: string[];
