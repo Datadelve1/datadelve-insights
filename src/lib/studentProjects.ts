@@ -212,6 +212,89 @@ export const STUDENT_PROJECTS: StudentProject[] = [
       ],
     },
   },
+  {
+    slug: "motor-vehicle-collisions-analysis-nyc",
+    title: "Project 3 - Motor Vehicle Collisions Analysis - NYC",
+    scenario:
+      "You are a Data Analyst for the NYC Department of Transportation (DOT). Your job is to analyze motor vehicle collision data across New York City to identify dangerous locations, common causes of crashes, and opportunities for improving road safety. The dataset includes crash dates/times, locations, boroughs, vehicle types, injuries/fatalities, and contributing factors. This is real open data collected by the NYPD.",
+    image:
+      "https://ik.imagekit.io/d3ejrh60s/prod/projects/RIT2KF2Q4J.jpg",
+    skills: [
+      "Data Cleaning (dates, text standardization, missing values)",
+      "Aggregation & Grouping",
+      "Time-Series Analysis (crashes over time)",
+      "Geospatial Visualization (mapping crash hotspots)",
+      "Business Storytelling",
+    ],
+    points: 150,
+    durationHours: 3,
+    publishedAt: "2025-10-03",
+    tags: ["Data Cleaning", "Time Series"],
+    details: {
+      intro:
+        "Your manager says: “The mayor’s office wants a data-driven report on traffic safety. Use this data to create a report with it.” Really helpful boss...",
+      questions: [
+        "Are traffic crashes rising or falling over time?",
+        "Which boroughs, streets, or intersections are the most dangerous?",
+        "What are the leading causes of crashes, and do they vary by borough?",
+        "Which groups (pedestrians, cyclists, motorists) face the highest risk of injury or death?",
+      ],
+      techStack: ["Excel", "SQL", "Power BI"],
+      notes: [
+        "For this amount of data it is recommended to put it into a database (SQL) for faster cleaning and analyzing.",
+      ],
+      steps: [
+        {
+          title: "Data Preparation",
+          items: [
+            "Inspect the dataset for missing boroughs, street names, or coordinates.",
+            "Convert date and time fields into proper datetime formats for analysis.",
+            "Standardize vehicle types (e.g., “Station Wagon/SUV” vs “SUV”).",
+          ],
+        },
+        {
+          title: "Collision Trends",
+          items: [
+            "Analyze the number of crashes per year, month, and day of week.",
+            "Identify time-of-day patterns (e.g., rush hour spikes).",
+            "Compare trends before and after major events or policy changes.",
+          ],
+        },
+        {
+          title: "Geographic Analysis",
+          items: [
+            "Count crashes by borough and neighborhood.",
+            "Identify the most dangerous streets and intersections.",
+            "Map crash hotspots to visualize risk areas.",
+          ],
+        },
+        {
+          title: "Cause Analysis",
+          items: [
+            "Find the top contributing factors to crashes (e.g., driver inattention, speeding).",
+            "Compare causes across boroughs and vehicle types.",
+            "Highlight causes that lead to the most injuries or fatalities.",
+          ],
+        },
+        {
+          title: "Victim Analysis",
+          items: [
+            "Break down injuries and fatalities by pedestrians, cyclists, and motorists.",
+            "Identify which groups are most at risk and where.",
+            "Look at trends over time for each victim group.",
+          ],
+        },
+        {
+          title: "Recommendations",
+          items: [
+            "Suggest where the DOT should focus safety improvements (signage, speed cameras, redesigns).",
+            "Recommend awareness campaigns targeting the most common crash causes.",
+            "Highlight neighborhoods where vulnerable groups need the most protection.",
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export const getProjectBySlug = (slug: string) =>
