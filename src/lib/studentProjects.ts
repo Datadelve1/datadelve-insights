@@ -44,12 +44,12 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     datasets: [
       {
         label: "DOHMH NYC Restaurant Inspection Results (CSV)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/DOHMH_NYC_Restaurant_Inspection_Results.csv",
+        path: "restaurant-health-inspection-analysis-nyc/DOHMH_NYC_Restaurant_Inspection_Results.csv",
         sizeLabel: "~123 MB",
       },
       {
         label: "Restaurant Inspection Data Dictionary (XLSX)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/restaurant-health-inspection-analysis-nyc/RestaurantInspectionDataDictionary.xlsx",
+        path: "restaurant-health-inspection-analysis-nyc/RestaurantInspectionDataDictionary.xlsx",
         sizeLabel: "~70 KB",
       },
     ],
@@ -140,17 +140,17 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     datasets: [
       {
         label: "Orders (CSV)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/orders.csv",
+        path: "e-commerce-profitability-analysis/orders.csv",
         sizeLabel: "~254 KB",
       },
       {
         label: "Products Catalog (CSV)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/products.csv",
+        path: "e-commerce-profitability-analysis/products.csv",
         sizeLabel: "~17 KB",
       },
       {
         label: "Marketing Spend (CSV)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/e-commerce-profitability-analysis/marketing_spend.csv",
+        path: "e-commerce-profitability-analysis/marketing_spend.csv",
         sizeLabel: "~10 KB",
       },
     ],
@@ -233,7 +233,7 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     datasets: [
       {
         label: "NYC Motor Vehicle Collisions - Crashes (CSV)",
-        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/motor-vehicle-collisions-analysis-nyc/Motor_Vehicle_Collisions_Crashes.csv",
+        path: "motor-vehicle-collisions-analysis-nyc/Motor_Vehicle_Collisions_Crashes.csv",
         sizeLabel: "~257 MB",
       },
     ],
