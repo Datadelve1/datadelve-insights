@@ -230,6 +230,13 @@ export const STUDENT_PROJECTS: StudentProject[] = [
     durationHours: 3,
     publishedAt: "2025-10-03",
     tags: ["Data Cleaning", "Time Series"],
+    datasets: [
+      {
+        label: "NYC Motor Vehicle Collisions - Crashes (CSV)",
+        url: "https://cszwkukwkcrecirbvvee.supabase.co/storage/v1/object/public/project-datasets/motor-vehicle-collisions-analysis-nyc/Motor_Vehicle_Collisions_Crashes.csv",
+        sizeLabel: "~257 MB",
+      },
+    ],
     details: {
       intro:
         "Your manager says: “The mayor’s office wants a data-driven report on traffic safety. Use this data to create a report with it.” Really helpful boss...",
