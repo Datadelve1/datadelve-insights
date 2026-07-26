@@ -208,7 +208,7 @@ const DelveSchool = () => {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            All tracks start June 5 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
+            All tracks start July 31 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
       </div>
