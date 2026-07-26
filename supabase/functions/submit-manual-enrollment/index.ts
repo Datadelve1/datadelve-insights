@@ -33,19 +33,20 @@ Deno.serve(async (req) => {
       return respond(false, { error: "Commitment form must be accepted" });
     }
 
-    // Cohort 3 pricing — discounted through 24th July WAT, normal 25th–30th July WAT, closed after.
-    const DISCOUNT_DEADLINE = Date.parse("2026-07-24T23:00:00Z");
-    const REGISTRATION_CLOSE = Date.parse("2026-07-30T23:00:00Z");
+    // Discounted pricing remains active until manually reverted.
+    const DISCOUNT_DEADLINE = Date.parse("2099-12-31T23:00:00Z");
+    const REGISTRATION_CLOSE = Date.parse("2099-12-31T23:00:00Z");
     const now = Date.now();
 
     if (now > REGISTRATION_CLOSE) {
-      return respond(false, { error: "Registration for Cohort 3 closed on 30th July." });
+      return respond(false, { error: "Registration is currently closed." });
     }
 
     const discountActive = now <= DISCOUNT_DEADLINE;
-    const discountedPrices: Record<string, number> = { beginner: 50000, professional: 75000, advanced: 125000 };
+    const discountedPrices: Record<string, number> = { beginner: 50000, professional: 100000, advanced: 150000 };
     const normalPrices: Record<string, number> = { beginner: 150000, professional: 275000, advanced: 350000 };
     const trackPrices = discountActive ? discountedPrices : normalPrices;
+
     const certPrice = certificate_requested ? 10000 : 0;
     const totalAmount = (trackPrices[track] || 0) + certPrice;
 
