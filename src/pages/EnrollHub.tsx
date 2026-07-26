@@ -60,7 +60,7 @@ const EnrollHub = () => {
           <p className="text-sm font-semibold text-center sm:text-left">
             {registrationOpen
               ? discountActive
-                ? "🔥 Cohort 3 · Discounted fee ends 24th July · Normal price from 25th · Registration closes 30th July"
+                ? "🔥 Cohort 3 · Limited-time discounted pricing — enroll now"
                 : "⚠️ Cohort 3 · Discount ended — normal price applies · Registration closes 30th July"
               : "🚫 Cohort 3 registration closed (30th July). New cohort details coming soon."}
           </p>
