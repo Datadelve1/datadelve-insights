@@ -11,14 +11,14 @@ export const NORMAL_PRICES: Record<TrackId, number> = {
 
 export const DISCOUNTED_PRICES: Record<TrackId, number> = {
   beginner: 50000,
-  professional: 75000,
-  advanced: 125000,
+  professional: 100000,
+  advanced: 150000,
 };
 
-// WAT is UTC+1 with no DST — end of July 24 WAT === 2026-07-24T23:00:00Z
-export const DISCOUNT_DEADLINE_ISO = "2026-07-24T23:00:00Z";
-// End of July 30 WAT
-export const REGISTRATION_CLOSE_ISO = "2026-07-30T23:00:00Z";
+// Discount remains active until we manually revert. Set far in the future.
+export const DISCOUNT_DEADLINE_ISO = "2099-12-31T23:00:00Z";
+// Registration stays open alongside the discount.
+export const REGISTRATION_CLOSE_ISO = "2099-12-31T23:00:00Z";
 
 export function isDiscountActive(now: Date = new Date()): boolean {
   return now.getTime() <= new Date(DISCOUNT_DEADLINE_ISO).getTime();
@@ -33,4 +33,5 @@ export function getTrackPrice(track: TrackId, now: Date = new Date()): number {
 }
 
 export const PRICING_NOTICE =
-  "Discounted fee ends 24th July • Normal price applies from 25th July • Registration closes 30th July";
+  "Limited-time discounted pricing — secure your seat today";
+
