@@ -35,7 +35,7 @@ const DelveSchool = () => {
             <span className="gradient-text">Delvetek</span> Training Tracks
           </h2>
           <p className="text-muted-foreground text-lg">
-            Pick the path that matches your goals. All tracks start June 5.
+            Pick the path that matches your goals. All tracks start July 31.
           </p>
         </div>
 
