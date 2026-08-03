@@ -5,7 +5,6 @@ import type { User, Session } from "@supabase/supabase-js";
 const ADMIN_EMAILS = [
   "datadelve1@gmail.com",
   "adewoleaderemi2019@gmail.com",
-  "marvellousayomide992@gmail.com",
   "davidgbadebo4@gmail.com",
 ];
 
