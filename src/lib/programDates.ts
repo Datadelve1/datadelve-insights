@@ -6,9 +6,22 @@
  * ... follows weekly pattern through Week 8 (Fri Jul 31 / Sat Aug 1, 2026).
  */
 
-// Program starts Friday June 12, 2026 at 6 PM WAT (UTC+1)
+// Program starts Friday June 12, 2026 at 6 PM WAT (UTC+1) — Cohort 2 default
 export const PROGRAM_START = new Date("2026-06-12T18:00:00+01:00");
 export const TOTAL_WEEKS = 8;
+
+/** Week 1 Friday 6 PM WAT for each cohort */
+export const COHORT_START_DATES: Record<string, string> = {
+  "Cohort 1": "2026-03-27T18:00:00+01:00",
+  "Cohort 2": "2026-06-12T18:00:00+01:00",
+  "Cohort 3": "2026-07-31T18:00:00+01:00",
+};
+
+/** Resolve the Week 1 Friday start for a given cohort (falls back to Cohort 2) */
+export function getCohortStart(cohort?: string | null): Date {
+  const iso = (cohort && COHORT_START_DATES[cohort]) || COHORT_START_DATES["Cohort 2"];
+  return new Date(iso);
+}
 
 export interface SessionDate {
   week: number;
