@@ -57,3 +57,15 @@ export function canAccessProject(
   }
   return true;
 }
+
+/** Beginners only get the first project; everyone else sees all projects. */
+export const BEGINNER_PROJECT_SLUG = "restaurant-health-inspection-analysis-nyc";
+
+export function isBeginner(enrollment: StudentEnrollment): boolean {
+  return (enrollment?.track ?? "").trim().toLowerCase() === "beginner";
+}
+
+export function canViewProject(slug: string, enrollment: StudentEnrollment): boolean {
+  if (isBeginner(enrollment)) return slug === BEGINNER_PROJECT_SLUG;
+  return true;
+}
