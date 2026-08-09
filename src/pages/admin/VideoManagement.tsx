@@ -54,7 +54,7 @@ interface Recording {
   created_at: string;
 }
 
-const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8];
+const WEEKS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const SESSIONS = WEEKS.flatMap(w => [
   { week: w, day: "Fri", label: `W${w} Fri` },
   { week: w, day: "Sat", label: `W${w} Sat` },
@@ -286,7 +286,7 @@ const VideoManagement = () => {
                         const taken = usedWeeks.has(s.week) && weekNumber !== val;
                         return (
                           <SelectItem key={val} value={val}>
-                            Week {s.week} {s.day} {s.week >= 7 ? "(Project)" : ""}
+                            Week {s.week} {s.day} {s.week >= 9 ? "(Project)" : ""}
                           </SelectItem>
                         );
                       })}
