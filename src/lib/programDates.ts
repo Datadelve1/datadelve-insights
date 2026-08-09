@@ -35,12 +35,10 @@ export interface SessionDate {
 
 function pad(n: number) { return n < 10 ? `0${n}` : `${n}`; }
 
-function buildSessionDate(week: number, day: "friday" | "saturday"): SessionDate {
+function buildSessionDate(week: number, day: "friday" | "saturday", start: Date = PROGRAM_START): SessionDate {
   const dayOffset = day === "friday" ? 0 : 1; // Saturday is 1 day after Friday
   const weekOffset = (week - 1) * 7;
-  const date = new Date(PROGRAM_START.getTime());
-  // Move to the correct day: add weekOffset + dayOffset days, reset to midnight WAT
-  date.setTime(PROGRAM_START.getTime() + (weekOffset + dayOffset) * 24 * 60 * 60 * 1000);
+  const date = new Date(start.getTime() + (weekOffset + dayOffset) * 24 * 60 * 60 * 1000);
 
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   // Extract date components in WAT (UTC+1)
@@ -63,27 +61,34 @@ function buildSessionDate(week: number, day: "friday" | "saturday"): SessionDate
   };
 }
 
-// Pre-computed session dates for all weeks
-export const ALL_SESSIONS: SessionDate[] = [];
-for (let w = 1; w <= TOTAL_WEEKS; w++) {
-  ALL_SESSIONS.push(buildSessionDate(w, "friday"));
-  ALL_SESSIONS.push(buildSessionDate(w, "saturday"));
+/** Build the full session list for a cohort */
+export function getSessionsForCohort(cohort?: string | null): SessionDate[] {
+  const start = getCohortStart(cohort);
+  const sessions: SessionDate[] = [];
+  for (let w = 1; w <= TOTAL_WEEKS; w++) {
+    sessions.push(buildSessionDate(w, "friday", start));
+    sessions.push(buildSessionDate(w, "saturday", start));
+  }
+  return sessions;
 }
 
+// Pre-computed session dates for all weeks (Cohort 2 default)
+export const ALL_SESSIONS: SessionDate[] = getSessionsForCohort();
+
 /** Get session info for a specific week and day */
-export function getSessionDate(week: number, day: "friday" | "saturday"): SessionDate {
-  return ALL_SESSIONS.find(s => s.week === week && s.day === day)!;
+export function getSessionDate(week: number, day: "friday" | "saturday", cohort?: string | null): SessionDate {
+  return getSessionsForCohort(cohort).find(s => s.week === week && s.day === day)!;
 }
 
 /** Get all sessions for a specific week */
-export function getWeekSessions(week: number): SessionDate[] {
-  return ALL_SESSIONS.filter(s => s.week === week);
+export function getWeekSessions(week: number, cohort?: string | null): SessionDate[] {
+  return getSessionsForCohort(cohort).filter(s => s.week === week);
 }
 
 /** Determine the current program week based on the current date (1-8, or null if before/after) */
-export function getCurrentWeek(): number | null {
+export function getCurrentWeek(cohort?: string | null): number | null {
   const now = Date.now();
-  const startMs = PROGRAM_START.getTime();
+  const startMs = getCohortStart(cohort).getTime();
   
   if (now < startMs) return null;
   
@@ -97,6 +102,6 @@ export function getCurrentWeek(): number | null {
 }
 
 /** Get the ISO date string (YYYY-MM-DD) for a session — useful for pre-filling date fields */
-export function getSessionISODate(week: number, day: "friday" | "saturday"): string {
-  return getSessionDate(week, day).fullDate;
+export function getSessionISODate(week: number, day: "friday" | "saturday", cohort?: string | null): string {
+  return getSessionDate(week, day, cohort).fullDate;
 }
