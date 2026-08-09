@@ -32,6 +32,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
   const [recordings, setRecordings] = useState<ClassRecording[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeRecording, setActiveRecording] = useState<ClassRecording | null>(null);
+  const [cohort, setCohort] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRecordings = async () => {
@@ -44,6 +45,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
         .limit(1)
         .maybeSingle();
       const studentCohort = enrollment?.cohort ?? "Cohort 1";
+      setCohort(studentCohort);
 
       const { data } = await supabase
         .from("class_recordings")
@@ -92,7 +94,7 @@ const ClassRecordings = ({ attendance, submittedReviews, googleReviewConfirmed }
               {recordings.map((rec) => {
                 const day = (rec as any).session_day || "friday";
                 const isPrivileged = isAdmin || isVideoExempt(user?.id);
-                const timingOk = isPrivileged || isAfter10PMForSession(rec.week_number, day === "saturday" ? "saturday" : "friday");
+                const timingOk = isPrivileged || isAfter10PMForSession(rec.week_number, day === "saturday" ? "saturday" : "friday", cohort);
                 const reviewDone = isPrivileged || hasReviewForWeek(rec.week_number, submittedReviews);
                 const unlocked = isPrivileged || (timingOk && reviewDone);
                 let statusMessage = "";

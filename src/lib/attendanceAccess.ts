@@ -9,7 +9,7 @@
  * Certain students are exempted from attendance/timing checks for video access.
  */
 
-import { PROGRAM_START } from "./programDates";
+import { PROGRAM_START, getCohortStart } from "./programDates";
 
 /** Students who get unrestricted access to all recordings regardless of attendance */
 const VIDEO_EXEMPT_USER_IDS = new Set([
@@ -22,43 +22,46 @@ export function isVideoExempt(userId: string | undefined): boolean {
 
 const PROGRAM_START_MS = PROGRAM_START.getTime();
 
+function sessionStartMs(cohort?: string | null): number {
+  return cohort ? getCohortStart(cohort).getTime() : PROGRAM_START_MS;
+}
+
 /** Check if the current time is past 10 PM WAT for a specific session */
-export function isAfter10PMForSession(weekNumber: number, day: 'friday' | 'saturday'): boolean {
-  // Friday 10 PM WAT = PROGRAM_START (Fri 6 PM WAT) + 4 hours
-  // Saturday 10 PM WAT = PROGRAM_START + 28 hours
+export function isAfter10PMForSession(weekNumber: number, day: 'friday' | 'saturday', cohort?: string | null): boolean {
+  // Friday 10 PM WAT = cohort start (Fri 6 PM WAT) + 4 hours
+  // Saturday 10 PM WAT = cohort start + 28 hours
   const dayOffset = day === 'friday' ? 4 : 28;
-  const sessionTime = PROGRAM_START_MS + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000 + dayOffset * 60 * 60 * 1000;
+  const sessionTime = sessionStartMs(cohort) + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000 + dayOffset * 60 * 60 * 1000;
   return Date.now() >= sessionTime;
 }
 
 /** Check if the current time is past 8 PM WAT for a specific session (for reviews) */
-export function isAfter8PMForSession(weekNumber: number, day: 'friday' | 'saturday'): boolean {
-  // Friday 8 PM WAT = PROGRAM_START (Fri 6 PM) + 2 hours
-  // Saturday 8 PM WAT = PROGRAM_START + 26 hours
+export function isAfter8PMForSession(weekNumber: number, day: 'friday' | 'saturday', cohort?: string | null): boolean {
+  // Friday 8 PM WAT = cohort start (Fri 6 PM) + 2 hours
+  // Saturday 8 PM WAT = cohort start + 26 hours
   const dayOffset = day === 'friday' ? 2 : 26;
-  const sessionTime = PROGRAM_START_MS + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000 + dayOffset * 60 * 60 * 1000;
+  const sessionTime = sessionStartMs(cohort) + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000 + dayOffset * 60 * 60 * 1000;
   return Date.now() >= sessionTime;
 }
 
 /**
  * Check if a student has access to a specific week's content (videos/assignments).
- * Requires attendance + past 10 PM + review submitted.
+ * Requires the session time to have passed.
  */
 export function hasWeekAccess(
   weekNumber: number,
   attendance: Record<string, string>,
   isAdmin: boolean,
-  userId?: string
+  userId?: string,
+  cohort?: string | null
 ): boolean {
   if (isAdmin || isVideoExempt(userId)) return true;
-  const friPresent = attendance[`${weekNumber}-friday`] === "present";
-  const satPresent = attendance[`${weekNumber}-saturday`] === "present";
-  return (friPresent && isAfter10PMForSession(weekNumber, 'friday')) ||
-         (satPresent && isAfter10PMForSession(weekNumber, 'saturday'));
+  return isAfter10PMForSession(weekNumber, 'friday', cohort) ||
+         isAfter10PMForSession(weekNumber, 'saturday', cohort);
 }
 
 /**
- * Full content access: attendance + timing + review gate.
+ * Full content access: timing + review gate.
  * Must have submitted review before accessing videos/assignments.
  */
 export function hasContentAccess(
@@ -66,10 +69,11 @@ export function hasContentAccess(
   attendance: Record<string, string>,
   submittedReviews: Record<string, boolean>,
   isAdmin: boolean,
-  userId?: string
+  userId?: string,
+  cohort?: string | null
 ): boolean {
   if (isAdmin || isVideoExempt(userId)) return true;
-  const weekAccess = hasWeekAccess(weekNumber, attendance, isAdmin, userId);
+  const weekAccess = hasWeekAccess(weekNumber, attendance, isAdmin, userId, cohort);
   const reviewDone = hasReviewForWeek(weekNumber, submittedReviews);
   return weekAccess && reviewDone;
 }
@@ -79,23 +83,26 @@ export function hasSessionAccess(
   weekNumber: number,
   day: 'friday' | 'saturday',
   attendance: Record<string, string>,
-  isAdmin: boolean
+  isAdmin: boolean,
+  cohort?: string | null
 ): boolean {
   if (isAdmin) return true;
-  const key = `${weekNumber}-${day}`;
-  return attendance[key] === "present" && isAfter10PMForSession(weekNumber, day);
+  return isAfter10PMForSession(weekNumber, day, cohort);
 }
 
-/** Check if review can be submitted for a specific session */
+/**
+ * Check if review can be submitted for a specific session.
+ * Only gated by the session time (8 PM WAT) — admin attendance marking is not required.
+ */
 export function canSubmitReview(
   weekNumber: number,
   day: 'friday' | 'saturday',
   attendance: Record<string, string>,
-  isAdmin: boolean
+  isAdmin: boolean,
+  cohort?: string | null
 ): boolean {
   if (isAdmin) return true;
-  const key = `${weekNumber}-${day}`;
-  return attendance[key] === "present" && isAfter8PMForSession(weekNumber, day);
+  return isAfter8PMForSession(weekNumber, day, cohort);
 }
 
 /** Check if student has submitted a review for at least one session in a week */
