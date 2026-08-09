@@ -286,7 +286,7 @@ const VideoManagement = () => {
                         const taken = usedWeeks.has(s.week) && weekNumber !== val;
                         return (
                           <SelectItem key={val} value={val}>
-                            Week {s.week} {s.day} {s.week >= 7 ? "(Project)" : ""}
+                            Week {s.week} {s.day} {s.week >= 9 ? "(Project)" : ""}
                           </SelectItem>
                         );
                       })}
