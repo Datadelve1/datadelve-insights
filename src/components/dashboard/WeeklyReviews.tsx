@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { ALL_SESSIONS as PROGRAM_SESSIONS, getSessionISODate } from "@/lib/programDates";
+import { getSessionsForCohort, getSessionISODate } from "@/lib/programDates";
+import { useStudentCohort } from "@/hooks/useStudentCohort";
 import { ADMIN_EMAILS } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -55,8 +56,6 @@ interface WeeklyReviewsProps {
 
 const TUTOR_RATINGS = ["Excellent", "Good", "Fair"] as const;
 
-const SESSIONS = PROGRAM_SESSIONS;
-
 const GOOGLE_REVIEW_URL = "https://g.page/r/delvetek/review";
 
 const WEEK_6_VIDEO_QUESTIONS = [
@@ -87,6 +86,8 @@ Thank you.`;
 
 const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: WeeklyReviewsProps) => {
   const { user, profile, isAdmin } = useAuth();
+  const { cohort } = useStudentCohort();
+  const SESSIONS = getSessionsForCohort(cohort);
   const isUnrestricted =
     isAdmin ||
     ADMIN_EMAILS.includes(profile?.email ?? user?.email ?? "");
@@ -368,8 +369,8 @@ const WeeklyReviews = ({ attendance, submittedReviews, onReviewSubmitted }: Week
               const key = `${s.week}-${s.day}`;
               const submitted = !!submittedReviews[key];
               const attended = attendance[key] === "present";
-              const timeReady = isUnrestricted || canSubmitReview(s.week, s.day, attendance, isAdmin);
-              const available = !submitted && (isUnrestricted || (attended && timeReady));
+              const timeReady = isUnrestricted || canSubmitReview(s.week, s.day, attendance, isAdmin, cohort);
+              const available = !submitted && (isUnrestricted || timeReady);
               const isActive = activeSession === key;
               const isFriday = s.day === "friday";
 
