@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2, Clock, Award } from "lucide-react";
 import { STUDENT_PROJECTS } from "@/lib/studentProjects";
-import { useStudentEnrollment, canAccessProject } from "@/hooks/useStudentEnrollment";
+import { useStudentEnrollment, canViewProject } from "@/hooks/useStudentEnrollment";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 
 const StudentProjects = () => {
@@ -22,7 +22,7 @@ const StudentProjects = () => {
   if (!user) return <Navigate to="/auth" replace />;
   if (!hasCommitted) return <Navigate to="/dashboard" replace />;
 
-  const visibleProjects = STUDENT_PROJECTS.filter((p) => canAccessProject(p.access, enrollment));
+  const visibleProjects = STUDENT_PROJECTS.filter((p) => canViewProject(p.slug, enrollment));
 
   return (
     <div className="min-h-screen bg-background">
