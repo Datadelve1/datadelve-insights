@@ -92,7 +92,7 @@ const EnrollHub = () => {
             Choose Your <span className="gradient-text">Delvetek</span> Track
           </h1>
           <p className="text-muted-foreground text-base md:text-lg mb-8">
-            Pick the path that matches your goals. All tracks start July 31 • Live online • Virtual Graduation 🎓
+            Pick the path that matches your goals. All tracks start October 3 • Live online • Virtual Graduation 🎓
           </p>
 
           {/* Hero Enroll CTA */}
@@ -333,7 +333,7 @@ const EnrollHub = () => {
         {/* Bottom note */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground text-sm">
-            All tracks start July 31 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
+            All tracks start October 3 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
 
@@ -572,7 +572,7 @@ const EnrollHub = () => {
               },
               {
                 q: "When does Cohort 3 start?",
-                a: "All tracks officially begin on July 31. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
+                a: "All tracks officially begin on October 3. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
               },
               {
                 q: "What's the difference between the tracks?",
@@ -621,7 +621,7 @@ const EnrollHub = () => {
             Ready to <span className="gradient-text">Transform</span> Your Career?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Seats fill fast. Lock in your spot today and start your data journey July 31.
+            Seats fill fast. Lock in your spot today and start your data journey October 3.
           </p>
           <Button asChild variant="hero" size="lg">
             <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
