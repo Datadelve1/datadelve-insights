@@ -38,7 +38,7 @@ const Hero = () => {
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in animation-delay-400 text-balance">
-            Join our July 31 Cohort (12 Weeks Program)
+            Join our Oct 3 Cohort (12 Weeks Program)
           </p>
 
           {/* CTA Buttons */}

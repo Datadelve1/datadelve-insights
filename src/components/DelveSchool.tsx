@@ -35,7 +35,7 @@ const DelveSchool = () => {
             <span className="gradient-text">Delvetek</span> Training Tracks
           </h2>
           <p className="text-muted-foreground text-lg">
-            Pick the path that matches your goals. All tracks start July 31.
+            Pick the path that matches your goals. All tracks start October 3.
           </p>
         </div>
 
@@ -208,7 +208,7 @@ const DelveSchool = () => {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-muted-foreground">
-            All tracks start July 31 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
+            All tracks start October 3 • Live online sessions • Virtual Graduation 🎓 • Certificate upon completion (paid)
           </p>
         </div>
       </div>
