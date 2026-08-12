@@ -15,10 +15,10 @@ export const DISCOUNTED_PRICES: Record<TrackId, number> = {
   advanced: 150000,
 };
 
-// Discount remains active until we manually revert. Set far in the future.
-export const DISCOUNT_DEADLINE_ISO = "2099-12-31T23:00:00Z";
-// Registration stays open alongside the discount.
-export const REGISTRATION_CLOSE_ISO = "2099-12-31T23:00:00Z";
+// Discounted pricing ends Sept 30, 2026 end-of-day WAT (UTC+1).
+export const DISCOUNT_DEADLINE_ISO = "2026-09-30T22:59:59Z";
+// Registration stays open until the cohort starts.
+export const REGISTRATION_CLOSE_ISO = "2026-10-02T22:59:59Z";
 
 export function isDiscountActive(now: Date = new Date()): boolean {
   return now.getTime() <= new Date(DISCOUNT_DEADLINE_ISO).getTime();
