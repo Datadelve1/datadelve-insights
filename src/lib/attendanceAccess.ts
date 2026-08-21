@@ -14,6 +14,7 @@ import { PROGRAM_START, getCohortStart } from "./programDates";
 /** Students who get unrestricted access to all recordings regardless of attendance */
 const VIDEO_EXEMPT_USER_IDS = new Set([
   "5037fadb-d49c-4a29-b09b-d44e7982ecb2", // Ikediashi Joshua
+  "f329ab0d-22a3-4cc9-ac5b-95191f99c56e", // Eniola Lambo
 ]);
 
 export function isVideoExempt(userId: string | undefined): boolean {
