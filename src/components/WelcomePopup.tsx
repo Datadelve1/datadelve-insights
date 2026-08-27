@@ -29,9 +29,11 @@ const WelcomePopup = () => {
 
   const goToEnroll = () => {
     setOpen(false);
-    setTimeout(() => {
-      document.getElementById("delve-school")?.scrollIntoView({ behavior: "smooth" });
-    }, 200);
+    const phone = "447775739225";
+    const message = encodeURIComponent(
+      "Hi Delvetek, I saw the new October cohort popup on your website and I'd like to enroll. Please share the enrollment details."
+    );
+    window.open(`https://wa.me/${phone}?text=${message}`, "_blank", "noopener,noreferrer");
   };
 
   if (!open) return null;
