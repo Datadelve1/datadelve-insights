@@ -11,6 +11,7 @@ import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import WelcomePopup from "@/components/WelcomePopup";
 import SEO from "@/components/SEO";
 
 
@@ -46,6 +47,7 @@ const Index = () => {
       </main>
       <Footer />
       <WhatsAppFloat />
+      <WelcomePopup />
     </div>
   );
 };
