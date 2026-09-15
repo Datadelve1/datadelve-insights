@@ -60,9 +60,9 @@ const EnrollHub = () => {
           <p className="text-sm font-semibold text-center sm:text-left">
             {registrationOpen
               ? discountActive
-                ? "🔥 Cohort 3 · Limited-time discounted pricing — enroll now"
-                : "⚠️ Cohort 3 · Discount ended — normal price applies · Registration closes 30th July"
-              : "🚫 Cohort 3 registration closed (30th July). New cohort details coming soon."}
+                ? "🔥 Cohort 4 · Limited-time discounted pricing — enroll now"
+                : "⚠️ Cohort 4 · Discount ended — normal price applies · Registration closes 29th October"
+              : "🚫 Cohort 4 registration closed (29th October). New cohort details coming soon."}
           </p>
           {registrationOpen && (
             <Button
@@ -86,7 +86,7 @@ const EnrollHub = () => {
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <BookOpen className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Cohort 3 Enrollment</span>
+            <span className="text-sm text-muted-foreground">Cohort 4 Enrollment</span>
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-6">
             Choose Your <span className="gradient-text">Delvetek</span> Track
@@ -568,10 +568,10 @@ const EnrollHub = () => {
             {[
               {
                 q: "What is the discounted fee for?",
-                a: "The discounted fee secures your seat in Cohort 3 at a reduced rate — available only until 24th July. From 25th July the normal price applies, and registration closes on 30th July. It's non-refundable.",
+                a: "The discounted fee secures your seat in Cohort 4 at a reduced rate — available until 30th September. From 1st October the normal price applies, and registration closes on 29th October. It's non-refundable.",
               },
               {
-                q: "When does Cohort 3 start?",
+                q: "When does Cohort 4 start?",
                 a: "All tracks officially begin on October 30. Live sessions are held on Fridays and Saturdays (3 hours each), delivered online through your student dashboard.",
               },
               {
