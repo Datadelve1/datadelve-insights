@@ -15,6 +15,7 @@ export const COHORT_START_DATES: Record<string, string> = {
   "Cohort 1": "2026-03-27T18:00:00+01:00",
   "Cohort 2": "2026-06-12T18:00:00+01:00",
   "Cohort 3": "2026-07-31T18:00:00+01:00",
+  "Cohort 4": "2026-10-30T18:00:00+01:00",
 };
 
 /** Resolve the Week 1 Friday start for a given cohort (falls back to Cohort 2) */
