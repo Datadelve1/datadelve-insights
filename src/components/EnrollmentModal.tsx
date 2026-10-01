@@ -9,8 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackLead, trackInitiateCheckout } from "@/lib/metaPixel";
 import {
   DISCOUNTED_PRICES,
-  NORMAL_PRICES,
-  isDiscountActive,
   isRegistrationOpen,
   PRICING_NOTICE,
   type TrackId,
@@ -42,9 +40,8 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
   const [reference, setReference] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const discountActive = isDiscountActive();
   const registrationOpen = isRegistrationOpen();
-  const priceFor = (id: TrackId) => (discountActive ? DISCOUNTED_PRICES[id] : NORMAL_PRICES[id]);
+  const priceFor = (id: TrackId) => DISCOUNTED_PRICES[id];
   const track = {
     id: selected,
     label: TRACK_LABELS.find((t) => t.id === selected)?.label || "Professional",
@@ -129,19 +126,15 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Deadline notice */}
+          {/* Enrollment notice */}
           <div className={`rounded-lg px-3 py-2 text-xs font-medium border ${
             !registrationOpen
               ? "bg-destructive/10 border-destructive/30 text-destructive"
-              : discountActive
-              ? "bg-primary/10 border-primary/30 text-foreground"
-              : "bg-amber-500/10 border-amber-500/30 text-foreground"
+              : "bg-primary/10 border-primary/30 text-foreground"
           }`}>
             {!registrationOpen
-              ? "🚫 Registration for Cohort 3 closed on 30th July."
-              : discountActive
-              ? "⏳ Discounted fee ends 24th July · Normal price applies from 25th July · Registration closes 30th July"
-              : "⚠️ Discount ended — normal price now applies · Registration closes 30th July"}
+              ? "🚫 Registration for Cohort 4 is closed."
+              : "Discounted fees are active for all tracks."}
           </div>
 
           {/* Track selection (always visible) */}
@@ -150,7 +143,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
             <div className="grid grid-cols-3 gap-2">
               {TRACK_LABELS.map((t) => {
                 const price = priceFor(t.id);
-                const normal = NORMAL_PRICES[t.id];
                 return (
                   <button
                     key={t.id}
@@ -163,11 +155,6 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                     }`}
                   >
                     <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
-                    {discountActive && (
-                      <p className="text-[10px] text-muted-foreground line-through leading-tight">
-                        ₦{normal.toLocaleString()}
-                      </p>
-                    )}
                     <p className="text-xs text-primary font-bold mt-0.5">₦{price.toLocaleString()}</p>
                   </button>
                 );

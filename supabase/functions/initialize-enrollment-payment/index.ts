@@ -27,9 +27,9 @@ Deno.serve(async (req) => {
     }
 
     const trackPrices: Record<string, number> = {
-      beginner: 10000,
-      professional: 50000,
-      advanced: 100000,
+      beginner: 50000,
+      professional: 100000,
+      advanced: 150000,
     };
     const certPrice = certificate_requested ? 10000 : 0;
     const totalAmount = (trackPrices[track] || 0) + certPrice;

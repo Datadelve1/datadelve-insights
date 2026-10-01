@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import {
   DISCOUNTED_PRICES,
-  NORMAL_PRICES,
-  isDiscountActive,
   isRegistrationOpen,
 } from "@/lib/enrollmentPricing";
 import {
@@ -41,12 +39,11 @@ import {
 } from "@/components/ui/table";
 
 const EnrollHub = () => {
-  const discountActive = isDiscountActive();
   const registrationOpen = isRegistrationOpen();
   const feeLabel = "Discounted Fee";
-  const beginnerFee = discountActive ? DISCOUNTED_PRICES.beginner : NORMAL_PRICES.beginner;
-  const professionalFee = discountActive ? DISCOUNTED_PRICES.professional : NORMAL_PRICES.professional;
-  const advancedFee = discountActive ? DISCOUNTED_PRICES.advanced : NORMAL_PRICES.advanced;
+  const beginnerFee = DISCOUNTED_PRICES.beginner;
+  const professionalFee = DISCOUNTED_PRICES.professional;
+  const advancedFee = DISCOUNTED_PRICES.advanced;
 
   const scrollToTracks = () => {
     document.getElementById("tracks")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -59,9 +56,7 @@ const EnrollHub = () => {
         <div className="container mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-sm font-semibold text-center sm:text-left">
             {registrationOpen
-              ? discountActive
-                ? "🔥 Cohort 4 · Limited-time discounted pricing — enroll now"
-                : "⚠️ Cohort 4 · Discount ended — normal price applies · Registration closes 29th October"
+              ? "🔥 Cohort 4 · Discounted pricing — enroll now"
               : "🚫 Cohort 4 registration closed (29th October). New cohort details coming soon."}
           </p>
           {registrationOpen && (
@@ -125,12 +120,8 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Beginner Track</p>
 
             <div className="mb-4">
-              {discountActive && (
-                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.beginner.toLocaleString()}</span>
-              )}
               <div className="text-xl font-bold text-primary">
                 ₦{beginnerFee.toLocaleString()}
-                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
               </div>
               <p className="text-sm text-foreground mt-1">
                 {feeLabel}: <span className="font-semibold">₦{beginnerFee.toLocaleString()}</span>
@@ -165,7 +156,7 @@ const EnrollHub = () => {
             </div>
 
             <Button asChild variant="hero" size="lg" className="w-full group/btn">
-              <Link to="/enroll/beginner" onClick={() => trackInitiateCheckout({ content_name: "Beginner Track", content_category: "beginner", currency: "NGN", value: 25000 })}>
+              <Link to="/enroll/beginner" onClick={() => trackInitiateCheckout({ content_name: "Beginner Track", content_category: "beginner", currency: "NGN", value: beginnerFee })}>
                 Enroll in Beginner Track
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
@@ -186,12 +177,8 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
 
             <div className="mb-4">
-              {discountActive && (
-                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.professional.toLocaleString()}</span>
-              )}
               <div className="text-xl font-bold text-primary">
                 ₦{professionalFee.toLocaleString()}
-                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
               </div>
               <p className="text-sm text-foreground mt-1">
                 {feeLabel}: <span className="font-semibold">₦{professionalFee.toLocaleString()}</span>
@@ -231,7 +218,7 @@ const EnrollHub = () => {
             </div>
 
             <Button asChild variant="hero" size="lg" className="w-full group/btn">
-              <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
+              <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: professionalFee })}>
                 Enroll in Professional Track
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
@@ -249,12 +236,8 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
 
             <div className="mb-4">
-              {discountActive && (
-                <span className="text-muted-foreground line-through text-sm">₦{NORMAL_PRICES.advanced.toLocaleString()}</span>
-              )}
               <div className="text-xl font-bold text-primary">
                 ₦{advancedFee.toLocaleString()}
-                {discountActive && <span className="text-xs font-normal text-muted-foreground ml-2">(until 24th July)</span>}
               </div>
               <p className="text-sm text-foreground mt-1">
                 {feeLabel}: <span className="font-semibold">₦{advancedFee.toLocaleString()}</span>
@@ -568,7 +551,7 @@ const EnrollHub = () => {
             {[
               {
                 q: "What is the discounted fee for?",
-                a: "The discounted fee secures your seat in Cohort 4 at a reduced rate — available until 30th September. From 1st October the normal price applies, and registration closes on 29th October. It's non-refundable.",
+                a: "The discounted fee secures your seat in Cohort 4 at a reduced rate. Beginner is ₦50,000, Professional is ₦100,000, and Advanced is ₦150,000. It's non-refundable.",
               },
               {
                 q: "When does Cohort 4 start?",
@@ -624,7 +607,7 @@ const EnrollHub = () => {
             Seats fill fast. Lock in your spot today and start your data journey October 30.
           </p>
           <Button asChild variant="hero" size="lg">
-            <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: 50000 })}>
+            <Link to="/enroll/professional" onClick={() => trackInitiateCheckout({ content_name: "Professional Track", content_category: "professional", currency: "NGN", value: professionalFee })}>
               Enroll Now
               <ArrowRight className="w-4 h-4" />
             </Link>
