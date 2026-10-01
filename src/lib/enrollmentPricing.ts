@@ -1,13 +1,6 @@
-// Cohort 3 pricing — discounted until July 24 (end-of-day WAT),
-// then normal price until registration closes end-of-day July 30 WAT.
+// Discounted pricing remains active until Delvetek explicitly changes it.
 
 export type TrackId = "beginner" | "professional" | "advanced";
-
-export const NORMAL_PRICES: Record<TrackId, number> = {
-  beginner: 150000,
-  professional: 275000,
-  advanced: 350000,
-};
 
 export const DISCOUNTED_PRICES: Record<TrackId, number> = {
   beginner: 50000,
@@ -15,21 +8,15 @@ export const DISCOUNTED_PRICES: Record<TrackId, number> = {
   advanced: 150000,
 };
 
-// Discounted pricing ends Sept 30, 2026 end-of-day WAT (UTC+1).
-export const DISCOUNT_DEADLINE_ISO = "2026-09-30T22:59:59Z";
 // Registration stays open until the cohort starts.
 export const REGISTRATION_CLOSE_ISO = "2026-10-29T22:59:59Z";
-
-export function isDiscountActive(now: Date = new Date()): boolean {
-  return now.getTime() <= new Date(DISCOUNT_DEADLINE_ISO).getTime();
-}
 
 export function isRegistrationOpen(now: Date = new Date()): boolean {
   return now.getTime() <= new Date(REGISTRATION_CLOSE_ISO).getTime();
 }
 
-export function getTrackPrice(track: TrackId, now: Date = new Date()): number {
-  return isDiscountActive(now) ? DISCOUNTED_PRICES[track] : NORMAL_PRICES[track];
+export function getTrackPrice(track: TrackId): number {
+  return DISCOUNTED_PRICES[track];
 }
 
 export const PRICING_NOTICE =

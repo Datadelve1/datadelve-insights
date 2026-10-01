@@ -6,7 +6,7 @@ type: feature
 **Cohort 2 enrollment is via manual bank transfer (Paystack disabled).**
 
 5-step flow in `EnrollmentModal.tsx`:
-1. Personal Details & Track Selection (Beginner ₦10k, Professional ₦50k, Advanced ₦100k; +₦10k optional certificate)
+1. Personal Details & Track Selection (discounted prices remain active until explicitly changed: Beginner ₦50k, Professional ₦100k, Advanced ₦150k; +₦10k optional certificate)
 2. Commitment Agreement — "commitment fee, not full payment" reassurance text shows for ALL tracks (Beginner, Professional, Advanced) so the experience is identical across tiers.
 3. Class schedule (weekday Mon/Wed 5-8pm or weekend Fri/Sat 6-9pm)
 4. Payment instructions — display bank details: **Wema Bank · 0127561293 · Delvetek Limited**. Instruction copy emphasises "pay first, THEN click". Primary button is labelled **"Next — After Payment"** (not "I Have Paid"); clicking it registers enrollment as `pending_manual` (edge function `submit-manual-enrollment`).
