@@ -551,7 +551,7 @@ const EnrollHub = () => {
             {[
               {
                 q: "What is the discounted fee for?",
-                a: "The discounted fee secures your seat in Cohort 4 at a reduced rate — available until 30th September. From 1st October the normal price applies, and registration closes on 29th October. It's non-refundable.",
+                a: "The discounted fee secures your seat in Cohort 4 at a reduced rate. Beginner is ₦50,000, Professional is ₦100,000, and Advanced is ₦150,000. It's non-refundable.",
               },
               {
                 q: "When does Cohort 4 start?",
