@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import {
   DISCOUNTED_PRICES,
+  ORIGINAL_PRICES,
   isRegistrationOpen,
 } from "@/lib/enrollmentPricing";
 import {
@@ -44,6 +45,9 @@ const EnrollHub = () => {
   const beginnerFee = DISCOUNTED_PRICES.beginner;
   const professionalFee = DISCOUNTED_PRICES.professional;
   const advancedFee = DISCOUNTED_PRICES.advanced;
+  const beginnerOriginal = ORIGINAL_PRICES.beginner;
+  const professionalOriginal = ORIGINAL_PRICES.professional;
+  const advancedOriginal = ORIGINAL_PRICES.advanced;
 
   const scrollToTracks = () => {
     document.getElementById("tracks")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -120,6 +124,9 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Beginner Track</p>
 
             <div className="mb-4">
+              <div className="text-sm text-muted-foreground line-through">
+                ₦{beginnerOriginal.toLocaleString()}
+              </div>
               <div className="text-xl font-bold text-primary">
                 ₦{beginnerFee.toLocaleString()}
               </div>
@@ -177,6 +184,9 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Professional Track</p>
 
             <div className="mb-4">
+              <div className="text-sm text-muted-foreground line-through">
+                ₦{professionalOriginal.toLocaleString()}
+              </div>
               <div className="text-xl font-bold text-primary">
                 ₦{professionalFee.toLocaleString()}
               </div>
@@ -236,6 +246,9 @@ const EnrollHub = () => {
             <p className="text-xs text-muted-foreground mb-4">Advanced Track</p>
 
             <div className="mb-4">
+              <div className="text-sm text-muted-foreground line-through">
+                ₦{advancedOriginal.toLocaleString()}
+              </div>
               <div className="text-xl font-bold text-primary">
                 ₦{advancedFee.toLocaleString()}
               </div>

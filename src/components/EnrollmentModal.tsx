@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackLead, trackInitiateCheckout } from "@/lib/metaPixel";
 import {
   DISCOUNTED_PRICES,
+  ORIGINAL_PRICES,
   isRegistrationOpen,
   PRICING_NOTICE,
   type TrackId,
@@ -155,7 +156,8 @@ const EnrollmentModal = ({ open, onOpenChange, defaultTrack }: EnrollmentModalPr
                     }`}
                   >
                     <p className="text-sm font-semibold capitalize text-foreground">{t.label}</p>
-                    <p className="text-xs text-primary font-bold mt-0.5">₦{price.toLocaleString()}</p>
+                    <p className="text-[11px] text-muted-foreground line-through mt-0.5">₦{ORIGINAL_PRICES[t.id].toLocaleString()}</p>
+                    <p className="text-xs text-primary font-bold">₦{price.toLocaleString()}</p>
                   </button>
                 );
               })}
