@@ -2,6 +2,13 @@
 
 export type TrackId = "beginner" | "professional" | "advanced";
 
+// Original (pre-discount) prices — shown crossed out for display only.
+export const ORIGINAL_PRICES: Record<TrackId, number> = {
+  beginner: 150000,
+  professional: 275000,
+  advanced: 350000,
+};
+
 export const DISCOUNTED_PRICES: Record<TrackId, number> = {
   beginner: 50000,
   professional: 100000,
