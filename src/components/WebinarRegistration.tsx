@@ -13,12 +13,12 @@ const WebinarRegistration = () => {
 
   const upcomingTrainings = [
     {
-      title: "Data Analytics Fundamentals",
-      date: "March 27th, 2026",
-      time: "6:00 PM (GMT+1)",
-      spots: "Registration closed",
-      description: "Learn the basics of data analytics, including Excel, SQL fundamentals, and data visualization principles.",
-      closed: true,
+      title: "Cybersecurity",
+      date: "Coming Soon",
+      time: "TBA",
+      spots: "Limited spots",
+      description: "Protect systems and data with hands-on training in network security, ethical hacking, and penetration testing.",
+      comingSoon: true,
     },
     {
       title: "Project Management",
@@ -48,13 +48,13 @@ const WebinarRegistration = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
             <Calendar className="w-4 h-4 text-primary" />
-            <span className="text-sm text-muted-foreground">Free Training Sessions</span>
+            <span className="text-sm text-muted-foreground">New Courses</span>
           </div>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Register for <span className="gradient-text">Free Training</span>
+            Register for Our <span className="gradient-text">Upcoming Courses</span>
           </h2>
           <p className="text-muted-foreground text-lg">
-            Join our free training sessions and kickstart your data analytics journey. Limited spots available!
+            Exciting new courses are on the way. Be the first to know when registration opens and secure your spot early!
           </p>
         </div>
 
