@@ -13,17 +13,19 @@ interface EnrollmentWelcomeProps {
   track?: string
   classSchedule?: string
   certificateRequested?: boolean
+  cohort?: string
+  startDate?: string
 }
 
-const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedule, certificateRequested }: EnrollmentWelcomeProps) => (
+const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedule, certificateRequested, cohort, startDate }: EnrollmentWelcomeProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to DelveTek Cohort 2 — Your Login Details</Preview>
+    <Preview>{`Welcome to DelveTek ${cohort || 'Cohort 2'} — Your Login Details`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <LogoHeader />
         <Heading style={h1}>Welcome to DelveTek, {fullName || 'Student'}! 🎉</Heading>
-        <Text style={text}>Your enrollment in the <strong>{track ? track.charAt(0).toUpperCase() + track.slice(1) : 'Beginner'} Track</strong> (Cohort 2) has been confirmed.</Text>
+        <Text style={text}>Your enrollment in the <strong>{track ? track.charAt(0).toUpperCase() + track.slice(1) : 'Beginner'} Track</strong> ({cohort || 'Cohort 2'}) has been confirmed.</Text>
         <Section style={infoBox}>
           <Heading as="h3" style={h3}>Your Login Details</Heading>
           <Text style={detailText}><strong>Email:</strong> {email}</Text>
@@ -37,7 +39,7 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
         <Heading as="h3" style={h3}>Get Started — Follow These Steps</Heading>
         <Text style={stepText}><strong>Step 1:</strong> <strong>Log in</strong> to your student dashboard using the email and temporary password above.</Text>
         <Text style={stepText}><strong>Step 2:</strong> <strong>Change your temporary password immediately</strong> after your first login.</Text>
-        <Text style={stepText}><strong>Step 3:</strong> Explore your dashboard so you're ready when <strong>classes begin on June 12</strong>.</Text>
+        <Text style={stepText}><strong>Step 3:</strong> Explore your dashboard so you're ready when <strong>classes begin on {startDate || 'June 12'}</strong>.</Text>
         <Text style={stepText}><strong>Step 4:</strong> <strong>Test your login access well before the first session</strong> so any issues can be resolved in time.</Text>
         <Heading as="h3" style={h3}>Need Help Accessing the Platform?</Heading>
         <Text style={stepText}><strong>Email:</strong> <a href="mailto:info@delvetek.io" style={{ color: '#D4A017', fontWeight: 'bold' }}>info@delvetek.io</a></Text>
@@ -52,7 +54,7 @@ const EnrollmentWelcomeEmail = ({ fullName, email, password, track, classSchedul
 
 export const template = {
   component: EnrollmentWelcomeEmail,
-  subject: 'Welcome to DelveTek Cohort 2 — Your Login Details',
+  subject: (d: Record<string, any>) => `Welcome to DelveTek ${d?.cohort || 'Cohort 2'} — Your Login Details`,
   displayName: 'Enrollment welcome',
   previewData: { fullName: 'Jane Doe', email: 'jane@example.com', password: 'TempPass123!', track: 'beginner', classSchedule: 'weekend', certificateRequested: true },
 } satisfies TemplateEntry
