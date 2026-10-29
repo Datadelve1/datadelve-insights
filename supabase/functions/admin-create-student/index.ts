@@ -140,6 +140,9 @@ Deno.serve(async (req) => {
 
     // Send welcome email
     let emailSent = false;
+    if (body?.skip_email === true) {
+      return respond(true, { success: true, email_sent: false, enrollment_id: enrollmentId });
+    }
     try {
       const { error: emailError } = await supabase.functions.invoke("send-transactional-email", {
         body: {
