@@ -156,6 +156,8 @@ Deno.serve(async (req) => {
             track,
             classSchedule,
             certificateRequested,
+            cohort,
+            startDate: cohort === 'Cohort 4' ? 'October 30' : undefined,
           },
         },
       });
