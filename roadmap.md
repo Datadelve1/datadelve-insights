@@ -1,1 +1,1 @@
-- [ ] Cohort 4 dashboards for 6 students (Opeyemi, Victor, Praise, Chinedu, Jennifer, Adaobi); send welcome emails only after user approves preview
+- [x] Cohort 4 dashboards for 6 students (Opeyemi, Victor, Praise, Chinedu, Jennifer, Adaobi); send welcome emails only after user approves preview
