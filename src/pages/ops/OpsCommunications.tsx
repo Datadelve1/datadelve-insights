@@ -13,7 +13,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { CheckCircle2, Send, Eye, Trash2, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Send, Eye, Trash2, AlertTriangle, Plus } from "lucide-react";
+import NewClassEmailDialog from "@/components/ops/NewClassEmailDialog";
 
 type Ctx = { user: any; isAdmin: boolean };
 
@@ -26,6 +27,7 @@ export default function OpsCommunications() {
   const [editing, setEditing] = useState<any>(null);
   const [preview, setPreview] = useState<any>(null);
   const [sending, setSending] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     let q = supabase.from("ops_emails").select("*").order("created_at", { ascending: false });
@@ -88,6 +90,7 @@ export default function OpsCommunications() {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h1 className="text-2xl font-display font-bold">Communications Centre</h1>
         <p className="text-sm text-muted-foreground flex items-center gap-2">
@@ -95,8 +98,12 @@ export default function OpsCommunications() {
           Emails are never sent automatically — an admin must review and approve every send.
         </p>
       </div>
+        <Button onClick={() => setCreating(true)}><Plus className="w-4 h-4 mr-1" /> New class email</Button>
+      </div>
 
-      <div className="flex items-center gap-2">
+      <NewClassEmailDialog open={creating} onOpenChange={setCreating} userId={user?.id} isAdmin={isAdmin} onCreated={load} />
+
+      <div className="flex flex-wrap items-center gap-2">
         {STATUSES.map(s => (
           <Button key={s} variant={status === s ? "default" : "outline"} size="sm" onClick={() => setStatus(s)}>
             {s.replace("_", " ")}
@@ -105,7 +112,7 @@ export default function OpsCommunications() {
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-secondary/40 text-xs text-muted-foreground">
               <tr><th className="text-left p-3">Subject</th><th className="text-left p-3">Type</th><th className="text-left p-3">Recipients</th><th className="text-left p-3">Scheduled</th><th className="text-left p-3">Status</th><th className="text-left p-3">Actions</th></tr>
@@ -174,7 +181,7 @@ export default function OpsCommunications() {
               <div className="text-xs text-muted-foreground">Subject</div>
               <div className="font-medium">{preview.subject}</div>
               <div className="text-xs text-muted-foreground">Body</div>
-              <div className="whitespace-pre-wrap bg-secondary/30 p-4 rounded text-sm">{preview.body}</div>
+              <div className="whitespace-pre-wrap bg-secondary/30 p-4 rounded text-sm">{String(preview.body || "").replace(/\{first_name\}/gi, (preview.recipients?.[0]?.name || "there").split(" ")[0])}</div>
               <div className="text-xs text-muted-foreground">Recipients ({(preview.recipients || []).length})</div>
               <div className="text-xs bg-secondary/30 p-3 rounded max-h-40 overflow-y-auto">
                 {(preview.recipients || []).map((r: any, i: number) => <div key={i}>{r.name ? `${r.name} <${r.email}>` : r.email}</div>)}
