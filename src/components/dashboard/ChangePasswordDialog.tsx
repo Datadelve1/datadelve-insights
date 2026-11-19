@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
+import { cleanPassword, newPasswordInputProps } from "@/lib/passwordInput";
 
 const ChangePasswordDialog = () => {
   const [open, setOpen] = useState(false);
@@ -25,17 +26,19 @@ const ChangePasswordDialog = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 8) {
+    const pw = cleanPassword(password);
+    const confirmPw = cleanPassword(confirm);
+    if (pw.length < 8) {
       toast({ title: "Password must be at least 8 characters", variant: "destructive" });
       return;
     }
-    if (password !== confirm) {
+    if (pw !== confirmPw) {
       toast({ title: "Passwords do not match", variant: "destructive" });
       return;
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser({ password: pw });
       if (error) throw error;
       toast({ title: "Password updated successfully" });
       setOpen(false);
@@ -68,6 +71,8 @@ const ChangePasswordDialog = () => {
             <div className="relative">
               <Input
                 type={show ? "text" : "password"}
+                name="new-password"
+                {...newPasswordInputProps}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -88,12 +93,19 @@ const ChangePasswordDialog = () => {
             <Label>Confirm New Password</Label>
             <Input
               type={show ? "text" : "password"}
+              name="confirm-password"
+              {...newPasswordInputProps}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
               minLength={8}
               placeholder="Re-enter new password"
             />
+            {confirm && (
+              <p className={`text-xs ${cleanPassword(password) === cleanPassword(confirm) ? "text-primary" : "text-destructive"}`}>
+                {cleanPassword(password) === cleanPassword(confirm) ? "Passwords match" : "Passwords don't match yet"}
+              </p>
+            )}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { cleanPassword } from "@/lib/passwordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,10 +40,17 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      const { error } = await supabase.auth.signInWithPassword({
+      let { error } = await supabase.auth.signInWithPassword({
         email: form.email.trim(),
         password: form.password,
       });
+      // New passwords are saved without stray spaces at the ends, so retry without them.
+      if (error && cleanPassword(form.password) !== form.password) {
+        ({ error } = await supabase.auth.signInWithPassword({
+          email: form.email.trim(),
+          password: cleanPassword(form.password),
+        }));
+      }
       if (error) throw error;
 
       // Check if student is withdrawn

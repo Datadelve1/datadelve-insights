@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
+import { cleanPassword, newPasswordInputProps } from "@/lib/passwordInput";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -47,18 +48,20 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
+    const pw = cleanPassword(password);
+    const confirmPw = cleanPassword(confirmPassword);
+    if (pw.length < 6) {
       toast({ title: "Password must be at least 6 characters", variant: "destructive" });
       return;
     }
-    if (password !== confirmPassword) {
+    if (pw !== confirmPw) {
       toast({ title: "Passwords do not match", variant: "destructive" });
       return;
     }
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser({ password: pw });
       if (error) throw error;
       setIsSuccess(true);
       toast({ title: "Password updated successfully! 🎉" });
@@ -127,6 +130,8 @@ const ResetPassword = () => {
                 <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
+                  name="new-password"
+                  {...newPasswordInputProps}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -147,11 +152,18 @@ const ResetPassword = () => {
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Confirm new password"
+                name="confirm-password"
+                {...newPasswordInputProps}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="bg-secondary border-border"
               />
+              {confirmPassword && (
+                <p className={`text-xs ${cleanPassword(password) === cleanPassword(confirmPassword) ? "text-primary" : "text-destructive"}`}>
+                  {cleanPassword(password) === cleanPassword(confirmPassword) ? "Passwords match" : "Passwords don't match yet — tap the eye icon to check what you typed"}
+                </p>
+              )}
             </div>
 
             <Button type="submit" disabled={isLoading} variant="hero" className="w-full h-12 text-base">

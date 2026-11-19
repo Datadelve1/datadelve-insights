@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { cleanPassword } from "@/lib/passwordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,10 +19,17 @@ const StaffLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      let { data, error } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase().trim(),
         password,
       });
+      // New passwords are saved without stray spaces at the ends, so retry without them.
+      if (error && cleanPassword(password) !== password) {
+        ({ data, error } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase().trim(),
+          password: cleanPassword(password),
+        }));
+      }
       if (error) throw error;
 
       // Check if this user has a staff profile

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
+import { cleanPassword, newPasswordInputProps } from "@/lib/passwordInput";
 
 const StaffChangePassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -24,17 +25,19 @@ const StaffChangePassword = () => {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword.length < 6) {
+    const pw = cleanPassword(newPassword);
+    const confirmPw = cleanPassword(confirmPassword);
+    if (pw.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
-    if (newPassword !== confirmPassword) {
+    if (pw !== confirmPw) {
       toast.error("Passwords do not match");
       return;
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { error } = await supabase.auth.updateUser({ password: pw });
       if (error) throw error;
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -71,6 +74,8 @@ const StaffChangePassword = () => {
               <Input
                 id="new-password"
                 type="password"
+                name="new-password"
+                {...newPasswordInputProps}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Min 6 characters"
@@ -83,11 +88,18 @@ const StaffChangePassword = () => {
               <Input
                 id="confirm-password"
                 type="password"
+                name="confirm-password"
+                {...newPasswordInputProps}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm new password"
                 required
               />
+              {confirmPassword && (
+                <p className={`text-xs ${cleanPassword(newPassword) === cleanPassword(confirmPassword) ? "text-primary" : "text-destructive"}`}>
+                  {cleanPassword(newPassword) === cleanPassword(confirmPassword) ? "Passwords match" : "Passwords don't match yet"}
+                </p>
+              )}
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Updating..." : "Set New Password"}
