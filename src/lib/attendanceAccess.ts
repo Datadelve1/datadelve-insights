@@ -11,6 +11,13 @@
 
 import { PROGRAM_START, getCohortStart } from "./programDates";
 
+/**
+ * Weekly reviews are archived: students no longer submit reviews and the
+ * review gate on recordings/assignments is switched off. Past review data is kept.
+ * Set to false to bring the review requirement back.
+ */
+export const REVIEWS_ARCHIVED = true;
+
 /** Students who get unrestricted access to all recordings regardless of attendance */
 const VIDEO_EXEMPT_USER_IDS = new Set([
   "5037fadb-d49c-4a29-b09b-d44e7982ecb2", // Ikediashi Joshua
@@ -111,6 +118,7 @@ export function hasReviewForWeek(
   weekNumber: number,
   submittedReviews: Record<string, boolean>
 ): boolean {
+  if (REVIEWS_ARCHIVED) return true;
   return !!submittedReviews[`${weekNumber}-any`] ||
          !!submittedReviews[`${weekNumber}-friday`] ||
          !!submittedReviews[`${weekNumber}-saturday`];

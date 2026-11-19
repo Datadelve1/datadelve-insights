@@ -21,6 +21,7 @@ import {
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import CommitmentGate from "@/components/dashboard/CommitmentGate";
 import WeeklyReviews from "@/components/dashboard/WeeklyReviews";
+import { REVIEWS_ARCHIVED } from "@/lib/attendanceAccess";
 import ClassRecordings from "@/components/dashboard/ClassRecordings";
 import Assignments from "@/components/dashboard/Assignments";
 import CertificatePayment from "@/components/dashboard/CertificatePayment";
@@ -133,7 +134,9 @@ const Dashboard = () => {
   }
 
   const totalReviews = Object.values(submittedReviews).filter(Boolean).length;
-  const progressPercent = Math.round((totalReviews / 16) * 100);
+  const progressPercent = REVIEWS_ARCHIVED
+    ? Math.round((Object.keys(assignmentScores).length / 8) * 100)
+    : Math.round((totalReviews / 16) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -170,9 +173,15 @@ const Dashboard = () => {
               Classes hold every Friday &amp; Saturday, 6 PM – 9 PM WAT.
             </p>
             <p className="text-xs text-muted-foreground">
-              Reviews open at 8 PM each session day. Videos &amp; assignments unlock at 10 PM after
-              submitting your review. Friday = Written Review · Saturday = Video Review.
-              <strong> A Google Review is required each week to unlock the next week's content.</strong>
+              {REVIEWS_ARCHIVED ? (
+                <>Class recordings &amp; assignments unlock at 10 PM WAT after each session.</>
+              ) : (
+                <>
+                  Reviews open at 8 PM each session day. Videos &amp; assignments unlock at 10 PM after
+                  submitting your review. Friday = Written Review · Saturday = Video Review.
+                  <strong> A Google Review is required each week to unlock the next week's content.</strong>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -183,7 +192,9 @@ const Dashboard = () => {
             Welcome, {profile?.full_name || "Student"}! 👋
           </h1>
           <p className="text-muted-foreground mb-6">
-            Stay consistent, complete your session reviews, and unlock your full potential.
+            {REVIEWS_ARCHIVED
+              ? "Stay consistent, complete your assignments, and unlock your full potential."
+              : "Stay consistent, complete your session reviews, and unlock your full potential."}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground p-4">
@@ -228,9 +239,9 @@ const Dashboard = () => {
                 const week = i + 1;
                 const friDone = !!submittedReviews[`${week}-friday`];
                 const satDone = !!submittedReviews[`${week}-saturday`];
-                const bothDone = friDone && satDone;
-                const anyDone = friDone || satDone;
                 const score = assignmentScores[week];
+                const bothDone = REVIEWS_ARCHIVED ? !!score : friDone && satDone;
+                const anyDone = REVIEWS_ARCHIVED ? !!score : friDone || satDone;
                 return (
                   <div
                     key={i}
@@ -254,6 +265,7 @@ const Dashboard = () => {
                         Week {week} {week >= 7 ? "(Project)" : ""}
                       </span>
                     </div>
+                    {!REVIEWS_ARCHIVED && (
                     <div className="pl-6 space-y-0.5">
                       <span className={`text-[10px] ${friDone ? "text-primary" : "text-muted-foreground"}`}>
                         Fri {friDone ? "✓" : "○"}
@@ -262,6 +274,7 @@ const Dashboard = () => {
                         Sat {satDone ? "✓" : "○"}
                       </span>
                     </div>
+                    )}
                     {score && (
                       <span className="text-xs text-primary font-medium pl-6">
                         Score: {score.score}/{score.total}
@@ -275,11 +288,13 @@ const Dashboard = () => {
         </Card>
 
         {/* Weekly Reviews */}
-        <WeeklyReviews
-          attendance={attendance}
-          submittedReviews={submittedReviews}
-          onReviewSubmitted={fetchDashboardData}
-        />
+        {!REVIEWS_ARCHIVED && (
+          <WeeklyReviews
+            attendance={attendance}
+            submittedReviews={submittedReviews}
+            onReviewSubmitted={fetchDashboardData}
+          />
+        )}
 
         {/* Class Recordings */}
         <ClassRecordings attendance={attendance} submittedReviews={submittedReviews} googleReviewConfirmed={googleReviewConfirmed} />
