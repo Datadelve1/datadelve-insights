@@ -10,7 +10,8 @@ const corsHeaders = {
 }
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/brevo'
-const PREFERRED_SENDER = 'info@delvetek.io'
+const PREFERRED_SENDER = 'hello@datadelve.io'
+const PREFERRED_DOMAIN = '@datadelve.io'
 const REPLY_TO = 'info@delvetek.io'
 
 Deno.serve(async (req) => {
@@ -69,14 +70,17 @@ Deno.serve(async (req) => {
       'X-Connection-Api-Key': BREVO_API_KEY,
     }
 
-    // Pick a confirmed Brevo sender (prefer info@delvetek.io once it is confirmed).
+    // Pick a confirmed Brevo sender: the branded datadelve.io address first, then any other confirmed one.
     const sRes = await fetch(`${GATEWAY_URL}/senders`, { headers })
     if (!sRes.ok) {
       const t = await sRes.text()
       return json({ ok: false, error: `Brevo senders lookup failed [${sRes.status}]: ${t.slice(0, 300)}` })
     }
     const senders = ((await sRes.json())?.senders || []).filter((s: any) => s.active)
-    const sender = senders.find((s: any) => s.email?.toLowerCase() === PREFERRED_SENDER) || senders[0]
+    const sender =
+      senders.find((s: any) => s.email?.toLowerCase() === PREFERRED_SENDER) ||
+      senders.find((s: any) => s.email?.toLowerCase().endsWith(PREFERRED_DOMAIN)) ||
+      senders[0]
     if (!sender) return json({ ok: false, error: 'No confirmed sender in Brevo' })
 
     let sent = 0, failed = 0

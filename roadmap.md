@@ -1,4 +1,4 @@
 - [x] Cohort 4 dashboards for 6 students (Opeyemi, Victor, Praise, Chinedu, Jennifer, Adaobi); send welcome emails only after user approves preview
 - [x] Archive student reviews: hide review section, recordings unlock at 10 PM without a review
 - [x] Class reminders + after-class emails via Brevo in Ops Centre Communications (admin approval required)
-- [ ] Confirm info@delvetek.io as a Brevo sender (user action in Brevo; currently sends from oloyedeopeyemi253@gmail.com)
+- [x] Branded Brevo sender: hello@datadelve.io (datadelve.io verified in Brevo)
