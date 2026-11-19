@@ -10,7 +10,7 @@ const corsHeaders = {
 }
 
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/brevo'
-const PREFERRED_SENDER = 'hello@datadelve.io'
+const PREFERRED_SENDER = 'info@datadelve.io'
 const PREFERRED_DOMAIN = '@datadelve.io'
 const REPLY_TO = 'info@delvetek.io'
 
