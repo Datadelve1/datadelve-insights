@@ -18,16 +18,28 @@ const ResetPassword = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes("type=recovery")) {
-      setIsRecovery(true);
-    }
+  const [isChecking, setIsChecking] = useState(true);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+  useEffect(() => {
+    // The sign-in library reads the reset link and clears it from the address bar
+    // before this page loads, so we also accept an already-active session.
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.replace(/^#/, "") || window.location.search);
+    const errDesc = params.get("error_description");
+    if (errDesc) setLinkError(errDesc.replace(/\+/g, " "));
+    if (hash.includes("type=recovery")) setIsRecovery(true);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (session && event === "SIGNED_IN")) {
         setIsRecovery(true);
+        setIsChecking(false);
       }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setIsRecovery(true);
+      setIsChecking(false);
     });
 
     return () => subscription.unsubscribe();
@@ -50,6 +62,7 @@ const ResetPassword = () => {
       if (error) throw error;
       setIsSuccess(true);
       toast({ title: "Password updated successfully! 🎉" });
+      await supabase.auth.signOut();
       setTimeout(() => navigate("/auth"), 3000);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -58,6 +71,14 @@ const ResetPassword = () => {
     }
   };
 
+  if (isChecking && !isRecovery) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!isRecovery && !isSuccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -65,7 +86,9 @@ const ResetPassword = () => {
           <img src={delvetekLogo} alt="Delvetek" className="h-14 w-auto rounded-xl mx-auto mb-6" />
           <h1 className="font-display text-2xl font-bold text-foreground mb-2">Invalid Reset Link</h1>
           <p className="text-muted-foreground mb-6">
-            This link is invalid or has expired. Please request a new password reset.
+            {linkError
+              ? "This reset link has already been used or has expired. Each link works only once — please request a new one."
+              : "This link is invalid or has expired. Please request a new password reset."}
           </p>
           <Button variant="hero" onClick={() => navigate("/auth")}>
             Back to Sign In
