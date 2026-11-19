@@ -39,12 +39,12 @@ const COHORTS: Cohort[] = [
   {
     number: 4,
     segments: [
-      { kind: "pre_onboarding", start: d("2026-09-06"), end: d("2026-09-11") },
-      { kind: "beginner", start: d("2026-09-11"), end: d("2026-10-23") },
-      { kind: "project", start: d("2026-10-23"), end: d("2026-11-06") },
-      { kind: "professional", start: d("2026-11-06"), end: d("2026-12-04") },
+      { kind: "pre_onboarding", start: d("2026-11-15"), end: d("2026-11-20") },
+      { kind: "beginner", start: d("2026-11-20"), end: d("2027-01-01") },
+      { kind: "project", start: d("2027-01-29"), end: d("2027-02-12") },
+      { kind: "professional", start: d("2027-02-12"), end: d("2027-03-12") },
     ],
-    graduation: d("2026-12-04"),
+    graduation: d("2027-03-12"),
   },
   {
     number: 5,

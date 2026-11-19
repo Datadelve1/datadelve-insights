@@ -6,4 +6,4 @@
 - [x] Ops Centre menu folds away on phones
 - [x] Saturday "Recording & Assignment Uploaded" email task per cohort (deadline Wednesday 11:59 PM); removed duplicate Tool Installation (Day 5) tasks
 - [x] All ops tasks assigned to David; Send email / Mark done on his dashboard; others see Pending/Done; task-done email to Opeyemi
-- [ ] Cohort 4+ task dates still follow the old schedule (waiting on user)
+- [x] Cohort 4 tasks, schedule chart and student calendar moved to first class Fri Nov 20, 2026 (website keeps Oct 30)
