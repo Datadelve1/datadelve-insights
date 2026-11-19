@@ -56,6 +56,13 @@ export default function OpsTasks() {
     setCohorts(data || []);
   };
   useEffect(() => { if (user) load(); }, [user]);
+  // People with no tasks of their own (e.g. the founder account) watch progress, so show Pending and Done together.
+  const [filterSet, setFilterSet] = useState(false);
+  useEffect(() => {
+    if (filterSet || tasks.length === 0 || !user) return;
+    if (!tasks.some(t => t.assignee_user_id === user.id)) setStatusFilter("all");
+    setFilterSet(true);
+  }, [tasks, user, filterSet]);
   useEffect(() => { loadStaff(); loadCohorts(); }, []);
 
   const staffMap = useMemo(() => Object.fromEntries(staff.map(s => [s.user_id, s.full_name || s.email])), [staff]);
