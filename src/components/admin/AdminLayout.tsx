@@ -39,6 +39,7 @@ import {
   Clock,
   HardDrive,
   Share2,
+  ShieldCheck,
 } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
 import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
@@ -102,6 +103,26 @@ function AdminSidebar({ userEmail }: { userEmail?: string | null }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Internal</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/staff/ops"
+                    end
+                    className="hover:bg-sidebar-accent/50"
+                    activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Operations Centre</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
@@ -151,6 +172,9 @@ const AdminLayout = () => {
                 <span className="text-sm text-muted-foreground hidden sm:block">
                   {profile?.full_name || user.email}
                 </span>
+                <Button variant="outline" size="sm" onClick={() => window.location.assign("/staff/ops")}>
+                  <ShieldCheck className="w-4 h-4 mr-2" /> Operations Centre
+                </Button>
                 <Button variant="ghost" size="sm" onClick={signOut}>
                   <LogOut className="w-4 h-4 mr-2" /> Sign Out
                 </Button>
