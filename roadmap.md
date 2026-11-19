@@ -1,3 +1,3 @@
 - [x] Cohort 4 dashboards for 6 students (Opeyemi, Victor, Praise, Chinedu, Jennifer, Adaobi); send welcome emails only after user approves preview
 - [x] Archive student reviews: hide review section, recordings unlock at 10 PM without a review
-- [ ] Bulk/cohort-wide + interest-list emails via Brevo (needs Brevo API key from user)
+- [ ] Class reminders + after-class emails to cohorts (needs a group-email service; waiting on user: Brevo signup, WhatsApp, or pause). Marketing/interest list dropped by user.
