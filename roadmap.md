@@ -2,3 +2,5 @@
 - [x] Archive student reviews: hide review section, recordings unlock at 10 PM without a review
 - [x] Class reminders + after-class emails via Brevo in Ops Centre Communications (admin approval required)
 - [x] Branded Brevo sender: info@datadelve.io (datadelve.io verified in Brevo)
+- [x] Ops Centre "Send test" for class emails (tested as datadelve1@gmail.com)
+- [x] Ops Centre menu folds away on phones

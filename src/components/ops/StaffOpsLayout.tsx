@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Calendar, Users, Mail, CheckSquare, ScrollText,
-  LogOut, ArrowLeft, Loader2, Bell, GraduationCap,
+  LogOut, ArrowLeft, Loader2, Bell, GraduationCap, Menu, X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -22,6 +22,7 @@ export default function StaffOpsLayout() {
   const { loading, user, isAdmin } = useOpsAccess();
   const navigate = useNavigate();
   const [notifCount, setNotifCount] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -54,10 +55,22 @@ export default function StaffOpsLayout() {
 
   return (
     <div className="min-h-screen bg-background flex w-full">
-      <aside className="w-56 border-r border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
-          <div className="text-xs text-muted-foreground">Delvetek</div>
-          <div className="font-display font-bold text-lg">Operations Centre</div>
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-background/70 md:hidden" onClick={() => setMenuOpen(false)} />
+      )}
+      <aside
+        className={`w-56 border-r border-border bg-card flex-col fixed inset-y-0 left-0 z-50 md:static md:flex ${
+          menuOpen ? "flex" : "hidden"
+        }`}
+      >
+        <div className="p-4 border-b border-border flex items-start justify-between">
+          <div>
+            <div className="text-xs text-muted-foreground">Delvetek</div>
+            <div className="font-display font-bold text-lg">Operations Centre</div>
+          </div>
+          <Button variant="ghost" size="icon" className="md:hidden -mr-2" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
+            <X className="w-4 h-4" />
+          </Button>
         </div>
         <nav className="flex-1 p-2 space-y-1">
           {items.map((it) => (
@@ -65,6 +78,7 @@ export default function StaffOpsLayout() {
               key={it.to}
               to={it.to}
               end={it.end}
+              onClick={() => setMenuOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
@@ -88,9 +102,14 @@ export default function StaffOpsLayout() {
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-border bg-card px-4 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            {isAdmin ? "Admin" : "Staff"} · {user?.email}
+        <header className="h-14 border-b border-border bg-card px-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Button variant="ghost" size="icon" className="md:hidden -ml-2" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div className="text-sm text-muted-foreground truncate">
+              {isAdmin ? "Admin" : "Staff"} · {user?.email}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -103,7 +122,7 @@ export default function StaffOpsLayout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-6">
           <Outlet context={{ user, isAdmin }} />
         </main>
       </div>
