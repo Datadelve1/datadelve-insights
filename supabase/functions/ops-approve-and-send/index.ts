@@ -52,17 +52,23 @@ Deno.serve(async (req) => {
     const { data: email, error: fetchErr } = await admin
       .from('ops_emails').select('*').eq('id', emailId).maybeSingle()
     if (fetchErr || !email) return json({ ok: false, error: 'Email not found' })
-    if (email.status === 'sent') return json({ ok: false, error: 'Already sent' })
+    const isTest = body?.test === true
+    if (!isTest && email.status === 'sent') return json({ ok: false, error: 'Already sent' })
     if (!email.subject?.trim() || !email.body?.trim()) {
       return json({ ok: false, error: 'Subject and body are required' })
     }
 
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    let testTo = ''
+    if (isTest) {
+      testTo = String(body?.testEmail || userRes.user.email || '').trim().toLowerCase()
+      if (!emailRe.test(testTo) || testTo.length > 254) return json({ ok: false, error: 'Enter a valid test email address' })
+    }
     const seen = new Set<string>()
     const recipients: Array<{ email: string; name?: string }> = (Array.isArray(email.recipients) ? email.recipients : [])
       .map((r: any) => ({ email: String(r?.email || '').trim().toLowerCase(), name: r?.name ? String(r.name).trim() : undefined }))
       .filter((r: any) => emailRe.test(r.email) && !seen.has(r.email) && seen.add(r.email))
-    if (recipients.length === 0) return json({ ok: false, error: 'No valid recipients' })
+    if (!isTest && recipients.length === 0) return json({ ok: false, error: 'No valid recipients' })
 
     const headers = {
       'Content-Type': 'application/json',
@@ -82,6 +88,39 @@ Deno.serve(async (req) => {
       senders.find((s: any) => s.email?.toLowerCase().endsWith(PREFERRED_DOMAIN)) ||
       senders[0]
     if (!sender) return json({ ok: false, error: 'No confirmed sender in Brevo' })
+
+    // Test send: one copy to a single address, personalised as the first student would see it.
+    // Does not change the email's status and never reaches students.
+    if (isTest) {
+      const sample = recipients[0]
+      const firstName = sample?.name ? sample.name.split(/\s+/)[0] : undefined
+      const res = await fetch(`${GATEWAY_URL}/smtp/email`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          sender: { name: 'Delvetek', email: sender.email },
+          replyTo: { email: REPLY_TO, name: 'Delvetek' },
+          to: [{ email: testTo }],
+          subject: `[TEST] ${personalize(email.subject, firstName)}`,
+          htmlContent: buildHtml(personalize(email.body, firstName)),
+          tags: ['ops', 'test'],
+        }),
+      })
+      if (!res.ok) {
+        const t = await res.text()
+        console.error(`Brevo test send failed [${res.status}]: ${t}`)
+        return json({ ok: false, error: `Brevo test send failed [${res.status}]: ${t.slice(0, 300)}` })
+      }
+      await admin.from('ops_activity_log').insert({
+        actor_user_id: userId,
+        actor_kind: 'admin',
+        action: 'email_test_sent',
+        entity_type: 'ops_emails',
+        entity_id: emailId,
+        detail: { to: testTo, subject: email.subject, provider: 'brevo', sender: sender.email },
+      })
+      return json({ ok: true, test: true, to: testTo, sender: sender.email })
+    }
 
     let sent = 0, failed = 0
     const errors: string[] = []

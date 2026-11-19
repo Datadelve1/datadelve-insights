@@ -13,7 +13,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { CheckCircle2, Send, Eye, Trash2, AlertTriangle, Plus } from "lucide-react";
+import { CheckCircle2, Send, Eye, Trash2, AlertTriangle, Plus, FlaskConical, Loader2 } from "lucide-react";
 import NewClassEmailDialog from "@/components/ops/NewClassEmailDialog";
 
 type Ctx = { user: any; isAdmin: boolean };
@@ -28,6 +28,29 @@ export default function OpsCommunications() {
   const [preview, setPreview] = useState<any>(null);
   const [sending, setSending] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [testRow, setTestRow] = useState<any>(null);
+  const [testEmail, setTestEmail] = useState("");
+  const [testing, setTesting] = useState(false);
+
+  const openTest = (row: any) => { setTestRow(row); setTestEmail(user?.email || ""); };
+
+  const sendTest = async () => {
+    if (!isAdmin || !testRow) return toast.error("Admin only");
+    setTesting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ops-approve-and-send", {
+        body: { emailId: testRow.id, test: true, testEmail: testEmail.trim() },
+      });
+      if (error || !data?.ok) {
+        toast.error(data?.error || error?.message || "Test send failed");
+      } else {
+        toast.success(`Test sent to ${data.to} from ${data.sender}`);
+        setTestRow(null);
+      }
+    } finally {
+      setTesting(false);
+    }
+  };
 
   const load = async () => {
     let q = supabase.from("ops_emails").select("*").order("created_at", { ascending: false });
@@ -129,7 +152,8 @@ export default function OpsCommunications() {
                   <td className="p-3 flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => setPreview(e)}><Eye className="w-4 h-4"/></Button>
                     <Button variant="ghost" size="icon" onClick={() => setEditing(e)}>Edit</Button>
-                    {isAdmin && e.status !== "sent" && <Button variant="ghost" size="icon" onClick={() => sendNow(e)} disabled={sending}><Send className="w-4 h-4"/></Button>}
+                    {isAdmin && <Button variant="ghost" size="icon" title="Send test" aria-label="Send test" onClick={() => openTest(e)}><FlaskConical className="w-4 h-4"/></Button>}
+                    {isAdmin && e.status !== "sent" && <Button variant="ghost" size="icon" title="Approve & send" aria-label="Approve and send" onClick={() => sendNow(e)} disabled={sending}><Send className="w-4 h-4"/></Button>}
                     {isAdmin && <Button variant="ghost" size="icon" onClick={() => removeRow(e)}><Trash2 className="w-4 h-4"/></Button>}
                   </td>
                 </tr>
@@ -166,9 +190,37 @@ export default function OpsCommunications() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Close</Button>
             <Button onClick={save}>Save</Button>
+            {isAdmin && editing && (
+              <Button variant="outline" onClick={() => openTest(editing)}><FlaskConical className="w-4 h-4 mr-1"/> Send test</Button>
+            )}
             {isAdmin && editing && editing.status !== "sent" && (
               <Button onClick={() => sendNow(editing)} disabled={sending}><CheckCircle2 className="w-4 h-4 mr-1"/> Approve & Send Now</Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!testRow} onOpenChange={(o) => !o && setTestRow(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Send a test email</DialogTitle></DialogHeader>
+          {testRow && (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Sends one copy of “{testRow.subject}” to the address below, exactly as students will get it, with “[TEST]” at the start of the subject.
+                Students are not emailed and the status stays the same.
+              </p>
+              <div>
+                <Label>Send test to</Label>
+                <Input type="email" value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" />
+              </div>
+              <p className="text-xs text-muted-foreground">Save any edits first — the test uses the saved version.</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTestRow(null)}>Cancel</Button>
+            <Button onClick={sendTest} disabled={testing || !testEmail.trim()}>
+              {testing ? <Loader2 className="w-4 h-4 mr-1 animate-spin"/> : <FlaskConical className="w-4 h-4 mr-1"/>} Send test
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
