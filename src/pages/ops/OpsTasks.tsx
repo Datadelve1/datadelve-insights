@@ -10,7 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Trash2, Mail, Link2, Wrench, GraduationCap, Coffee } from "lucide-react";
+import { Plus, Trash2, Mail, Link2, Wrench, GraduationCap, Coffee, Send } from "lucide-react";
+import TaskEmailDialog from "@/components/ops/TaskEmailDialog";
+import { isSendableTask } from "@/lib/opsTaskEmails";
+import { completeOpsTask } from "@/lib/opsTaskComplete";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -37,6 +40,7 @@ export default function OpsTasks() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("open");
   const [open, setOpen] = useState(false);
+  const [emailTask, setEmailTask] = useState<any>(null);
   const [form, setForm] = useState<any>({ title: "", description: "", assignee_user_id: "", cohort_id: "", task_type: "", due_date: "", priority: "normal", is_company_task: true });
 
   const load = async () => {
@@ -56,6 +60,8 @@ export default function OpsTasks() {
 
   const staffMap = useMemo(() => Object.fromEntries(staff.map(s => [s.user_id, s.full_name || s.email])), [staff]);
   const cohortMap = useMemo(() => Object.fromEntries(cohorts.map(c => [c.id, `Cohort ${c.number}`])), [cohorts]);
+  const cohortNum = useMemo(() => Object.fromEntries(cohorts.map(c => [c.id, c.number])), [cohorts]);
+  const actorName = staffMap[user?.id] || user?.email || "Staff";
 
   const filtered = useMemo(() => {
     return tasks.filter(t => {
@@ -99,17 +105,12 @@ export default function OpsTasks() {
   };
 
   const updateStatus = async (t: any, status: string) => {
-    await updateField(t, {
-      status,
-      completed_at: status === "completed" ? new Date().toISOString() : null,
-      completed_by: status === "completed" ? user.id : null,
-    });
     if (status === "completed") {
-      await supabase.from("ops_activity_log").insert({
-        actor_user_id: user.id, actor_kind: isAdmin ? "admin" : "staff",
-        action: "task_completed", entity_type: "ops_tasks", entity_id: t.id, detail: { title: t.title },
-      });
+      const res = await completeOpsTask(t, { id: user.id, name: actorName, isAdmin });
+      if (!res.ok) return toast.error(res.error || "Could not mark done");
+      return load();
     }
+    await updateField(t, { status, completed_at: null, completed_by: null });
   };
 
   const remove = async (t: any) => {
@@ -124,7 +125,7 @@ export default function OpsTasks() {
         <div>
           <h1 className="text-2xl font-display font-bold">Training Ops Tasks</h1>
           <p className="text-sm text-muted-foreground">
-            Every scheduled email, class link, dashboard setup & pre-onboarding milestone across cohorts 3–10.
+            Every scheduled email, class link, dashboard setup & pre-onboarding milestone across cohorts 3–10. Only the person a task is assigned to can send or tick it off; everyone else sees Pending or Done.
           </p>
         </div>
         <Button onClick={() => setOpen(true)}><Plus className="w-4 h-4 mr-1"/>New task</Button>
@@ -169,7 +170,7 @@ export default function OpsTasks() {
               const meta = t.task_type ? TYPE_META[t.task_type] : null;
               return (
                 <div key={t.id} className="p-3 flex items-center gap-3 flex-wrap">
-                  <Checkbox checked={t.status === "completed"} onCheckedChange={() => updateStatus(t, t.status === "completed" ? "pending" : "completed")} />
+                  <Checkbox checked={t.status === "completed"} disabled={t.assignee_user_id !== user?.id} onCheckedChange={() => updateStatus(t, t.status === "completed" ? "pending" : "completed")} />
                   <div className="flex-1 min-w-[240px]">
                     <div className={`text-sm font-medium ${t.status === "completed" ? "line-through text-muted-foreground" : ""}`}>{t.title}</div>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -188,10 +189,21 @@ export default function OpsTasks() {
                     </SelectContent>
                   </Select>
 
-                  <Select value={t.status} onValueChange={v => updateStatus(t, v)}>
-                    <SelectTrigger className="w-32 h-8 text-xs"><SelectValue/></SelectTrigger>
-                    <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s.replace("_"," ")}</SelectItem>)}</SelectContent>
-                  </Select>
+                  {t.assignee_user_id === user?.id ? (
+                    <>
+                      {isSendableTask(t) && t.status !== "completed" && (
+                        <Button size="sm" className="h-8" onClick={() => setEmailTask(t)}><Send className="w-4 h-4 mr-1"/>Send email</Button>
+                      )}
+                      <Select value={t.status} onValueChange={v => updateStatus(t, v)}>
+                        <SelectTrigger className="w-32 h-8 text-xs"><SelectValue/></SelectTrigger>
+                        <SelectContent>{STATUSES.map(s => <SelectItem key={s} value={s}>{s.replace("_"," ")}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </>
+                  ) : (
+                    <Badge variant={t.status === "completed" ? "default" : "outline"} className="w-20 justify-center text-[10px]">
+                      {t.status === "completed" ? "Done" : "Pending"}
+                    </Badge>
+                  )}
 
                   {(isAdmin || t.created_by === user.id) && (
                     <Button variant="ghost" size="icon" onClick={() => remove(t)}><Trash2 className="w-4 h-4"/></Button>
@@ -202,6 +214,17 @@ export default function OpsTasks() {
           </div>
         </CardContent>
       </Card>
+
+      <TaskEmailDialog
+        task={emailTask}
+        cohortNumber={emailTask?.cohort_id ? cohortNum[emailTask.cohort_id] ?? null : null}
+        open={!!emailTask}
+        onOpenChange={(o) => !o && setEmailTask(null)}
+        user={user}
+        actorName={actorName}
+        isAdmin={isAdmin}
+        onDone={load}
+      />
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">

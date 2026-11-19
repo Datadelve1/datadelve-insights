@@ -21,6 +21,7 @@ import { template as referrerNotification } from './referrer-notification.tsx'
 import { template as adminWelcome } from './admin-welcome.tsx'
 import { template as cohortMoveNotification } from './cohort-move-notification.tsx'
 import { template as opsCustom } from './ops-custom.tsx'
+import { template as opsTaskCompleted } from './ops-task-completed.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'enrollment-welcome': enrollmentWelcome,
@@ -35,4 +36,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'admin-welcome': adminWelcome,
   'cohort-move-notification': cohortMoveNotification,
   'ops-custom': opsCustom,
+  'ops-task-completed': opsTaskCompleted,
 }
