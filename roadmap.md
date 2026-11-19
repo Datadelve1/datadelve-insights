@@ -4,3 +4,6 @@
 - [x] Branded Brevo sender: info@datadelve.io (datadelve.io verified in Brevo)
 - [x] Ops Centre "Send test" for class emails (tested as datadelve1@gmail.com)
 - [x] Ops Centre menu folds away on phones
+- [x] Saturday "Recording & Assignment Uploaded" email task per cohort (deadline Wednesday 11:59 PM); removed duplicate Tool Installation (Day 5) tasks
+- [x] All ops tasks assigned to David; Send email / Mark done on his dashboard; others see Pending/Done; task-done email to Opeyemi
+- [ ] Cohort 4+ task dates still follow the old schedule (waiting on user)

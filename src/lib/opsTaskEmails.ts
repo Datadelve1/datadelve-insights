@@ -20,15 +20,21 @@ export function isSendableTask(t: OpsTaskLike): boolean {
   return t.task_type === "email" || t.task_type === "class_link";
 }
 
-/** Assignment deadline after a Saturday class: the following Wednesday, 11:59 PM. */
-export function assignmentDeadline(saturdayISO: string): Date {
-  const d = addDays(parseISO(saturdayISO), 4);
+/**
+ * Assignment deadline after a Saturday class: the next Wednesday, 11:59 PM.
+ * If the email goes out late, the deadline is counted from the send day so it is never in the past.
+ */
+export function assignmentDeadline(saturdayISO: string, sendDay: Date = new Date()): Date {
+  const sat = parseISO(saturdayISO);
+  const today = new Date(sendDay.getFullYear(), sendDay.getMonth(), sendDay.getDate());
+  let d = addDays(sat > today ? sat : today, 1);
+  while (d.getDay() !== 3) d = addDays(d, 1);
   d.setHours(23, 59, 0, 0);
   return d;
 }
 
-export function formatDeadline(saturdayISO: string): string {
-  return format(assignmentDeadline(saturdayISO), "EEEE, MMMM d") + " at 11:59 PM";
+export function formatDeadline(saturdayISO: string, sendDay?: Date): string {
+  return format(assignmentDeadline(saturdayISO, sendDay), "EEEE, MMMM d") + " at 11:59 PM";
 }
 
 export function taskTrack(t: OpsTaskLike): TaskTrack {
@@ -49,17 +55,17 @@ function weekLabel(title: string): string {
   return m ? `${m[1]} (${m[2]})` : "";
 }
 
-export function buildTaskEmail(t: OpsTaskLike, cohortNumber: number | null, classLink = "") {
+export function buildTaskEmail(t: OpsTaskLike, cohortNumber: number | null, classLink = "", sendDay: Date = new Date()) {
   const cohort = cohortNumber ? `Cohort ${cohortNumber}` : "your cohort";
   const week = weekLabel(t.title);
   const sign = "The Delvetek Team";
   const help = "Any questions? Reply to this email or message us on WhatsApp: +44 7775 739225.";
 
   if (isRecordingTask(t) && t.due_date) {
-    const deadline = formatDeadline(t.due_date);
+    const deadline = formatDeadline(t.due_date, sendDay);
     return {
       needsClassLink: false,
-      subject: `${week ? week + " — " : ""}Recording is up & new assignment (due ${format(assignmentDeadline(t.due_date), "EEE MMM d")}, 11:59 PM)`,
+      subject: `${week ? week + " — " : ""}Recording is up & new assignment (due ${format(assignmentDeadline(t.due_date, sendDay), "EEE MMM d")}, 11:59 PM)`,
       body: [
         "Hi {first_name},",
         `Thank you for joining this week's ${cohort} classes.`,
