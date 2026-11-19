@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStaffAuth } from "@/hooks/useStaffAuth";
+import { getOpsScope } from "@/lib/opsScope";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,10 @@ const IDLE_REASONS = [
 
 const StaffDashboard = () => {
   const { user, staffProfile, loading, signOut } = useStaffAuth();
+  // Ops-only people go straight to the Operations page.
+  useEffect(() => {
+    if (getOpsScope(user?.email)) window.location.replace("/staff/ops");
+  }, [user]);
   const [status, setStatus] = useState<"offline" | "active" | "idle">("offline");
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [activityInput, setActivityInput] = useState("");

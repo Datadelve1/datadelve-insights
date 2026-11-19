@@ -1,3 +1,4 @@
+import { getOpsScope } from "@/lib/opsScope";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -156,6 +157,7 @@ const AdminLayout = () => {
   }
 
   if (!user || !isAdmin) return <Navigate to="/admin" replace />;
+  if (getOpsScope(user.email)) return <Navigate to="/staff/ops" replace />;
 
   return (
     <AdminCohortProvider>

@@ -11,7 +11,7 @@ import TaskEmailDialog from "@/components/ops/TaskEmailDialog";
 import { isSendableTask } from "@/lib/opsTaskEmails";
 import { completeOpsTask } from "@/lib/opsTaskComplete";
 
-type Ctx = { user: any; isAdmin: boolean };
+type Ctx = { user: any; isAdmin: boolean; scope?: { cohorts: number[] } | null };
 
 const TYPE_META: Record<string, { label: string; cls: string }> = {
   dashboard:      { label: "🛠 Dashboard",      cls: "bg-slate-500 text-white" },
@@ -24,7 +24,7 @@ const TYPE_META: Record<string, { label: string; cls: string }> = {
 const day = (s: string) => new Date(s + "T00:00:00");
 
 export default function OpsDashboard() {
-  const { user, isAdmin } = useOutletContext<Ctx>();
+  const { user, isAdmin, scope } = useOutletContext<Ctx>();
   const [data, setData] = useState<any>({ tasks: [], cohorts: [], activity: [], staff: [] });
   const [emailTask, setEmailTask] = useState<any>(null);
   const [marking, setMarking] = useState<string | null>(null);
@@ -36,8 +36,16 @@ export default function OpsDashboard() {
       supabase.from("ops_activity_log").select("*").order("created_at", { ascending: false }).limit(10),
       supabase.from("staff_profiles").select("user_id, full_name, email"),
     ]);
-    setData({ tasks: tasks.data || [], cohorts: cohorts.data || [], activity: activity.data || [], staff: staff.data || [] });
-  }, []);
+    // Ops-only people see just their cohorts.
+    let cs = cohorts.data || [];
+    let ts = tasks.data || [];
+    if (scope) {
+      cs = cs.filter((c: any) => scope.cohorts.includes(c.number));
+      const ids = new Set(cs.map((c: any) => c.id));
+      ts = ts.filter((t: any) => t.cohort_id && ids.has(t.cohort_id));
+    }
+    setData({ tasks: ts, cohorts: cs, activity: scope ? [] : activity.data || [], staff: staff.data || [] });
+  }, [scope?.cohorts.join(",")]);
   useEffect(() => { if (user) load(); }, [user, load]);
 
   const staffMap = useMemo(() => Object.fromEntries((data.staff || []).map((s: any) => [s.user_id, s.full_name || s.email])), [data.staff]);
@@ -68,7 +76,9 @@ export default function OpsDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-display font-bold">Operations Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Today's snapshot across all cohorts.</p>
+        <p className="text-sm text-muted-foreground">
+          {scope ? `Your tasks for Cohort ${scope.cohorts.join(", ")}.` : "Today's snapshot across all cohorts."}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -138,6 +148,7 @@ export default function OpsDashboard() {
         </CardContent>
       </Card>
 
+      {!scope && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><Users className="w-4 h-4"/> Cohorts</CardTitle></CardHeader>
@@ -163,6 +174,7 @@ export default function OpsDashboard() {
           </CardContent>
         </Card>
       </div>
+      )}
 
       <TaskEmailDialog
         task={emailTask}

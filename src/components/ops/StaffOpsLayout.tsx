@@ -1,4 +1,5 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { getOpsScope } from "@/lib/opsScope";
 import { useOpsAccess } from "@/hooks/useOpsAccess";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ export default function StaffOpsLayout() {
   const navigate = useNavigate();
   const [notifCount, setNotifCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const scope = getOpsScope(user?.email);
 
   useEffect(() => {
     if (!user) return;
@@ -47,6 +50,12 @@ export default function StaffOpsLayout() {
       </div>
     );
   }
+
+  // Ops-only people see just the Operations page.
+  if (scope && location.pathname.replace(/\/+$/, "") !== "/staff/ops") {
+    return <Navigate to="/staff/ops" replace />;
+  }
+  const navItems = scope ? [{ ...items[0], label: "Operations" }] : items;
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -73,7 +82,7 @@ export default function StaffOpsLayout() {
           </Button>
         </div>
         <nav className="flex-1 p-2 space-y-1">
-          {items.map((it) => (
+          {navItems.map((it) => (
             <NavLink
               key={it.to}
               to={it.to}
@@ -93,14 +102,16 @@ export default function StaffOpsLayout() {
           ))}
         </nav>
         <div className="p-2 border-t border-border">
-          {isAdmin && (
+          {isAdmin && !scope && (
             <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/admin/dashboard")}>
               <ShieldCheck className="w-4 h-4 mr-2" /> Admin Portal
             </Button>
           )}
-          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/staff/dashboard")}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Staff Dashboard
-          </Button>
+          {!scope && (
+            <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/staff/dashboard")}>
+              <ArrowLeft className="w-4 h-4 mr-2" /> Staff Dashboard
+            </Button>
+          )}
           <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
             <LogOut className="w-4 h-4 mr-2" /> Sign Out
           </Button>
@@ -113,7 +124,7 @@ export default function StaffOpsLayout() {
               <Menu className="w-5 h-5" />
             </Button>
             <div className="text-sm text-muted-foreground truncate">
-              {isAdmin ? "Admin" : "Staff"} · {user?.email}
+              {scope ? `Cohort ${scope.cohorts.join(", ")}` : isAdmin ? "Admin" : "Staff"} · {user?.email}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -128,7 +139,7 @@ export default function StaffOpsLayout() {
           </div>
         </header>
         <main className="flex-1 overflow-auto p-4 md:p-6">
-          <Outlet context={{ user, isAdmin }} />
+          <Outlet context={{ user, isAdmin, scope }} />
         </main>
       </div>
     </div>
