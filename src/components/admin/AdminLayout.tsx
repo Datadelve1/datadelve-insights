@@ -172,7 +172,7 @@ const AdminLayout = () => {
                 <span className="text-sm text-muted-foreground hidden sm:block">
                   {profile?.full_name || user.email}
                 </span>
-                <Button variant="outline" size="sm" onClick={() => window.location.assign("/staff/ops")}>
+                <Button variant="outline" size="sm" className="hidden sm:inline-flex" onClick={() => window.location.assign("/staff/ops")}>
                   <ShieldCheck className="w-4 h-4 mr-2" /> Operations Centre
                 </Button>
                 <Button variant="ghost" size="sm" onClick={signOut}>

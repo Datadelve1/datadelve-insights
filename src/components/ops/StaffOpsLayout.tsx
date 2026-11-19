@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Calendar, Users, Mail, CheckSquare, ScrollText,
-  LogOut, ArrowLeft, Loader2, Bell, GraduationCap, Menu, X,
+  LogOut, ArrowLeft, Loader2, Bell, GraduationCap, Menu, X, ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -93,6 +93,11 @@ export default function StaffOpsLayout() {
           ))}
         </nav>
         <div className="p-2 border-t border-border">
+          {isAdmin && (
+            <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/admin/dashboard")}>
+              <ShieldCheck className="w-4 h-4 mr-2" /> Admin Portal
+            </Button>
+          )}
           <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/staff/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Staff Dashboard
           </Button>
