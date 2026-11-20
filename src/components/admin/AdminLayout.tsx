@@ -2,13 +2,7 @@ import { getOpsScope } from "@/lib/opsScope";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -23,107 +17,53 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import {
-  LogOut,
-  Users,
-  BarChart3,
-  Video,
-  FileText,
-  Bell,
-  GraduationCap,
-  Loader2,
-  LayoutDashboard,
-  Database,
-  FileVideo,
-  MessageSquare,
-  ClipboardList,
-  Clock,
-  HardDrive,
-  Share2,
-  ShieldCheck,
-} from "lucide-react";
+import { LogOut, Loader2, ShieldCheck } from "lucide-react";
 import delvetekLogo from "@/assets/delvetek-logo.jpeg";
-import { AdminCohortProvider, useAdminCohort } from "@/contexts/AdminCohortContext";
-
-const SUPER_ADMIN_EMAIL = "datadelve1@gmail.com";
-
-const baseNavItems = [
-  { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Enrollments", url: "/admin/enrollments", icon: ClipboardList },
-  { title: "Ambassadors", url: "/admin/ambassadors", icon: Share2 },
-  { title: "Student Tracking", url: "/admin/students", icon: Users },
-  { title: "Weekly Reports", url: "/admin/reports", icon: BarChart3 },
-  { title: "Review Questions", url: "/admin/review-questions", icon: MessageSquare },
-  { title: "Video Management", url: "/admin/videos", icon: Video },
-  { title: "Student Videos", url: "/admin/student-videos", icon: FileVideo },
-  { title: "Assignments", url: "/admin/assignments", icon: FileText },
-  { title: "Datasets", url: "/admin/datasets", icon: Database },
-  { title: "Certificates", url: "/admin/certificates", icon: GraduationCap },
-  { title: "Notifications", url: "/admin/notifications", icon: Bell },
-  { title: "Storage Manager", url: "/admin/storage", icon: HardDrive },
-];
-
-const superAdminItem = { title: "Staff Tracking", url: "/admin/staff", icon: Clock };
+import { AdminCohortProvider, useAdminCohort, ADMIN_COHORTS, type Cohort } from "@/contexts/AdminCohortContext";
+import { adminNavFor, findAdminNavItem } from "@/lib/adminNav";
 
 function AdminSidebar({ userEmail }: { userEmail?: string | null }) {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
-  const location = useLocation();
-  const navItems = userEmail === SUPER_ADMIN_EMAIL ? [...baseNavItems, superAdminItem] : baseNavItems;
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
+  const groups = adminNavFor(userEmail);
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarContent className="bg-sidebar">
         <div className="p-4 flex items-center gap-3">
-          <img src={delvetekLogo} alt="Delvetek" className="h-8 w-8 rounded-lg shrink-0" />
+          <img src={delvetekLogo} alt="Delvetek" className="h-9 w-9 rounded-lg shrink-0" />
           {!collapsed && (
-            <span className="font-display font-bold text-sm text-sidebar-foreground">
-              Admin Portal
-            </span>
+            <div className="leading-tight">
+              <div className="font-display font-bold text-sidebar-foreground">Delvetek</div>
+              <div className="text-xs text-muted-foreground">Admin portal</div>
+            </div>
           )}
         </div>
-        <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end
-                      className="hover:bg-sidebar-accent/50"
-                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
-                    >
-                      <item.icon className="mr-2 h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Internal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/staff/ops"
-                    end
-                    className="hover:bg-sidebar-accent/50"
-                    activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
-                  >
-                    <ShieldCheck className="mr-2 h-4 w-4 shrink-0" />
-                    {!collapsed && <span>Operations Centre</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {groups.map((g) => (
+          <SidebarGroup key={g.label} className="py-1">
+            {!collapsed && <SidebarGroupLabel className="uppercase tracking-wide">{g.label}</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {g.items.map((item) => (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton asChild tooltip={item.title} className="h-10 text-[15px]">
+                      <NavLink
+                        to={item.url}
+                        end
+                        onClick={() => isMobile && setOpenMobile(false)}
+                        className="hover:bg-sidebar-accent/60"
+                        activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                      >
+                        <item.icon className="h-5 w-5 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   );
@@ -132,16 +72,31 @@ function AdminSidebar({ userEmail }: { userEmail?: string | null }) {
 function CohortSelector() {
   const { cohort, setCohort } = useAdminCohort();
   return (
-    <Select value={cohort} onValueChange={(v) => setCohort(v as any)}>
-      <SelectTrigger className="w-36 h-8 text-xs bg-secondary border-border">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="Cohort 1">Cohort 1</SelectItem>
-        <SelectItem value="Cohort 2">Cohort 2</SelectItem>
-        <SelectItem value="Cohort 3">Cohort 3</SelectItem>
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-muted-foreground hidden md:inline">Showing</span>
+      <Select value={cohort} onValueChange={(v) => setCohort(v as Cohort)}>
+        <SelectTrigger className="w-32 h-9 bg-secondary border-border font-medium" aria-label="Cohort">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {ADMIN_COHORTS.map((c) => (
+            <SelectItem key={c} value={c}>{c}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function PageTitle() {
+  const location = useLocation();
+  const item = findAdminNavItem(location.pathname);
+  if (!item) return null;
+  return (
+    <div className="min-w-0 hidden sm:block">
+      <div className="font-display font-semibold leading-tight truncate">{item.title}</div>
+      <div className="text-xs text-muted-foreground truncate hidden lg:block">{item.description}</div>
+    </div>
   );
 }
 
@@ -165,20 +120,21 @@ const AdminLayout = () => {
         <div className="min-h-screen flex w-full">
           <AdminSidebar userEmail={user.email} />
           <div className="flex-1 flex flex-col min-w-0">
-            <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4">
-              <div className="flex items-center gap-3">
+            <header className="h-16 flex items-center justify-between gap-3 border-b border-border bg-card px-4">
+              <div className="flex items-center gap-3 min-w-0">
                 <SidebarTrigger className="text-foreground" />
-                <CohortSelector />
+                <PageTitle />
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground hidden sm:block">
-                  {profile?.full_name || user.email}
-                </span>
-                <Button variant="outline" size="sm" className="hidden sm:inline-flex" onClick={() => window.location.assign("/staff/ops")}>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <CohortSelector />
+                <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => window.location.assign("/staff/ops")}>
                   <ShieldCheck className="w-4 h-4 mr-2" /> Operations Centre
                 </Button>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                <span className="text-sm text-muted-foreground hidden xl:block max-w-40 truncate">
+                  {profile?.full_name || user.email}
+                </span>
+                <Button variant="ghost" size="sm" onClick={signOut} aria-label="Sign out">
+                  <LogOut className="w-4 h-4 sm:mr-2" /> <span className="hidden sm:inline">Sign out</span>
                 </Button>
               </div>
             </header>

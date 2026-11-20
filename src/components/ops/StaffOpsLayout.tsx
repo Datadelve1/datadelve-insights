@@ -89,14 +89,14 @@ export default function StaffOpsLayout() {
               end={it.end}
               onClick={() => setMenuOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] transition-colors ${
                   isActive
                     ? "bg-primary/15 text-primary font-medium"
                     : "text-foreground/80 hover:bg-secondary"
                 }`
               }
             >
-              <it.icon className="h-4 w-4" />
+              <it.icon className="h-5 w-5" />
               {it.label}
             </NavLink>
           ))}

@@ -8,3 +8,5 @@
 - [x] All ops tasks assigned to David; Send email / Mark done on his dashboard; others see Pending/Done; task-done email to Opeyemi
 - [x] Cohort 4 tasks, schedule chart and student calendar moved to first class Fri Nov 20, 2026 (website keeps Oct 30)
 - [x] David sees only the Operations page (no other menu items), Cohort 4 only
+- [x] Saturday recording email always listed right after that Saturday's class link (all weeks, all cohorts)
+- [x] Simpler admin portal (menu + home page) and Operations Centre for datadelve1@gmail.com

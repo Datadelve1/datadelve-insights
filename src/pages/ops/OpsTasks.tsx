@@ -14,6 +14,7 @@ import { Plus, Trash2, Mail, Link2, Wrench, GraduationCap, Coffee, Send } from "
 import TaskEmailDialog from "@/components/ops/TaskEmailDialog";
 import { isSendableTask } from "@/lib/opsTaskEmails";
 import { completeOpsTask } from "@/lib/opsTaskComplete";
+import { sortOpsTasks } from "@/lib/opsTaskOrder";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -45,7 +46,7 @@ export default function OpsTasks() {
 
   const load = async () => {
     const { data } = await supabase.from("ops_tasks").select("*").order("due_date", { ascending: true, nullsFirst: false });
-    setTasks(data || []);
+    setTasks(sortOpsTasks(data || []));
   };
   const loadStaff = async () => {
     const { data } = await supabase.from("staff_profiles").select("user_id, full_name, email");

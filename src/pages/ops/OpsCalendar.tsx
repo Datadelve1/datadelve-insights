@@ -1,3 +1,4 @@
+import { sortOpsTasks } from "@/lib/opsTaskOrder";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +35,7 @@ export default function OpsCalendar() {
       const end = endOfMonth(addMonths(cursor, 1)).toISOString();
       const [events, tasks, emails, cohorts] = await Promise.all([
         supabase.from("ops_events").select("id,title,starts_at,kind"),
-        supabase.from("ops_tasks").select("id,title,due_date").not("due_date", "is", null),
+        supabase.from("ops_tasks").select("id,title,due_date,task_type").not("due_date", "is", null),
         supabase.from("ops_emails").select("id,subject,scheduled_at,status").not("scheduled_at", "is", null),
         supabase.from("ops_cohorts").select("id,number,onboarding_date,graduation_date,beginner_dates,professional_dates"),
       ]);
@@ -43,7 +44,7 @@ export default function OpsCalendar() {
       (events.data || []).forEach((e: any) =>
         all.push({ id: `e-${e.id}`, date: new Date(e.starts_at), title: e.title, kind: e.kind, color: "bg-blue-500/70" })
       );
-      (tasks.data || []).forEach((t: any) =>
+      sortOpsTasks((tasks.data || []) as any[]).forEach((t: any) =>
         all.push({ id: `t-${t.id}`, date: new Date(t.due_date), title: `Task: ${t.title}`, kind: "task", color: "bg-amber-500/70" })
       );
       (emails.data || []).forEach((e: any) =>
