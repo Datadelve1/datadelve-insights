@@ -115,6 +115,12 @@ export default function OpsDashboard() {
     return true;
   });
 
+  // Running and upcoming cohorts first, soonest at the top.
+  const currentCohorts = [...data.cohorts]
+    .filter((c: any) => !c.graduation_date || !isBefore(day(c.graduation_date), today))
+    .sort((a: any, b: any) => a.number - b.number)
+    .slice(0, 6);
+
   const markDone = async (t: any) => {
     setMarking(t.id);
     const res = await completeOpsTask(t, { id: user.id, name: actorName, isAdmin });
@@ -240,7 +246,9 @@ export default function OpsDashboard() {
         </CardHeader>
         <CardContent className="space-y-5">
           {statusTasks.length === 0 && (
-            <p className="text-sm text-muted-foreground py-6 text-center">Nothing to show here.</p>
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              {statusFilter === "done" ? "Nothing marked done in the last 14 days yet." : statusFilter === "overdue" ? "Nothing overdue. All caught up." : "No tasks in these four weeks."}
+            </p>
           )}
           {groupByDay(statusTasks).map((g) => (
             <DayGroup key={g.date} date={g.date}>
@@ -277,7 +285,7 @@ export default function OpsDashboard() {
               <CardTitle className="text-lg font-display flex items-center gap-2"><Users className="w-5 h-5" /> Cohorts</CardTitle>
             </CardHeader>
             <CardContent className="space-y-1">
-              {data.cohorts.slice(0, 6).map((c: any) => (
+              {currentCohorts.map((c: any) => (
                 <Link
                   key={c.id}
                   to={`/staff/ops/cohorts/${c.id}`}

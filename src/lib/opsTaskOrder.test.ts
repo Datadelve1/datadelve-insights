@@ -22,4 +22,14 @@ describe("ops task order", () => {
     ]);
     expect(sorted.map((x) => x.id)).toEqual(["link", "other", "rec"]);
   });
+
+  it("keeps each cohort's recording email directly under its own class link when cohorts share a Saturday", () => {
+    const sorted = sortOpsTasks([
+      t("c5rec", "Cohort 5 — Beginner Recording & Assignment Uploaded (Week 2 - Saturday)", "email", "2026-11-21"),
+      t("c4rec", "Cohort 4 — Beginner Recording & Assignment Uploaded (Week 1 - Saturday)", "email", "2026-11-21"),
+      t("c5link", "Cohort 5 — Beginner Class Link (Week 2 - Saturday)", "class_link", "2026-11-21"),
+      t("c4link", "Cohort 4 — Beginner Class Link (Week 1 - Saturday)", "class_link", "2026-11-21"),
+    ]);
+    expect(sorted.map((x) => x.id)).toEqual(["c4link", "c4rec", "c5link", "c5rec"]);
+  });
 });
